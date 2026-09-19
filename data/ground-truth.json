@@ -278,8 +278,8 @@
   "testnetDeployment": {
     "network": "Arc Testnet (5042002)",
     "explorer": "https://explorer.testnet.arc.io",
-    "orderBook": "0x55EC8907f937fEA942c5f98039a218708E965280",
-    "swapAdapter": "0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f",
+    "orderBook": "0x80C8B0b55827F0456564554E3A82F9B20ad6019F",
+    "swapAdapter": "0x80FBe4f593fc33A102CC41e3aF158ED4Fb71864C",
     "keeper": "0x364EDC06254874e62FF4AD8fA4d9a45238cb5609",
     "demoPool": {
       "poolId": "0x96bde8368b72f805a1cdcfc365fdf8e238c3fdb7d54db95b93e640ccc76d9c00",
@@ -291,30 +291,28 @@
       "note": "Has a hook with BEFORE_SWAP + AFTER_SWAP and both delta flags, so the fill exercises the transient-delta settlement path."
     },
     "transactions": {
-      "realSwapThroughHookPool": "0x718a6a366f41e82c6e1e531b9f1622ee3b8daa60ae08f863b720a517586b776f",
-      "createOrder1": "0x6cf50c7a8b3026301f51e1540a57d106ec6aec9c65b11bcef413a6818309ca26",
-      "armOrder1_rejected": "0x6c6f3582c37dfbe82cf30a9306a8846c8b78bd8f54403b732ebeee4f67de6052",
-      "armOrder2": "0x2a2928de338fd6a0aefa126987889174501bff75d5e313f32d0178e2fbf90bab",
-      "fillOrder2": "0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d"
+      "armOrder1": "0x3936113c7039323147131e9822fadf00ff0b0dc78a98582ed523e504e32fe752",
+      "fillOrder1": "0x2d8138e62b973c96b69bc6fe995b6edb4f423049c214554afdf9d2aced81f423",
+      "armOrder2_refused": "0x55801b9c1bd99299fc23715afaa76fd34a3a00baf8a5d2961164712200a66de3"
     },
     "theRejection": {
-      "_why": "More persuasive than the successful fill: it is the invariant refusing to act, which is the thing the design claims.",
-      "amountOut": "0.396122 USDC",
-      "feeAt50bps": "0.001980 USDC",
-      "gasCost": "0.01282902 USDC",
-      "profit": "-0.01084902 USDC",
-      "outcome": "keeper refused; caught in simulation before spending gas"
+      "amountOut": "0.023764 USDC",
+      "feeAt50bps": "0.000118 USDC",
+      "gasCost": "0.013109 USDC",
+      "profit": "-0.012991 USDC",
+      "_note": "Order 2 is deliberately left OPEN and armed. The keeper re-simulates it every cycle and refuses it every time, so the app has a live example of the invariant holding rather than a screenshot of one."
     },
     "theFill": {
-      "amountOut": "10.297301 USDC",
-      "feeAt50bps": "0.051486 USDC",
-      "gasUsed": 351348,
-      "effectiveGasPrice": "25 Gwei",
-      "gasCost": "0.00878370 USDC",
-      "keeperProfit": "0.04270230 USDC",
-      "margin": "5.9x",
-      "block": 62936970
-    }
+      "amountOut": "4.762711 USDC",
+      "feeAt50bps": "0.023813 USDC",
+      "gasUsed": 372711,
+      "gasCost": "0.009318 USDC",
+      "keeperProfit": "0.014495 USDC",
+      "margin": "2.6x",
+      "block": 62958859
+    },
+    "_note": "Redeployed 2026-09-19 after adding checkOrders, on-chain caps, and PoolKey-in-order. The earlier deployment (0x55EC8907...) predates all three and its checkOrders reverts.",
+    "supersededOrderBook": "0x55EC8907f937fEA942c5f98039a218708E965280"
   },
   "liquidityIsNotStable": {
     "_status": "RESOLVED 2026-09-19 - liquidity IS stable. The earlier alarm was bad state reads.",

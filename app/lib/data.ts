@@ -7,37 +7,37 @@
 export const DEPLOY = {
   chainId: 5042002,
   mainnetChainId: 5042,
-  orderBook: "0x55EC8907f937fEA942c5f98039a218708E965280",
-  swapAdapter: "0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f",
+  orderBook: "0x80C8B0b55827F0456564554E3A82F9B20ad6019F",
+  swapAdapter: "0x80FBe4f593fc33A102CC41e3aF158ED4Fb71864C",
   keeper: "0x364EDC06254874e62FF4AD8fA4d9a45238cb5609",
 } as const;
 
 export const TX = {
-  fill: "0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d",
-  arm: "0x2a2928de338fd6a0aefa126987889174501bff75d5e313f32d0178e2fbf90bab",
-  armRefused: "0x6c6f3582c37dfbe82cf30a9306a8846c8b78bd8f54403b732ebeee4f67de6052",
+  fill: "0x2d8138e62b973c96b69bc6fe995b6edb4f423049c214554afdf9d2aced81f423",
+  arm: "0x3936113c7039323147131e9822fadf00ff0b0dc78a98582ed523e504e32fe752",
+  armRefused: "0x55801b9c1bd99299fc23715afaa76fd34a3a00baf8a5d2961164712200a66de3",
   swapThroughHookPool: "0x718a6a366f41e82c6e1e531b9f1622ee3b8daa60ae08f863b720a517586b776f",
 } as const;
 
 /** The fill that cleared. Block 62,936,970 on Arc testnet. */
 export const FILL = {
-  block: 62936970,
-  proceeds: "10.297301",
+  block: 62958859,
+  proceeds: "4.762711",
   feeBps: 50,
-  fee: "0.051486",
-  gasUsed: "351,348",
+  fee: "0.023813",
+  gasUsed: "372,711",
   gasPriceGwei: "25",
-  gasCost: "0.008784",
-  margin: "+0.042702",
-  marginX: "5.9×",
+  gasCost: "0.009318",
+  margin: "+0.014495",
+  marginX: "2.6x",
 } as const;
 
 /** The order that was refused. This is the more persuasive of the two. */
 export const REFUSAL = {
-  proceeds: "0.396122",
-  fee: "0.001980",
-  gasCost: "0.012829",
-  result: "−0.010849",
+  proceeds: "0.023764",
+  fee: "0.000118",
+  gasCost: "0.013109",
+  result: "-0.012991",
 } as const;
 
 export const ARITHMETIC = [
@@ -53,7 +53,7 @@ export const GAS_ROWS = [
   { call: "Uniswap V4 swap (no hook)", gas: "157,274", usdc: "0.003343" },
   { call: "Uniswap V4 swap (hook pool)", gas: "263,994", usdc: "0.005610" },
   { call: "Order fill, mainnet fork", gas: "357,845", usdc: "0.007604" },
-  { call: "Order fill, testnet", gas: "351,348", usdc: "0.008784" },
+  { call: "Order fill, testnet", gas: "372,711", usdc: "0.009318" },
 ] as const;
 
 export const RISKS = [
