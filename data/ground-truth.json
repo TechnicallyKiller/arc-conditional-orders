@@ -142,7 +142,6 @@
     "Is Morpho deployed on Arc testnet? If not, deploy one for Phase 6",
     "Measured gas per operation from a real deployment - no public figure is trustworthy",
     "cirBTC redemption path with Circle - is there a non-DEX exit for seized collateral?",
-    "Does single-block sqrtPriceX96 resist manipulation, or is a TWAP observation window needed before mainnet?",
     "Settlement gas overhead constant (currently 30000) must be measured on a real deployment"
   ],
   "toolchain": {
@@ -188,7 +187,8 @@
     "1 - harness (arc-foundry, --network arc pinned)",
     "2 - CostFloor (negative tests pass)",
     "3 - OrderBook + on-chain trigger (fires at trigger, refuses above it)",
-    "4 - route adapters (OrderBook tests pass unchanged against a real Uniswap V4 swap)"
+    "4 - route adapters (OrderBook tests pass unchanged against a real Uniswap V4 swap)",
+    "4b - trigger hardening (arm/dwell defeats single-block manipulation)"
   ],
   "testPool": {
     "poolId": "0xacea282c439a359cb659855961bdc2e01c6b62dbef811f1c7ac6c79c4fd5583a",
@@ -238,6 +238,18 @@
       },
       "conclusion": "Stop-loss demand is REAL BUT MODEST: ~1 in 6 actively-traded tokens draws down >=20% in a day, ~1 in 20 draws down >=50%. The median pool never draws down at all. Crucially 90% of pools are UP over 24h - this is an accumulation market, so the more wanted order type is TAKE-PROFIT (sell into strength), not crash protection. OrderBook already supports both via triggerBelow; only the positioning changes.",
       "method": "tools/history.py"
+    }
+  },
+  "security": {
+    "singleBlockManipulation": {
+      "threat": "An attacker swaps to push a pool's price through a trigger, fills the order at the wick, and reverts the pool - all inside one transaction. The victim is dumped at a price that never really existed.",
+      "whyPriceBandsFail": "The realised fill genuinely IS near the trigger; that is the attack, not a deviation from it. A band on execution price does not catch it.",
+      "whyNoTwap": "Uniswap V4 removed V3's built-in oracle. There is no TWAP to read on an arbitrary pool without a hook providing one.",
+      "mitigation": "Two-phase arm/execute with a dwell window. armOrder records that the trigger held at block N; execute requires block >= N + minDwellBlocks and re-checks the trigger. Both observations must land in DIFFERENT blocks, so a spike-and-revert inside one transaction can never satisfy both.",
+      "cost": "An attacker must now HOLD the manipulated price across blocks and wear the arbitrage for the whole window.",
+      "staleness": "maxArmAgeBlocks prevents replaying an old observation when price later revisits the trigger.",
+      "defaults": "minDwellBlocks=2 (~1.0s at 0.507s blocks), maxArmAgeBlocks=300 (~2.5 min)",
+      "residualRisk": "A well-capitalised attacker can still hold a price across a short dwell on a very thin pool. The dwell window is a cost multiplier, not a proof. Sizing it against real pool depth is outstanding work before mainnet."
     }
   }
 }

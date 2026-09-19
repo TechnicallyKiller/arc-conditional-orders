@@ -31,6 +31,9 @@ contract OrderBook is CostFloor {
         bool triggerBelow;    // true = fire at or below the tick (stop-loss)
         uint64 expiry;
         Status status;
+        // Arming state. A trigger must hold across blocks before it can fill - see armOrder.
+        uint64 armedAtBlock;
+        int24 armedTick;
     }
 
     IPoolManager public immutable poolManager;
@@ -42,6 +45,13 @@ contract OrderBook is CostFloor {
     address public feeRecipient;
     uint16 public feeBps;
     uint256 public marginNative;
+    /// @dev Blocks a trigger must remain true before a fill is allowed. At 0.507s blocks this
+    ///      is sub-second, but it forces an attacker to HOLD a manipulated price across blocks
+    ///      and wear the arbitrage, instead of spiking and reverting inside one transaction.
+    uint64 public minDwellBlocks;
+    /// @dev An arm older than this is stale and must be redone, so a long-ago observation
+    ///      cannot be replayed when price happens to revisit the trigger.
+    uint64 public maxArmAgeBlocks;
     mapping(address => bool) public routerAllowed;
 
     uint256 public nextOrderId = 1;
@@ -52,6 +62,7 @@ contract OrderBook is CostFloor {
     event OrderCreated(uint256 indexed id, address indexed owner, address tokenIn, uint128 amountIn, int24 triggerTick, bool triggerBelow);
     event OrderCancelled(uint256 indexed id);
     event OrderFilled(uint256 indexed id, address indexed keeper, uint256 amountOut, uint256 fee, uint256 gasCostNative);
+    event OrderArmed(uint256 indexed id, int24 tick, uint64 atBlock);
 
     error NotOwner();
     error NotOrderOwner();
@@ -63,6 +74,9 @@ contract OrderBook is CostFloor {
     error SwapFailed();
     error Reentrancy();
     error ZeroAmount();
+    error NotArmed();
+    error DwellNotMet(uint64 armedAtBlock, uint64 currentBlock, uint64 required);
+    error ArmStale(uint64 armedAtBlock, uint64 currentBlock);
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
@@ -76,14 +90,22 @@ contract OrderBook is CostFloor {
         _locked = 1;
     }
 
-    constructor(address _poolManager, address _feeRecipient, uint16 _feeBps, uint256 _marginNative, uint256 _settlementGasOverhead)
-        CostFloor(_settlementGasOverhead)
-    {
+    constructor(
+        address _poolManager,
+        address _feeRecipient,
+        uint16 _feeBps,
+        uint256 _marginNative,
+        uint256 _settlementGasOverhead,
+        uint64 _minDwellBlocks,
+        uint64 _maxArmAgeBlocks
+    ) CostFloor(_settlementGasOverhead) {
         poolManager = IPoolManager(_poolManager);
         owner = msg.sender;
         feeRecipient = _feeRecipient;
         feeBps = _feeBps;
         marginNative = _marginNative;
+        minDwellBlocks = _minDwellBlocks;
+        maxArmAgeBlocks = _maxArmAgeBlocks;
     }
 
     /// @dev On Arc an ERC-20 USDC transfer moves NATIVE value, so any contract that can hold
@@ -114,7 +136,9 @@ contract OrderBook is CostFloor {
             triggerTick: triggerTick,
             triggerBelow: triggerBelow,
             expiry: expiry,
-            status: Status.Open
+            status: Status.Open,
+            armedAtBlock: 0,
+            armedTick: 0
         });
         emit OrderCreated(id, msg.sender, tokenIn, amountIn, triggerTick, triggerBelow);
     }
@@ -131,6 +155,23 @@ contract OrderBook is CostFloor {
     // Keeper
     // ------------------------------------------------------------------
 
+    /// @notice Record that an order's trigger is currently true. Permissionless, like execute.
+    /// @dev Splitting observation from execution is what defeats single-block price manipulation:
+    ///      a spike-and-revert inside one transaction can never satisfy both this and the
+    ///      re-check in execute(), because they must land in different blocks.
+    function armOrder(uint256 id) external {
+        Order storage o = orders[id];
+        if (o.status != Status.Open) revert OrderNotOpen();
+        if (o.expiry != 0 && block.timestamp > o.expiry) revert OrderExpired();
+
+        int24 tick = poolManager.currentTick(o.poolId);
+        _requireTrigger(o, tick);
+
+        o.armedAtBlock = uint64(block.number);
+        o.armedTick = tick;
+        emit OrderArmed(id, tick, uint64(block.number));
+    }
+
     /// @notice Fill an order. Reverts unless the trigger is genuinely met AND the fee collected
     ///         covers this call's own gas plus margin.
     function execute(uint256 id, address router, bytes calldata routeData)
@@ -145,7 +186,15 @@ contract OrderBook is CostFloor {
         if (o.expiry != 0 && block.timestamp > o.expiry) revert OrderExpired();
         if (!routerAllowed[router]) revert RouterNotAllowed(router);
 
-        _assertTriggerMet(o);
+        // The trigger must have been observed in an EARLIER block and still hold now.
+        uint64 armed = o.armedAtBlock;
+        if (armed == 0) revert NotArmed();
+        if (block.number < armed + minDwellBlocks) {
+            revert DwellNotMet(armed, uint64(block.number), armed + minDwellBlocks);
+        }
+        if (block.number > armed + maxArmAgeBlocks) revert ArmStale(armed, uint64(block.number));
+
+        _requireTrigger(o, poolManager.currentTick(o.poolId));
 
         // Effects before interactions: the order cannot be filled twice even if a router calls back.
         o.status = Status.Filled;
@@ -175,8 +224,7 @@ contract OrderBook is CostFloor {
         emit OrderFilled(id, msg.sender, amountOut, fee, gasCostNative);
     }
 
-    function _assertTriggerMet(Order storage o) internal view {
-        int24 tick = poolManager.currentTick(o.poolId);
+    function _requireTrigger(Order storage o, int24 tick) internal view {
         bool met = o.triggerBelow ? tick <= o.triggerTick : tick >= o.triggerTick;
         if (!met) revert TriggerNotMet(tick, o.triggerTick, o.triggerBelow);
     }
@@ -196,5 +244,10 @@ contract OrderBook is CostFloor {
 
     function setMargin(uint256 _marginNative) external onlyOwner {
         marginNative = _marginNative;
+    }
+
+    function setDwell(uint64 _minDwellBlocks, uint64 _maxArmAgeBlocks) external onlyOwner {
+        minDwellBlocks = _minDwellBlocks;
+        maxArmAgeBlocks = _maxArmAgeBlocks;
     }
 }

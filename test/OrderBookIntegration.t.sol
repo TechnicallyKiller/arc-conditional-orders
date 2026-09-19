@@ -39,7 +39,7 @@ contract OrderBookIntegrationTest is Test {
         vm.txGasPrice(21.25 gwei);
 
         adapter = new V4SwapAdapter(GT.UNIV4_POOL_MANAGER);
-        book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000);
+        book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000, 2, 300);
         book.setRouter(address(adapter), true);
 
         // Acquire real tokens for the trader by actually buying them on the pool.
@@ -60,6 +60,11 @@ contract OrderBookIntegrationTest is Test {
         return abi.encodeCall(V4SwapAdapter.swapExactIn, (_key(), false, amountIn, address(book)));
     }
 
+    function _armAndWait(uint256 id) internal {
+        book.armOrder(id);
+        vm.roll(block.number + 2);
+    }
+
     function _create(int24 trigger, bool below, uint128 minOut) internal returns (uint256 id) {
         vm.prank(trader);
         id = book.createOrder(TOKEN, traderTokens, minOut, POOL, trigger, below, 0);
@@ -68,6 +73,7 @@ contract OrderBookIntegrationTest is Test {
     /// Same assertion as the mocked suite, against a real swap.
     function test_stopLossFillsThroughRealPool() public {
         uint256 id = _create(liveTick + 1000, true, 0); // trigger already met
+        _armAndWait(id);
 
         uint256 traderUsdcBefore = IERC20(GT.USDC).balanceOf(trader);
 
@@ -96,12 +102,13 @@ contract OrderBookIntegrationTest is Test {
             abi.encodeWithSelector(OrderBook.TriggerNotMet.selector, liveTick, trigger, true)
         );
         vm.prank(keeper);
-        book.execute(id, address(adapter), _route(traderTokens));
+        book.armOrder(id);
     }
 
     /// The trader's own slippage bound must still bind against a real pool.
     function test_slippageBoundBindsThroughRealPool() public {
         uint256 id = _create(liveTick + 1000, true, type(uint128).max);
+        _armAndWait(id);
         vm.prank(keeper);
         vm.expectPartialRevert(OrderBook.SlippageExceeded.selector);
         book.execute(id, address(adapter), _route(traderTokens));

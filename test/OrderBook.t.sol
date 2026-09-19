@@ -26,18 +26,19 @@ contract OrderBookTest is Test {
 
     int24 liveTick;
     uint128 constant AMOUNT_IN = 1_000e18;
-    uint256 constant PAYOUT = 1_000e6; // 1,000 USDC out, 6dp ERC-20 view
+    uint256 constant PAYOUT = 1_000e6;
+    uint64 constant DWELL = 2;
+    uint64 constant MAX_ARM_AGE = 300;
 
     function setUp() public {
         vm.createSelectFork(vm.rpcUrl("arc"));
-
         // Without this tx.gasprice is 0, the cost floor is trivially satisfied, and every
         // negative test would pass for the wrong reason.
         vm.txGasPrice(21.25 gwei);
 
         tokenIn = new MockERC20();
         router = new MockRouter(GT.USDC);
-        book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000); // 0.5% fee
+        book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000, DWELL, MAX_ARM_AGE);
         book.setRouter(address(router), true);
 
         liveTick = IPoolManager(GT.UNIV4_POOL_MANAGER).currentTick(LIVE_POOL);
@@ -46,7 +47,7 @@ contract OrderBookTest is Test {
         vm.prank(trader);
         tokenIn.approve(address(book), type(uint256).max);
 
-        vm.deal(address(router), PAYOUT * 1e12 * 10); // fund router with real USDC (native 18dp)
+        vm.deal(address(router), PAYOUT * 1e12 * 10);
         router.setPayout(PAYOUT);
     }
 
@@ -55,42 +56,94 @@ contract OrderBookTest is Test {
         id = book.createOrder(address(tokenIn), AMOUNT_IN, minOut, LIVE_POOL, triggerTick, below, 0);
     }
 
+    /// Arm the trigger, then advance past the dwell window, as a keeper would across blocks.
+    function _armAndWait(uint256 id) internal {
+        book.armOrder(id);
+        vm.roll(block.number + DWELL);
+    }
+
     function _route() internal view returns (bytes memory) {
         return abi.encodeCall(MockRouter.swap, (address(tokenIn), AMOUNT_IN));
     }
 
     // =================================================================
-    // NEGATIVE TESTS FIRST
+    // Single-block manipulation defence - the reason arming exists
     // =================================================================
 
-    /// THE Phase 3 gate. A stop-loss must refuse to fill while price is above its trigger.
-    function test_refusesWhenPriceHasNotFallenToTrigger() public {
-        // Stop-loss 1000 ticks BELOW the live price: not triggered.
-        int24 trigger = liveTick - 1000;
-        uint256 id = _create(trigger, true, 0);
+    /// THE anti-manipulation assertion. An attacker who spikes the pool through a trigger and
+    /// reverts it inside one transaction can never fill, because arming and executing must land
+    /// in different blocks. Everything else here is ordinary order-book hygiene; this is the
+    /// property that makes the dwell window worth its gas.
+    function test_cannotArmAndFillInSameBlock() public {
+        uint256 id = _create(liveTick + 1000, true, 0);
+        book.armOrder(id);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(OrderBook.TriggerNotMet.selector, liveTick, trigger, true)
-        );
+        vm.expectPartialRevert(OrderBook.DwellNotMet.selector);
         vm.prank(keeper);
         book.execute(id, address(router), _route());
     }
 
-    /// The mirror case: a take-profit must refuse while price is below its trigger.
-    function test_refusesTakeProfitBelowTrigger() public {
+    function test_cannotFillWithoutArming() public {
+        uint256 id = _create(liveTick + 1000, true, 0);
+        vm.expectRevert(OrderBook.NotArmed.selector);
+        vm.prank(keeper);
+        book.execute(id, address(router), _route());
+    }
+
+    /// An observation from long ago must not be replayable when price revisits the trigger.
+    function test_staleArmIsRejected() public {
+        uint256 id = _create(liveTick + 1000, true, 0);
+        book.armOrder(id);
+        vm.roll(block.number + MAX_ARM_AGE + 1);
+
+        vm.expectPartialRevert(OrderBook.ArmStale.selector);
+        vm.prank(keeper);
+        book.execute(id, address(router), _route());
+    }
+
+    /// Arming is permissionless, like execution: safety must not depend on who observes.
+    function test_anyoneCanArm() public {
+        uint256 id = _create(liveTick + 1000, true, 0);
+        vm.prank(address(0xD00D));
+        book.armOrder(id);
+        vm.roll(block.number + DWELL);
+        vm.prank(keeper);
+        (uint256 amountOut,) = book.execute(id, address(router), _route());
+        assertEq(amountOut, PAYOUT);
+    }
+
+    // =================================================================
+    // Trigger correctness - now enforced at arm time AND at fill time
+    // =================================================================
+
+    function test_cannotArmWhenPriceHasNotFallenToTrigger() public {
+        int24 trigger = liveTick - 1000;
+        uint256 id = _create(trigger, true, 0);
+        vm.expectRevert(
+            abi.encodeWithSelector(OrderBook.TriggerNotMet.selector, liveTick, trigger, true)
+        );
+        vm.prank(keeper);
+        book.armOrder(id);
+    }
+
+    function test_cannotArmTakeProfitBelowTrigger() public {
         int24 trigger = liveTick + 1000;
         uint256 id = _create(trigger, false, 0);
         vm.expectRevert(
             abi.encodeWithSelector(OrderBook.TriggerNotMet.selector, liveTick, trigger, false)
         );
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.armOrder(id);
     }
 
-    /// A fill whose fee cannot cover its own gas must revert, even though the trigger is met.
+    // =================================================================
+    // Other negative paths
+    // =================================================================
+
     function test_refusesWhenFeeDoesNotCoverGas() public {
-        book.setFee(0, feeRecipient); // zero fee -> zero value produced
+        book.setFee(0, feeRecipient);
         uint256 id = _create(liveTick + 1000, true, 0);
+        _armAndWait(id);
         vm.expectPartialRevert(CostFloor.CostFloorBreached.selector);
         vm.prank(keeper);
         book.execute(id, address(router), _route());
@@ -98,6 +151,7 @@ contract OrderBookTest is Test {
 
     function test_refusesWhenSlippageExceeded() public {
         uint256 id = _create(liveTick + 1000, true, uint128(PAYOUT + 1));
+        _armAndWait(id);
         vm.expectRevert(
             abi.encodeWithSelector(OrderBook.SlippageExceeded.selector, PAYOUT, PAYOUT + 1)
         );
@@ -108,6 +162,7 @@ contract OrderBookTest is Test {
     function test_refusesUnapprovedRouter() public {
         MockRouter rogue = new MockRouter(GT.USDC);
         uint256 id = _create(liveTick + 1000, true, 0);
+        _armAndWait(id);
         vm.expectRevert(abi.encodeWithSelector(OrderBook.RouterNotAllowed.selector, address(rogue)));
         vm.prank(keeper);
         book.execute(id, address(rogue), _route());
@@ -115,6 +170,7 @@ contract OrderBookTest is Test {
 
     function test_cannotFillTwice() public {
         uint256 id = _create(liveTick + 1000, true, 0);
+        _armAndWait(id);
         vm.prank(keeper);
         book.execute(id, address(router), _route());
 
@@ -125,6 +181,7 @@ contract OrderBookTest is Test {
 
     function test_cancelledOrderCannotFill() public {
         uint256 id = _create(liveTick + 1000, true, 0);
+        _armAndWait(id);
         vm.prank(trader);
         book.cancelOrder(id);
         vm.expectRevert(OrderBook.OrderNotOpen.selector);
@@ -142,9 +199,11 @@ contract OrderBookTest is Test {
     function test_expiredOrderCannotFill() public {
         vm.prank(trader);
         uint256 id = book.createOrder(
-            address(tokenIn), AMOUNT_IN, 0, LIVE_POOL, liveTick + 1000, true, uint64(block.timestamp + 1)
+            address(tokenIn), AMOUNT_IN, 0, LIVE_POOL, liveTick + 1000, true, uint64(block.timestamp + 100)
         );
-        vm.warp(block.timestamp + 2);
+        book.armOrder(id);
+        vm.roll(block.number + DWELL);
+        vm.warp(block.timestamp + 200);
         vm.expectRevert(OrderBook.OrderExpired.selector);
         vm.prank(keeper);
         book.execute(id, address(router), _route());
@@ -154,10 +213,9 @@ contract OrderBookTest is Test {
     // Positive path
     // =================================================================
 
-    /// The other half of the gate: it fires when the price HAS reached the trigger.
     function test_fillsWhenPriceReachesTrigger() public {
-        int24 trigger = liveTick + 1000; // live price is already at/below this
-        uint256 id = _create(trigger, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 0);
+        _armAndWait(id);
 
         uint256 traderBefore = IERC20(GT.USDC).balanceOf(trader);
 
@@ -169,17 +227,15 @@ contract OrderBookTest is Test {
         assertEq(IERC20(GT.USDC).balanceOf(trader) - traderBefore, PAYOUT - fee, "trader underpaid");
         assertEq(IERC20(GT.USDC).balanceOf(feeRecipient), fee, "fee not collected");
         assertEq(tokenIn.balanceOf(trader), 0, "tokenIn not taken");
-        console.log("fee (USDC 6dp):", fee);
     }
 
-    /// The decimal boundary, in the place it actually bites. The fee is a 6dp ERC-20 amount and
-    /// the gas cost is native 18dp; comparing them unscaled is wrong by 1e12. Unscaled, this
-    /// fee would look ~1000x SMALLER than the gas cost and the fill would wrongly revert.
+    /// The decimal boundary, in the place it actually bites. Fee is a 6dp ERC-20 amount and gas
+    /// cost is native 18dp; comparing them unscaled is wrong by 1e12, and unscaled this fee
+    /// would look ~1000x SMALLER than the gas cost, so the fill would wrongly revert.
     function test_feeMustBeScaledBeforeCostFloor() public pure {
-        uint256 fee = (PAYOUT * 50) / 10_000; // 5 USDC, 6dp
+        uint256 fee = (PAYOUT * 50) / 10_000;
         uint256 feeNative = fee * GT.NATIVE_PER_ERC20;
         uint256 typicalGasCost = 300_000 * 21.25 gwei;
-
         assertLt(fee, typicalGasCost, "unscaled fee looks smaller than gas - the trap");
         assertGt(feeNative, typicalGasCost, "scaled fee must clear gas cost");
     }
