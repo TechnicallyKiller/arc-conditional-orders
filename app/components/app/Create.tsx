@@ -18,7 +18,7 @@ const field: React.CSSProperties = {
 };
 const panel: React.CSSProperties = {
   padding: 18, border: "1px solid rgba(242,237,226,.08)", borderRadius: 16,
-  background: "rgba(31,28,22,.5)",
+  background: "var(--paper-2)",
 };
 
 const createOrderAbi = parseAbi([
@@ -151,12 +151,6 @@ export function Create({ currentTick }: { currentTick: number | null }) {
               : "Approve and create order"}
           </button>
 
-          {w.kind === "passkey" && (
-            <p style={{ margin: 0, fontSize: 12, lineHeight: "17px", color: "var(--ink-3)" }}>
-              Gas is sponsored on this wallet, so you need no USDC. Both calls are batched into one
-              signature.
-            </p>
-          )}
           {result && (
             <div style={{ padding: 14, borderRadius: 2, background: "var(--sunk)", borderLeft: "2px solid var(--pine)" }}>
               <div className="label" style={{ color: "var(--pine)" }}>Order created</div>

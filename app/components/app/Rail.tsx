@@ -1,36 +1,56 @@
 import { Chip } from "./Chip";
 import { DEPLOY } from "../../lib/data";
 import { addrUrl, short } from "../../lib/chain";
+import { secondsFromBlocks, type KeeperStatus } from "../../lib/keeper";
 
 const sect: React.CSSProperties = {
   padding: 18, border: "1px solid rgba(242,237,226,.08)", borderRadius: 16,
-  background: "rgba(31,28,22,.5)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+  background: "var(--paper-2)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
 };
 const h3: React.CSSProperties = { margin: 0, fontSize: 15, lineHeight: "21px", fontWeight: 600 };
 const note: React.CSSProperties = { margin: "10px 0 0", fontSize: 12, lineHeight: "17px", color: "var(--ink-3)" };
 const kv: React.CSSProperties = { display: "flex", justifyContent: "space-between", gap: 12, marginTop: 10, fontSize: 13, color: "var(--ink-2)" };
 
 export function Rail({
-  keeperAlive, head, caps,
+  keeper, head, caps,
 }: {
-  keeperAlive: boolean | null;
+  keeper: KeeperStatus | null;
   head: bigint | null;
   caps: { order: string; total: string; filled: string } | null;
 }) {
+  const tone = !keeper ? "muted" : !keeper.reachable ? "refused" : keeper.alive ? "filled" : "unreadable";
+  const word = !keeper ? "Checking" : !keeper.reachable ? "RPC down" : keeper.alive ? "Live" : "Not running";
   return (
     <aside style={{ flex: "1 1 280px", minWidth: 0, maxWidth: 360, display: "flex", flexDirection: "column", gap: 16 }}>
       <section style={sect}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
           <h3 style={h3}>Keeper</h3>
-          <Chip tone={keeperAlive === null ? "muted" : keeperAlive ? "filled" : "unreadable"}>
-            {keeperAlive === null ? "Unknown" : keeperAlive ? "Live" : "Not running"}
-          </Chip>
+          <Chip tone={tone}>{word}</Chip>
         </div>
         <div style={kv}><span>Chain head</span><span className="num">{head ? head.toLocaleString() : "—"}</span></div>
+        <div style={kv}>
+          <span>Keeper last acted</span>
+          <span className="num">{keeper?.lastSeen ? keeper.lastSeen.toLocaleString() : "never"}</span>
+        </div>
+        {keeper?.ageBlocks !== null && keeper?.ageBlocks !== undefined && (
+          <div style={kv}>
+            <span>Age</span>
+            <span className="num" style={{ color: keeper.alive ? "var(--pine)" : "var(--ochre)" }}>
+              {secondsFromBlocks(keeper.ageBlocks).toFixed(0)}s ago
+            </span>
+          </div>
+        )}
         <p style={note}>
-          Fills depend on a keeper running. The contract is permissionless — anyone may run one,
-          and nobody can steal with one — but if none does, orders sit and do not fire.
+          Read from OrderArmed and OrderFilled events, not from order state — an order sits armed
+          precisely because a keeper armed it and then stopped, so order state would report a dead
+          keeper as live.
         </p>
+        {keeper && !keeper.alive && keeper.reachable && (
+          <p style={{ ...note, color: "var(--ochre)" }}>
+            No keeper has acted recently. Orders will not arm or fill. Treat any protection here as
+            suspended — anyone can run a keeper, and until someone does these orders are inert.
+          </p>
+        )}
       </section>
 
       <section style={sect}>

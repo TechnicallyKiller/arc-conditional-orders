@@ -4,7 +4,7 @@ import { addrUrl, short, txUrl } from "../../lib/chain";
 
 const panel: React.CSSProperties = {
   flex: "1 1 320px", minWidth: 0, padding: 20,
-  border: "1px solid rgba(242,237,226,.08)", borderRadius: 16, background: "rgba(31,28,22,.5)",
+  border: "1px solid rgba(242,237,226,.08)", borderRadius: 16, background: "var(--paper-2)",
 };
 
 export function Proof() {

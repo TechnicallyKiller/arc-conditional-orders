@@ -10,6 +10,7 @@ import { Proof } from "../components/app/Proof";
 import { Connect } from "../components/app/Connect";
 import { WalletProvider } from "../lib/wallet";
 import { DEPLOY } from "../lib/data";
+import { readKeeper, type KeeperStatus } from "../lib/keeper";
 import { TESTNET_MARKET } from "../lib/markets";
 import {
   client, fmt, loadOrders, orderBookAbi, TriggerState, type OrderView,
@@ -29,6 +30,7 @@ function AppInner() {
   const [head, setHead] = useState<bigint | null>(null);
   const [caps, setCaps] = useState<{ order: string; total: string; filled: string } | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [keeper, setKeeper] = useState<KeeperStatus | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -43,6 +45,7 @@ function AppInner() {
         ]);
         if (!alive) return;
         setHead(h);
+        readKeeper(DEPLOY.orderBook as `0x${string}`).then((k) => { if (alive) setKeeper(k); });
         setOrders(os);
         // Zero means unlimited in the contract; say so rather than printing "0.000000".
         const cap = (v: bigint) => (v === 0n ? "uncapped" : fmt(Number(v) / 1e6));
@@ -62,7 +65,7 @@ function AppInner() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
-      <Atmosphere />
+      <Atmosphere argus={false} />
 
       <header style={{ position: "sticky", top: 0, zIndex: 20, display: "flex", justifyContent: "center", padding: 16, pointerEvents: "none" }}>
         <div
@@ -164,7 +167,7 @@ function AppInner() {
               </div>
 
               <Rail
-                keeperAlive={orders === null ? null : open.some((o) => o.state === TriggerState.Arming || o.state === TriggerState.Ready) ? true : false}
+                keeper={keeper}
                 head={head}
                 caps={caps}
               />
