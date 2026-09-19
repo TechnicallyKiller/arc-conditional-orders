@@ -1,0 +1,149 @@
+{
+  "_note": "Every value here was confirmed by direct on-chain read or primary Circle documentation on 2026-09-19. The chain overrides the docs wherever they disagree. Nothing may appear as a constant in the codebase unless it is in this file.",
+  "verifiedAt": "2026-09-19",
+  "network": {
+    "mainnet": {
+      "chainId": 5042,
+      "chainIdHex": "0x13b2",
+      "rpc": "https://rpc.mainnet.arc.io",
+      "explorer": "https://explorer.arc.io",
+      "verifiedBy": "eth_chainId -> 0x13b2",
+      "blockTimeSeconds": 0.507,
+      "blockTimeVerifiedBy": "timestamp delta over 10000 blocks at head 21661101"
+    },
+    "testnet": {
+      "chainId": 5042002,
+      "rpc": "https://rpc.testnet.arc.io",
+      "explorer": "https://explorer.testnet.arc.io",
+      "verifiedBy": "docs.arc.io/arc/references/connect-to-arc",
+      "morphoDeployed": "UNVERIFIED - must check before Phase 6"
+    }
+  },
+  "fees": {
+    "minBaseFeeGwei": 20,
+    "observedGasPriceWei": "21251306746",
+    "note": "Transactions below 20 Gwei maxFeePerGas are silently dropped by the mempool: no receipt, no error, no block inclusion.",
+    "verifiedBy": "eth_gasPrice -> 0x4f2a912fa"
+  },
+  "usdc": {
+    "erc20Address": "0x3600000000000000000000000000000000000000",
+    "erc20Decimals": 6,
+    "nativeDecimals": 18,
+    "scalingFactor": "10^12",
+    "totalSupplyErc20": "624526370.98",
+    "note": "One balance, two interfaces. A contract's USDC is its NATIVE balance. Never mix msg.value/address.balance (18dp) with balanceOf (6dp) without scaling.",
+    "verifiedBy": "eth_getCode non-empty; totalSupply read on-chain",
+    "implementation": "0xC6AD664ac6679F4Ce74e10E91449C93Ec1ae3cA6",
+    "precompile": "0x1800000000000000000000000000000000000000",
+    "transferIsNativeValueMove": true,
+    "contractsMustBePayable": "An ERC-20 USDC transfer moves native value. Any contract receiving USDC needs a payable receive()."
+  },
+  "morpho": {
+    "blue": "0x34CD04070dD72b14E241112F6d83812Df5Af7fCD",
+    "bytecodeSize": 15582,
+    "owner": "0xcAb782bB6a811727b89F09d9b290acbA66223ddD",
+    "feeRecipient": "0x0000000000000000000000000000000000000000",
+    "hasFlashLoan": true,
+    "selectors": {
+      "flashLoan(address,uint256,bytes)": "0xe0232b42",
+      "liquidate((address,address,address,address,uint256),address,uint256,uint256,bytes)": "0xd8eabcb8",
+      "supply((address,address,address,address,uint256),uint256,uint256,address,bytes)": "0xa99aad89",
+      "borrow((address,address,address,address,uint256),uint256,uint256,address,address)": "0x50d8cd4b",
+      "createMarket((address,address,address,address,uint256))": "0x8c1358a2",
+      "idToMarketParams(bytes32)": "0x2c3c9157",
+      "market(bytes32)": "0x5c60e39a",
+      "position(bytes32,address)": "0x93c52062"
+    },
+    "verifiedBy": "selectors grepped from deployed bytecode; owner() and market() called on-chain",
+    "totals": {
+      "marketCount": 11,
+      "borrowedUsd": 10198597,
+      "suppliedUsd": 177712027,
+      "collateralUsd": 16213967
+    }
+  },
+  "targetMarket": {
+    "name": "cirBTC / USDC",
+    "marketId": "0xc2db905f174e5defcce01d321b09f15f78856a36a21b90cc7e1abbc29225815d",
+    "loanToken": "0x3600000000000000000000000000000000000000",
+    "collateralToken": "0x171A4217b86A807A64eB94757Db6849fb4bDbAA0",
+    "oracle": "0x2AA87fF48933Ce6aBA240BEE916Fc2e6Ec1e51Ab",
+    "irm": "0xF02615d094Fc02fC031C35fe705e175aA4653f20",
+    "lltv": "860000000000000000",
+    "lltvPercent": 86,
+    "totalSupplyAssets": "176724113725533",
+    "totalBorrowAssets": "10165832067171",
+    "collateralCirBtc": "197.30",
+    "cirBtcPriceUsd": 81189,
+    "currentLtvPercent": 63.4,
+    "drawdownToLiquidationPercent": 26.2,
+    "verifiedBy": "idToMarketParams + market() read on-chain at block ~21661101"
+  },
+  "swapVenue": {
+    "uniswapV4PoolManager": "0x8366a39cc670b4001a1121b8f6a443a643e40951",
+    "permit2": "0x000000000022d473030f116ddee9f6b43ac78ba3",
+    "usdcInPoolManager": 3795238.53,
+    "cirBtcInPoolManager": 0.424,
+    "cirBtcExitLiquidityUsd": 34424,
+    "exitLiquidityVsCollateralPercent": 0.215,
+    "BLOCKER": "Exit liquidity for cirBTC is 0.215% of the collateral that would need to be sold. Atomic swap-based liquidation of this market is NOT viable at current depth. Re-read weekly.",
+    "verifiedBy": "balanceOf(PoolManager) for each collateral asset; V4 is a singleton so this is total on-DEX depth"
+  },
+  "assets": {
+    "cirBTC": {
+      "address": "0x171A4217b86A807A64eB94757Db6849fb4bDbAA0",
+      "decimals": 8,
+      "totalSupply": 336.81
+    },
+    "WETH": {
+      "address": "0x128cC466B61f542da60c70e3aA11c10e19B84EDB",
+      "decimals": 18,
+      "inPoolManager": 5.71
+    },
+    "EURC": {
+      "address": "0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1",
+      "decimals": 6
+    },
+    "PST": {
+      "address": "0xa6Db07ebF438d91Aa653746fc05523e435645525",
+      "decimals": 6,
+      "inPoolManager": 0
+    },
+    "sUSDai": {
+      "address": "0x0B2b2B2076d95dda7817e785989fE353fe955ef9",
+      "decimals": 18,
+      "inPoolManager": 0
+    }
+  },
+  "rpcLimits": {
+    "ethGetLogsMaxResults": 2000,
+    "note": "Exceeding this returns error -32602, NOT a truncated result. Code that swallows RPC errors will silently report zero events. This bit us during Phase 0."
+  },
+  "openQuestions": [
+    "Enabled LLTVs and IRMs (isLltvEnabled / isIrmEnabled) - needed before creating a demo market",
+    "Is Morpho deployed on Arc testnet? If not, deploy one for Phase 6",
+    "Measured gas per operation from a real deployment - no public figure is trustworthy",
+    "cirBTC redemption path with Circle - is there a non-DEX exit for seized collateral?"
+  ],
+  "toolchain": {
+    "required": "circlefin/arc-foundry v0.8.0-2",
+    "installPath": "~/.arc-foundry/bin",
+    "sha256": "088bdb96a84418b757f9825d491e702792f1d1d1e29a9145af305a6600a79556",
+    "requiredFlag": "--network arc (pinned in foundry.toml as network = \"arc\")",
+    "why": "USDC ERC-20 at 0x3600... delegates to 0xC6AD664ac6679F4Ce74e10E91449C93Ec1ae3cA6 which calls a precompile at 0x1800000000000000000000000000000000000000. Stock Foundry returns OpcodeNotFound: every test that moves USDC fails. Read-only tests pass under stock Foundry, which is the dangerous case - a green suite that proves nothing.",
+    "verifiedBy": "forge test traces, stock vs arc-foundry, 2026-09-19"
+  },
+  "measuredGas": {
+    "_note": "Measured on an Arc mainnet fork under arc-foundry, not estimated. Public figures disagree; these do not.",
+    "morphoFlashLoan1MUsdc": {
+      "gas": 94592,
+      "gasPriceGwei": 21.25,
+      "costUsdc": 0.0020102,
+      "costCents": 0.201
+    }
+  },
+  "phasesComplete": [
+    "0 - ground truth",
+    "1 - harness (7/7 fork tests pass under arc-foundry)"
+  ]
+}

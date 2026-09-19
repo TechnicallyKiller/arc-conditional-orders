@@ -1,0 +1,13 @@
+/out/
+/cache/
+node_modules/
+/lib/
+.env
+*.tsbuildinfo
+/broadcast/
+
+# vendored third-party skills + local agent config
+.agents/
+.claude/
+skills-lock.json
+pnpm-workspace.yaml
