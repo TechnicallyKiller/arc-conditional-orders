@@ -7,6 +7,8 @@ import { Rail } from "../components/app/Rail";
 import { Markets } from "../components/app/Markets";
 import { Create } from "../components/app/Create";
 import { Proof } from "../components/app/Proof";
+import { Connect } from "../components/app/Connect";
+import { WalletProvider } from "../lib/wallet";
 import { DEPLOY } from "../lib/data";
 import { TESTNET_MARKET } from "../lib/markets";
 import {
@@ -21,7 +23,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "proof", label: "Proof" },
 ];
 
-export default function App() {
+function AppInner() {
   const [tab, setTab] = useState<Tab>("orders");
   const [orders, setOrders] = useState<OrderView[] | null>(null);
   const [head, setHead] = useState<bigint | null>(null);
@@ -103,13 +105,7 @@ export default function App() {
             <span className="label" style={{ padding: "6px 11px", borderRadius: 999, background: "rgba(242,237,226,.10)", color: "var(--ink)" }}>
               Testnet
             </span>
-            <button
-              disabled
-              title="Wallet connection is not wired up yet"
-              style={{ height: 36, padding: "0 18px", border: "none", borderRadius: 999, background: "var(--rule-2)", color: "var(--ink-3)", font: "inherit", fontSize: 13, fontWeight: 600, cursor: "not-allowed" }}
-            >
-              Connect wallet
-            </button>
+            <Connect />
           </div>
         </div>
       </header>
@@ -177,5 +173,13 @@ export default function App() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <WalletProvider>
+      <AppInner />
+    </WalletProvider>
   );
 }

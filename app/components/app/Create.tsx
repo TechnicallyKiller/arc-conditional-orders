@@ -1,6 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { encodeFunctionData, erc20Abi, parseAbi, type Hex } from "viem";
+import { useWallet } from "../../lib/wallet";
+import { DEPLOY } from "../../lib/data";
+import { txUrl } from "../../lib/chain";
 import { Row } from "./Chip";
 import { TickScale } from "../TickScale";
 import { TESTNET_MARKET } from "../../lib/markets";
@@ -17,10 +21,19 @@ const panel: React.CSSProperties = {
   background: "rgba(31,28,22,.5)",
 };
 
+const createOrderAbi = parseAbi([
+  "struct PoolKey { address currency0; address currency1; uint24 fee; int24 tickSpacing; address hooks; }",
+  "function createOrder(address tokenIn, uint128 amountIn, uint128 minAmountOut, PoolKey key, int24 triggerTick, bool triggerBelow, uint64 expiry) returns (uint256)",
+]);
+
 export function Create({ currentTick }: { currentTick: number | null }) {
   const m = TESTNET_MARKET;
+  const w = useWallet();
   const [amount, setAmount] = useState("");
   const [trigger, setTrigger] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<{ hash: Hex } | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const nowPrice = currentTick === null ? null : humanPriceFromTick(currentTick, 6, m.decimals);
 
@@ -43,6 +56,42 @@ export function Create({ currentTick }: { currentTick: number | null }) {
   }, [amount, trigger, m.decimals, m.poolFeeBps]);
 
   const valid = calc.tick !== null;
+  const amountWei = (() => {
+    const a = parseFloat(amount);
+    return isFinite(a) && a > 0 ? BigInt(Math.floor(a * 10 ** m.decimals)) : 0n;
+  })();
+  const canSubmit = Boolean(w.address) && valid && amountWei > 0n && calc.clears > 0 && !submitting;
+
+  async function submit() {
+    if (!canSubmit || calc.tick === null) return;
+    setSubmitting(true); setSubmitError(null); setResult(null);
+    try {
+      // Approve exactly this order, not an unlimited allowance. One extra call, and the right
+      // default for a contract that has not been audited.
+      const approve = {
+        to: m.token as Hex,
+        data: encodeFunctionData({ abi: erc20Abi, functionName: "approve", args: [DEPLOY.orderBook as Hex, amountWei] }),
+      };
+      const create = {
+        to: DEPLOY.orderBook as Hex,
+        data: encodeFunctionData({
+          abi: createOrderAbi, functionName: "createOrder",
+          args: [
+            m.token as Hex, amountWei, 0n,
+            { currency0: m.currency0, currency1: m.token, fee: m.fee, tickSpacing: m.tickSpacing, hooks: m.hooks },
+            calc.tick, true, 0n,
+          ],
+        }),
+      };
+      const hash = await w.send([approve, create]);
+      setResult({ hash });
+      setAmount(""); setTrigger("");
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message.split("\n")[0] : String(e));
+    } finally {
+      setSubmitting(false);
+    }
+  }
   const backTone = !valid ? "var(--brick)" : calc.drift > 0.005 ? "var(--ochre)" : "var(--pine)";
 
   return (
@@ -84,16 +133,47 @@ export function Create({ currentTick }: { currentTick: number | null }) {
           </div>
 
           <button
-            type="submit"
-            disabled
-            title="Wallet connection is not wired up yet"
+            type="button"
+            onClick={submit}
+            disabled={!canSubmit}
             style={{
-              height: 48, borderRadius: 6, border: "none", background: "var(--rule-2)",
-              color: "var(--ink-3)", font: "inherit", fontSize: 15, fontWeight: 600, cursor: "not-allowed",
+              height: 48, borderRadius: 6, border: "none",
+              background: canSubmit ? "var(--vermilion)" : "var(--rule-2)",
+              color: canSubmit ? "var(--paper)" : "var(--ink-3)",
+              font: "inherit", fontSize: 15, fontWeight: 600,
+              cursor: canSubmit ? "pointer" : "not-allowed",
             }}
           >
-            Connect a wallet to continue
+            {submitting ? "Confirm in your wallet…"
+              : !w.address ? "Connect a wallet to continue"
+              : !valid || amountWei === 0n ? "Enter an amount and a trigger"
+              : calc.clears <= 0 ? "Too small to be filled"
+              : "Approve and create order"}
           </button>
+
+          {w.kind === "passkey" && (
+            <p style={{ margin: 0, fontSize: 12, lineHeight: "17px", color: "var(--ink-3)" }}>
+              Gas is sponsored on this wallet, so you need no USDC. Both calls are batched into one
+              signature.
+            </p>
+          )}
+          {result && (
+            <div style={{ padding: 14, borderRadius: 2, background: "var(--sunk)", borderLeft: "2px solid var(--pine)" }}>
+              <div className="label" style={{ color: "var(--pine)" }}>Order created</div>
+              <a href={txUrl(result.hash)} target="_blank" rel="noreferrer" className="num" style={{ fontSize: 13 }}>
+                {result.hash.slice(0, 10)}…{result.hash.slice(-6)} ↗
+              </a>
+              <p style={{ margin: "8px 0 0", fontSize: 12, color: "var(--ink-3)" }}>
+                It will fill only when price reaches your trigger, a keeper is running, and the fee
+                covers the gas. Watch it on the Orders tab.
+              </p>
+            </div>
+          )}
+          {submitError && (
+            <div style={{ padding: 14, borderRadius: 2, background: "var(--sunk)", borderLeft: "2px solid var(--brick)", color: "var(--brick)", fontSize: 12 }}>
+              {submitError}
+            </div>
+          )}
         </form>
 
         <div style={{ flex: "1 1 320px", minWidth: 0, display: "flex", flexDirection: "column", gap: 16 }}>
