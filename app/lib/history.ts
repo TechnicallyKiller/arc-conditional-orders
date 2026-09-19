@@ -1,5 +1,5 @@
 import { parseAbiItem, type Hex } from "viem";
-import { client } from "./orderbook";
+import { clientFor } from "./clients";
 import { poolIdOf } from "./pools";
 import type { Market } from "./markets";
 
@@ -19,7 +19,8 @@ const SWAP = parseAbiItem(
 
 export type Series = { ticks: number[]; blocks: bigint[] };
 
-export async function readHistory(m: Market, blocks = 900): Promise<Series> {
+export async function readHistory(m: Market, blocks = 40_000): Promise<Series> {
+  const client = clientFor(m.network);
   const head = await client.getBlockNumber();
   try {
     const logs = await client.getLogs({

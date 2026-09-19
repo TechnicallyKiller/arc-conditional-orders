@@ -1,5 +1,5 @@
 import { keccak256, encodeAbiParameters, type Hex } from "viem";
-import { client } from "./orderbook";
+import { clientFor } from "./clients";
 import type { Market } from "./markets";
 
 const PM = "0x8366a39CC670B4001A1121B8F6A443A643e40951" as const;
@@ -20,6 +20,17 @@ export type PoolState = { tick: number; liquidity: bigint; readable: boolean };
 
 /** Reads slot0 and liquidity for many pools in one multicall, so all rows share a block. */
 export async function readPools(markets: Market[]): Promise<Record<string, PoolState>> {
+  const byNetwork = { mainnet: markets.filter((m) => m.network === "mainnet"), testnet: markets.filter((m) => m.network === "testnet") };
+  const parts = await Promise.all(
+    (Object.keys(byNetwork) as (keyof typeof byNetwork)[])
+      .filter((n) => byNetwork[n].length)
+      .map((n) => readPoolsOn(n, byNetwork[n]))
+  );
+  return Object.assign({}, ...parts);
+}
+
+async function readPoolsOn(network: "mainnet" | "testnet", markets: Market[]): Promise<Record<string, PoolState>> {
+  const client = clientFor(network);
   const abi = [{
     name: "extsload", type: "function", stateMutability: "view",
     inputs: [{ type: "bytes32" }], outputs: [{ type: "bytes32" }],

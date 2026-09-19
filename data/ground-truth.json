@@ -336,28 +336,30 @@
     "conclusion": "Liquidity never changed - one value across every swap for six hours, and both pools trade every ~2s with no gap over 15s. Tradability is continuous."
   },
   "measuredDepth": {
-    "_at": "block 21694303, realised via executed swaps",
+    "_CORRECTION": "The earlier figures were WRONG. For native-currency pools the adapter pulled input through the 6dp ERC-20 interface while V4 quotes 18dp, so a swap labelled $50 actually moved 0.000001 USDC. Dust trades have no price impact, which is why everything read 0 bps. Proven in test/UnitsProof.t.sol and fixed in V4SwapAdapter._toErc20Units.",
+    "_at": "block 21694303, realised via executed swaps with correct units",
     "USO_50usdc": {
-      "totalBps": 99,
+      "totalBps": 138,
       "poolFeeBps": 100,
-      "trueImpactBps": 0
+      "trueImpactBps": 38
     },
     "USO_500usdc": {
-      "totalBps": 100,
+      "totalBps": 471,
       "poolFeeBps": 100,
-      "trueImpactBps": 0
+      "trueImpactBps": 371
     },
     "SCHNOZ_50usdc": {
-      "totalBps": 1,
+      "totalBps": 824,
       "poolFeeBps": 1,
-      "trueImpactBps": 0
+      "trueImpactBps": 823
     },
     "erc20Pool_50usdc": {
       "totalBps": 318,
       "poolFeeBps": 300,
       "trueImpactBps": 18
     },
-    "BB": "NOT TRADEABLE despite 4.5e24 nominal liquidity"
+    "BB": "NOT TRADEABLE at this block even with correct units",
+    "conclusion": "Arc's pools are THIN. A $500 sell on the deepest one costs 3.71% in slippage on top of its 1% fee. Any claim that a stop-loss here executes cleanly at size is false."
   },
   "rpcStateReadsAreUnreliable": {
     "_severity": "HIGH - affects the keeper in production",

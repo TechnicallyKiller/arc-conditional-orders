@@ -28,6 +28,16 @@ contract V4SwapAdapter is IUnlockCallback {
         return currency == NATIVE ? GT.USDC : currency;
     }
 
+    /// @dev AMOUNTS ARE IN THE CURRENCY'S OWN UNITS. For native USDC that is 18dp, because that
+    ///      is what V4 accounts in. Pulling it through the ERC-20 interface needs the 6dp figure,
+    ///      so divide by 1e12 — rounding UP, since underpaying leaves the pool short and reverts.
+    ///      Getting this backwards makes a "$50" swap move 0.000001 USDC and silently report
+    ///      zero price impact, which is exactly what it did before this comment existed.
+    function _toErc20Units(address currency, uint256 nativeAmount) internal pure returns (uint256) {
+        if (currency != NATIVE) return nativeAmount;
+        return (nativeAmount + GT.NATIVE_PER_ERC20 - 1) / GT.NATIVE_PER_ERC20;
+    }
+
     struct CallbackData {
         PoolKey key;
         bool zeroForOne;
@@ -50,7 +60,9 @@ contract V4SwapAdapter is IUnlockCallback {
         returns (uint256 amountOut)
     {
         address currencyIn = zeroForOne ? key.currency0 : key.currency1;
-        IERC20(_erc20Of(currencyIn)).transferFrom(msg.sender, address(this), amountIn);
+        IERC20(_erc20Of(currencyIn)).transferFrom(
+            msg.sender, address(this), _toErc20Units(currencyIn, amountIn)
+        );
 
         bytes memory res = poolManager.unlock(
             abi.encode(CallbackData({key: key, zeroForOne: zeroForOne, amountIn: amountIn, recipient: recipient, caller: msg.sender}))

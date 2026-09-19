@@ -51,7 +51,7 @@ contract PoolDepthTest is Test {
         (uint160 sqrtP,,,) = PM.slot0(poolIdOf(key));
         require(sqrtP > 0, "pool not initialised");
 
-        IERC20(GT.USDC).approve(address(adapter), usdc);
+        IERC20(GT.USDC).approve(address(adapter), type(uint256).max);
         uint256 before = IERC20(key.currency1).balanceOf(address(this));
         uint256 out = adapter.swapExactIn(key, true, usdc, address(this));
         uint256 got = IERC20(key.currency1).balanceOf(address(this)) - before;
@@ -64,20 +64,20 @@ contract PoolDepthTest is Test {
         bps = expected > out ? ((expected - out) * 10_000) / expected : 0;
         uint256 feeBps = uint256(key.fee) / 100; // V4 fee is in hundredths of a bip
         uint256 impactBps = bps > feeBps ? bps - feeBps : 0;
-        console.log(name, usdc / 1e6, "USDC in");
+        console.log(name, usdc / (key.currency0 == address(0) ? 1e18 : 1e6), "USDC in");
         console.log("        total bps:", bps, " of which pool fee:", feeBps);
         console.log("        true price impact bps:", impactBps);
     }
 
     function test_depth_USO_50() public {
         PoolKey memory k = PoolKey(address(0), USO, 10000, 200, address(0));
-        uint256 bps = _measure("USO   ", k, 50e6);
+        uint256 bps = _measure("USO   ", k, 50e18);
         assertLt(bps, 500, "USO: >5% slippage on $50");
     }
 
     function test_depth_USO_500() public {
         PoolKey memory k = PoolKey(address(0), USO, 10000, 200, address(0));
-        _measure("USO   ", k, 500e6);
+        _measure("USO   ", k, 500e18);
     }
 
     /// BB reports 4.5e24 liquidity, traded 135 times in 6h with a single stable liquidity
@@ -87,14 +87,14 @@ contract PoolDepthTest is Test {
     /// executed swaps, never by reading the liquidity field.
     function test_depth_BB_isNotTradeableAtThisBlock() public {
         PoolKey memory k = PoolKey(address(0), BB, 2500, 50, address(0));
-        IERC20(GT.USDC).approve(address(adapter), 50e6);
+        IERC20(GT.USDC).approve(address(adapter), type(uint256).max);
         vm.expectRevert(V4SwapAdapter.NothingReceived.selector);
-        adapter.swapExactIn(k, true, 50e6, address(this));
+        adapter.swapExactIn(k, true, 50e18, address(this));
     }
 
     function test_depth_SCHNOZ_50() public {
         PoolKey memory k = PoolKey(address(0), SCHNOZ, 100, 1, address(0));
-        _measure("SCHNOZ", k, 50e6);
+        _measure("SCHNOZ", k, 50e18);
     }
 
     function test_depth_ERC20POOL_50() public {
@@ -106,8 +106,8 @@ contract PoolDepthTest is Test {
     /// against native USDC, not the ERC-20 interface.
     function test_nativeCurrencyPoolIsTradeable() public {
         PoolKey memory k = PoolKey(address(0), USO, 10000, 200, address(0));
-        IERC20(GT.USDC).approve(address(adapter), 10e6);
-        uint256 out = adapter.swapExactIn(k, true, 10e6, address(this));
+        IERC20(GT.USDC).approve(address(adapter), type(uint256).max);
+        uint256 out = adapter.swapExactIn(k, true, 10e18, address(this));
         assertGt(out, 0, "native-currency pool must be tradeable");
     }
 

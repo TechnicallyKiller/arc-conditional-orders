@@ -12,9 +12,11 @@ const GRID = "1.3fr .85fr .75fr 1fr .95fr auto";
 
 function DepthBadge({ m }: { m: Market }) {
   const failed = !m.sellTestPassed;
-  const marginal = (m.impactBps ?? 0) > 100;
-  const bg = failed ? "var(--brick-tint, #2B1410)" : marginal ? "#2A2110" : "#10241C";
-  const fg = failed ? "var(--brick)" : marginal ? "var(--ochre)" : "var(--pine)";
+  const bps = m.impactBps500 ?? m.impactBps50;
+  const unmeasured = bps === null;
+  const marginal = (bps ?? 0) > 100;
+  const bg = failed ? "#2B1410" : unmeasured ? "#12100C" : marginal ? "#2A2110" : "#10241C";
+  const fg = failed ? "var(--brick)" : unmeasured ? "var(--ink-3)" : marginal ? "var(--ochre)" : "var(--pine)";
   return (
     <span
       title={failed
@@ -25,7 +27,7 @@ function DepthBadge({ m }: { m: Market }) {
         fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", whiteSpace: "nowrap",
       }}
     >
-      {failed ? "sell test failed" : `${m.impactBps} bps`}
+      {failed ? "sell test failed" : unmeasured ? "not measured" : `${bps} bps`}
     </span>
   );
 }
@@ -66,7 +68,8 @@ export function Markets({ onSetStop }: { onSetStop: () => void }) {
       </h1>
       <p style={{ margin: "6px 0 24px", fontSize: 13, lineHeight: "19px", color: "var(--ink-2)", maxWidth: "72ch" }}>
         Depth is measured, not assumed — each badge is the price impact of a real executed sell,
-        excluding the pool&apos;s own fee. The line is drawn from Swap events, so every vertex is a
+        excluding the pool&apos;s own fee. These pools are thin and the numbers say so: a $500 sell
+        on USO costs 3.71% in slippage. The line is drawn from Swap events, so every vertex is a
         trade that happened rather than an interpolation.
       </p>
 
@@ -76,7 +79,7 @@ export function Markets({ onSetStop }: { onSetStop: () => void }) {
           <span style={{ textAlign: "right" }}>Price</span>
           <span style={{ textAlign: "right" }}>Pool fee</span>
           <span>Recent trades</span>
-          <span>Depth $500</span>
+          <span>Impact</span>
           <span />
         </div>
 
