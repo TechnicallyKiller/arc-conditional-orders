@@ -6,7 +6,7 @@ import {OrderBook} from "../contracts/OrderBook.sol";
 import {CostFloor} from "../contracts/CostFloor.sol";
 import {V4SwapAdapter} from "../contracts/adapters/V4SwapAdapter.sol";
 import {V4Price} from "../contracts/libraries/V4Price.sol";
-import {IPoolManager, PoolKey, PoolId} from "../contracts/interfaces/IPoolManager.sol";
+import {IPoolManager, PoolKey, PoolId, poolIdOf} from "../contracts/interfaces/IPoolManager.sol";
 import {IERC20} from "../contracts/interfaces/IERC20.sol";
 import {ArcGroundTruth as GT} from "../contracts/ArcGroundTruth.sol";
 
@@ -67,7 +67,7 @@ contract OrderBookIntegrationTest is Test {
 
     function _create(int24 trigger, bool below, uint128 minOut) internal returns (uint256 id) {
         vm.prank(trader);
-        id = book.createOrder(TOKEN, traderTokens, minOut, POOL, trigger, below, 0);
+        id = book.createOrder(TOKEN, traderTokens, minOut, _key(), trigger, below, 0);
     }
 
     /// Same assertion as the mocked suite, against a real swap.

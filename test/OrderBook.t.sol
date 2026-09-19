@@ -5,7 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {OrderBook} from "../contracts/OrderBook.sol";
 import {CostFloor} from "../contracts/CostFloor.sol";
 import {V4Price} from "../contracts/libraries/V4Price.sol";
-import {IPoolManager, PoolId} from "../contracts/interfaces/IPoolManager.sol";
+import {IPoolManager, PoolId, PoolKey, poolIdOf} from "../contracts/interfaces/IPoolManager.sol";
 import {IERC20} from "../contracts/interfaces/IERC20.sol";
 import {ArcGroundTruth as GT} from "../contracts/ArcGroundTruth.sol";
 import {MockERC20, MockRouter} from "./mocks/Mocks.sol";
@@ -21,8 +21,14 @@ contract OrderBookTest is Test {
     address keeper = address(0xCAFE);
     address feeRecipient = address(0xFEE);
 
-    PoolId constant LIVE_POOL =
-        PoolId.wrap(0x870728a1dee8290b0dcb7ce52c664433f63fc5243ced76c03bd2e6bba10d0cc9);
+    /// Live pool with known key and real liquidity (see V4SwapAdapter.t.sol).
+    address constant POOL_TOKEN = 0x70122C10800AE1905092157c21C0Df58802998F2;
+
+    function _key() internal pure returns (PoolKey memory) {
+        return PoolKey({
+            currency0: GT.USDC, currency1: POOL_TOKEN, fee: 30000, tickSpacing: 200, hooks: address(0)
+        });
+    }
 
     int24 liveTick;
     uint128 constant AMOUNT_IN = 1_000e18;
@@ -41,7 +47,7 @@ contract OrderBookTest is Test {
         book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000, DWELL, MAX_ARM_AGE);
         book.setRouter(address(router), true);
 
-        liveTick = IPoolManager(GT.UNIV4_POOL_MANAGER).currentTick(LIVE_POOL);
+        liveTick = IPoolManager(GT.UNIV4_POOL_MANAGER).currentTick(poolIdOf(_key()));
 
         tokenIn.mint(trader, AMOUNT_IN);
         vm.prank(trader);
@@ -53,7 +59,7 @@ contract OrderBookTest is Test {
 
     function _create(int24 triggerTick, bool below, uint128 minOut) internal returns (uint256 id) {
         vm.prank(trader);
-        id = book.createOrder(address(tokenIn), AMOUNT_IN, minOut, LIVE_POOL, triggerTick, below, 0);
+        id = book.createOrder(address(tokenIn), AMOUNT_IN, minOut, _key(), triggerTick, below, 0);
     }
 
     /// Arm the trigger, then advance past the dwell window, as a keeper would across blocks.
@@ -199,7 +205,7 @@ contract OrderBookTest is Test {
     function test_expiredOrderCannotFill() public {
         vm.prank(trader);
         uint256 id = book.createOrder(
-            address(tokenIn), AMOUNT_IN, 0, LIVE_POOL, liveTick + 1000, true, uint64(block.timestamp + 100)
+            address(tokenIn), AMOUNT_IN, 0, _key(), liveTick + 1000, true, uint64(block.timestamp + 100)
         );
         book.armOrder(id);
         vm.roll(block.number + DWELL);

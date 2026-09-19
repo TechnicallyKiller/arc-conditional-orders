@@ -6,7 +6,8 @@
   "description": "Conditional orders for Arc spot traders, with an on-chain cost floor.",
   "scripts": {
     "test": "forge test",
-    "build": "forge build"
+    "build": "forge build",
+    "keeper": "tsx src/keeper/index.ts"
   },
   "dependencies": {
     "viem": "^2.21.55"

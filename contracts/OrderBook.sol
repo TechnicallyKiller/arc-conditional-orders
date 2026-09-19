@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import {CostFloor} from "./CostFloor.sol";
 import {V4Price} from "./libraries/V4Price.sol";
-import {IPoolManager, PoolId} from "./interfaces/IPoolManager.sol";
+import {IPoolManager, PoolId, PoolKey, poolIdOf} from "./interfaces/IPoolManager.sol";
 import {IERC20} from "./interfaces/IERC20.sol";
 import {ArcGroundTruth as GT} from "./ArcGroundTruth.sol";
 
@@ -26,7 +26,10 @@ contract OrderBook is CostFloor {
         address tokenIn;
         uint128 amountIn;
         uint128 minAmountOut; // trader's own slippage bound; the contract never picks one
-        PoolId poolId;
+        /// @dev The full key, not just the id. The id is derivable from the key but not the
+        ///      reverse, and a keeper that cannot reconstruct the key cannot route the swap.
+        ///      Discovered by running the keeper against a pool older than its log lookback.
+        PoolKey key;
         int24 triggerTick;
         bool triggerBelow;    // true = fire at or below the tick (stop-loss)
         uint64 expiry;
@@ -120,7 +123,7 @@ contract OrderBook is CostFloor {
         address tokenIn,
         uint128 amountIn,
         uint128 minAmountOut,
-        PoolId poolId,
+        PoolKey calldata key,
         int24 triggerTick,
         bool triggerBelow,
         uint64 expiry
@@ -132,7 +135,7 @@ contract OrderBook is CostFloor {
             tokenIn: tokenIn,
             amountIn: amountIn,
             minAmountOut: minAmountOut,
-            poolId: poolId,
+            key: key,
             triggerTick: triggerTick,
             triggerBelow: triggerBelow,
             expiry: expiry,
@@ -141,6 +144,12 @@ contract OrderBook is CostFloor {
             armedTick: 0
         });
         emit OrderCreated(id, msg.sender, tokenIn, amountIn, triggerTick, triggerBelow);
+    }
+
+    /// @dev Solidity's auto-generated getter for `orders` omits the nested PoolKey, so a keeper
+    ///      reading it would get an order it cannot route. This returns the whole thing.
+    function getOrder(uint256 id) external view returns (Order memory) {
+        return orders[id];
     }
 
     function cancelOrder(uint256 id) external {
@@ -164,7 +173,7 @@ contract OrderBook is CostFloor {
         if (o.status != Status.Open) revert OrderNotOpen();
         if (o.expiry != 0 && block.timestamp > o.expiry) revert OrderExpired();
 
-        int24 tick = poolManager.currentTick(o.poolId);
+        int24 tick = poolManager.currentTick(_poolId(o.key));
         _requireTrigger(o, tick);
 
         o.armedAtBlock = uint64(block.number);
@@ -194,7 +203,7 @@ contract OrderBook is CostFloor {
         }
         if (block.number > armed + maxArmAgeBlocks) revert ArmStale(armed, uint64(block.number));
 
-        _requireTrigger(o, poolManager.currentTick(o.poolId));
+        _requireTrigger(o, poolManager.currentTick(_poolId(o.key)));
 
         // Effects before interactions: the order cannot be filled twice even if a router calls back.
         o.status = Status.Filled;
@@ -222,6 +231,11 @@ contract OrderBook is CostFloor {
         if (fee > 0) IERC20(TOKEN_OUT).transfer(feeRecipient, fee);
 
         emit OrderFilled(id, msg.sender, amountOut, fee, gasCostNative);
+    }
+
+    /// @dev poolId = keccak256(abi.encode(PoolKey)), verified against a live Arc pool.
+    function _poolId(PoolKey storage k) internal view returns (PoolId) {
+        return PoolId.wrap(keccak256(abi.encode(k.currency0, k.currency1, k.fee, k.tickSpacing, k.hooks)));
     }
 
     function _requireTrigger(Order storage o, int24 tick) internal view {

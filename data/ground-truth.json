@@ -180,6 +180,13 @@
       "gas": 263994,
       "costCents": 0.561,
       "note": "AFTER_SWAP_RETURNS_DELTA hook pool"
+    },
+    "keeperFullCycle": {
+      "armGas": "~50k",
+      "fillGas": 233083,
+      "fillCostUsdc": 0.00489474,
+      "example": "47.047706 USDC fill -> 0.235238 USDC fee at 50bps, 48x the gas cost",
+      "note": "Measured on a local arc-anvil mainnet fork with the keeper driving it autonomously."
     }
   },
   "phasesComplete": [
@@ -188,7 +195,8 @@
     "2 - CostFloor (negative tests pass)",
     "3 - OrderBook + on-chain trigger (fires at trigger, refuses above it)",
     "4 - route adapters (OrderBook tests pass unchanged against a real Uniswap V4 swap)",
-    "4b - trigger hardening (arm/dwell defeats single-block manipulation)"
+    "4b - trigger hardening (arm/dwell defeats single-block manipulation)",
+    "5 - keeper (observe/simulate/execute; full cycle autonomous on a fork)"
   ],
   "testPool": {
     "poolId": "0xacea282c439a359cb659855961bdc2e01c6b62dbef811f1c7ac6c79c4fd5583a",
@@ -251,5 +259,9 @@
       "defaults": "minDwellBlocks=2 (~1.0s at 0.507s blocks), maxArmAgeBlocks=300 (~2.5 min)",
       "residualRisk": "A well-capitalised attacker can still hold a price across a short dwell on a very thin pool. The dwell window is a cost multiplier, not a proof. Sizing it against real pool depth is outstanding work before mainnet."
     }
+  },
+  "designNotes": {
+    "orderCarriesPoolKey": "Orders store the full PoolKey, not just the PoolId. The id is derivable from the key but not the reverse, and a keeper that cannot reconstruct the key cannot route the swap. Found by running the keeper against a pool older than its log lookback - the unit tests could not have caught it.",
+    "getOrderExists": "Solidity's auto-generated getter for a mapping to a struct OMITS nested structs, so orders() does not return the key. getOrder() exists for the keeper."
   }
 }
