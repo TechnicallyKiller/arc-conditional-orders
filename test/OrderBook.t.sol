@@ -292,4 +292,71 @@ contract OrderBookTest is Test {
         vm.prank(keeper);
         book.setCaps(1, 1);
     }
+
+    // =================================================================
+    // checkOrders - the keeper's view, and why PoolUnreadable is separate
+    // =================================================================
+
+    function _ids(uint256 a) internal pure returns (uint256[] memory out) {
+        out = new uint256[](1);
+        out[0] = a;
+    }
+
+    function test_checkOrdersReportsNotTriggered() public {
+        uint256 id = _create(liveTick - 1000, true, 0);
+        (OrderBook.TriggerState[] memory st, int24[] memory tk) = book.checkOrders(_ids(id));
+        assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.NotTriggered));
+        assertEq(tk[0], liveTick, "tick should still be reported");
+    }
+
+    function test_checkOrdersReportsTriggeredThenArmingThenReady() public {
+        uint256 id = _create(liveTick + 1000, true, 0);
+        (OrderBook.TriggerState[] memory st,) = book.checkOrders(_ids(id));
+        assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.Triggered));
+
+        book.armOrder(id);
+        (st,) = book.checkOrders(_ids(id));
+        assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.Arming));
+
+        vm.roll(block.number + DWELL);
+        (st,) = book.checkOrders(_ids(id));
+        assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.Ready));
+    }
+
+    /// THE point of the enum. An unreadable pool must NOT look like "not triggered", or a
+    /// keeper silently does nothing while the user believes they are protected.
+    function test_unreadablePoolIsDistinctFromNotTriggered() public {
+        PoolKey memory dead = PoolKey({
+            currency0: GT.USDC, currency1: address(0xDEAD), fee: 3000, tickSpacing: 60, hooks: address(0)
+        });
+        vm.prank(trader);
+        uint256 id = book.createOrder(address(tokenIn), AMOUNT_IN, 0, dead, 0, true, 0);
+
+        (OrderBook.TriggerState[] memory st,) = book.checkOrders(_ids(id));
+        assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.PoolUnreadable), "must be distinguishable");
+        assertTrue(
+            st[0] != OrderBook.TriggerState.NotTriggered,
+            "an unreadable pool reported as not-triggered is a silent failure"
+        );
+    }
+
+    function test_checkOrdersReportsCancelledAndExpired() public {
+        uint256 id = _create(liveTick + 1000, true, 0);
+        vm.prank(trader);
+        book.cancelOrder(id);
+        (OrderBook.TriggerState[] memory st,) = book.checkOrders(_ids(id));
+        assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.NotOpen));
+    }
+
+    /// Every order in one call means every order is evaluated against the same block.
+    function test_checkOrdersBatches() public {
+        uint256 a = _create(liveTick + 1000, true, 0);
+        uint256 b = _create(liveTick - 1000, true, 0);
+        uint256[] memory ids = new uint256[](2);
+        ids[0] = a;
+        ids[1] = b;
+        (OrderBook.TriggerState[] memory st,) = book.checkOrders(ids);
+        assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.Triggered));
+        assertEq(uint8(st[1]), uint8(OrderBook.TriggerState.NotTriggered));
+    }
 }

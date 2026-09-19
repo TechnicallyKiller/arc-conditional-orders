@@ -37,6 +37,20 @@ library V4Price {
     /// @notice Current tick, reverting if the pool does not exist. Used for trigger evaluation
     ///         because ticks are monotonic in price, cheap to compare, and carry no decimals -
     ///         which on Arc removes an entire class of 18-vs-6 mistakes from the hot path.
+    /// @notice Non-reverting read. Lets a caller tell "pool reads as uninitialised" apart from
+    ///         "trigger not met" - a distinction that matters because the public Arc RPC has
+    ///         been observed returning zero for a slot that Swap events prove was non-zero.
+    ///         A keeper that cannot tell those apart silently fails to fill.
+    function tryCurrentTick(IPoolManager manager, PoolId id)
+        internal
+        view
+        returns (bool ok, int24 tick)
+    {
+        uint160 sqrtPriceX96;
+        (sqrtPriceX96, tick,,) = slot0(manager, id);
+        ok = sqrtPriceX96 != 0;
+    }
+
     function currentTick(IPoolManager manager, PoolId id) internal view returns (int24 tick) {
         uint160 sqrtPriceX96;
         (sqrtPriceX96, tick,,) = slot0(manager, id);

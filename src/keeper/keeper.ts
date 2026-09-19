@@ -4,7 +4,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { arc, MIN_MAX_FEE_PER_GAS, NATIVE_PER_ERC20 } from "../lib/chain.js";
-import { orderBookAbi, adapterAbi, Status } from "./abi.js";
+import { orderBookAbi, adapterAbi, Status, TriggerState } from "./abi.js";
 import { readTick, poolIdOf, type PoolKey } from "./pools.js";
 
 export type Mode = "observe" | "simulate" | "execute";
@@ -64,10 +64,9 @@ export class Keeper {
   }
 
   private async tick() {
-    const [head, nextId, minDwell] = await Promise.all([
+    const [head, nextId] = await Promise.all([
       this.client.getBlockNumber(),
       this.client.readContract({ address: this.cfg.orderBook, abi: orderBookAbi, functionName: "nextOrderId" }),
-      this.client.readContract({ address: this.cfg.orderBook, abi: orderBookAbi, functionName: "minDwellBlocks" }),
     ]);
 
     const open: Order[] = [];
@@ -80,30 +79,45 @@ export class Keeper {
       return;
     }
 
-    for (const o of open) {
-      const tick = await readTick(this.client, this.cfg.poolManager, poolIdOf(o.key));
-      if (tick === null) {
-        console.log(`[${head}] order ${o.id}: pool not initialised`);
-        continue;
-      }
-      const met = o.triggerBelow ? tick <= o.triggerTick : tick >= o.triggerTick;
+    // One on-chain call evaluates every order against the SAME block, and reports an
+    // unreadable pool explicitly rather than letting it masquerade as "not triggered".
+    const [states, ticks] = (await this.client.readContract({
+      address: this.cfg.orderBook, abi: orderBookAbi, functionName: "checkOrders",
+      args: [open.map((o) => o.id)],
+    })) as unknown as [number[], number[]];
+
+    for (let i = 0; i < open.length; i++) {
+      const o = open[i];
+      const state = states[i] as TriggerState;
+      const tick = ticks[i];
       const dir = o.triggerBelow ? "<=" : ">=";
       const label = `order ${o.id} tick ${tick} ${dir} ${o.triggerTick}`;
 
-      if (!met) {
+      if (state === TriggerState.PoolUnreadable) {
+        // Never treat this as "nothing to do". The user believes they are protected.
+        console.error(
+          `[${head}] order ${o.id}: *** POOL UNREADABLE *** cannot evaluate the trigger. ` +
+          `This is an RPC or pool problem, NOT a quiet no-op. Orders on this pool are unprotected.`
+        );
+        continue;
+      }
+      if (state === TriggerState.NotOpen || state === TriggerState.Expired) continue;
+      if (state === TriggerState.NotTriggered) {
         console.log(`[${head}] ${label}: not triggered`);
         continue;
       }
-
-      if (o.armedAtBlock === 0n) {
+      if (state === TriggerState.Triggered) {
         console.log(`[${head}] ${label}: TRIGGERED, needs arming`);
         if (this.cfg.mode === "execute") await this.arm(o.id);
         continue;
       }
-
-      const ready = head >= o.armedAtBlock + minDwell;
-      if (!ready) {
+      if (state === TriggerState.Arming) {
         console.log(`[${head}] ${label}: armed at ${o.armedAtBlock}, waiting out dwell`);
+        continue;
+      }
+      if (state === TriggerState.ArmExpired) {
+        console.log(`[${head}] ${label}: arm went stale, re-arming`);
+        if (this.cfg.mode === "execute") await this.arm(o.id);
         continue;
       }
 

@@ -370,7 +370,12 @@
       "Cross-check a tick read against the most recent Swap event's tick before acting",
       "Treat event data as authoritative and state reads as a hint"
     ],
-    "status": "OPEN - must be addressed before mainnet"
+    "status": "OPEN - must be addressed before mainnet",
+    "mitigationImplemented": {
+      "contract": "OrderBook.checkOrders(uint256[]) returns an explicit TriggerState per order, with PoolUnreadable as its OWN state rather than folded into NotTriggered. One call also evaluates every order against the same block.",
+      "keeper": "Treats PoolUnreadable as a loud error, never a quiet no-op, because the user believes they are protected.",
+      "stillOpen": "Point the keeper at a provider endpoint rather than the public RPC before mainnet. The contract change makes the failure visible; it does not make the read correct."
+    }
   },
   "nativeUsdcUnits": {
     "finding": "Uniswap V4 accounts Arc's native USDC (currency address(0)) in 18dp. A pool whose currency0 is native pays out in native units, not the 6dp ERC-20 view.",

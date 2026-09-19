@@ -21,6 +21,9 @@ contract OrderBook is CostFloor {
 
     enum Status { None, Open, Filled, Cancelled }
 
+    /// @dev PoolUnreadable is deliberately its own state, not folded into NotTriggered.
+    enum TriggerState { NotOpen, Expired, PoolUnreadable, NotTriggered, Triggered, Arming, ArmExpired, Ready }
+
     struct Order {
         address owner;
         address tokenIn;
@@ -160,6 +163,41 @@ contract OrderBook is CostFloor {
             armedTick: 0
         });
         emit OrderCreated(id, msg.sender, tokenIn, amountIn, triggerTick, triggerBelow);
+    }
+
+    /// @notice What a keeper needs to decide what to do, for many orders in ONE call.
+    /// @dev Two reasons this exists rather than the keeper reading pools itself:
+    ///      1. PoolUnreadable is reported explicitly. The public Arc RPC has returned zero for
+    ///         a pool slot that Swap events prove was non-zero; a keeper that cannot
+    ///         distinguish that from "not triggered" silently leaves orders unprotected.
+    ///      2. One call instead of N keeps every order evaluated against the SAME block.
+    function checkOrders(uint256[] calldata ids)
+        external
+        view
+        returns (TriggerState[] memory states, int24[] memory ticks)
+    {
+        states = new TriggerState[](ids.length);
+        ticks = new int24[](ids.length);
+        for (uint256 i = 0; i < ids.length; i++) {
+            (states[i], ticks[i]) = _check(orders[ids[i]]);
+        }
+    }
+
+    function _check(Order storage o) internal view returns (TriggerState state, int24 tick) {
+        if (o.status != Status.Open) return (TriggerState.NotOpen, 0);
+        if (o.expiry != 0 && block.timestamp > o.expiry) return (TriggerState.Expired, 0);
+
+        bool ok;
+        (ok, tick) = poolManager.tryCurrentTick(_poolId(o.key));
+        if (!ok) return (TriggerState.PoolUnreadable, 0);
+
+        bool met = o.triggerBelow ? tick <= o.triggerTick : tick >= o.triggerTick;
+        if (!met) return (TriggerState.NotTriggered, tick);
+
+        if (o.armedAtBlock == 0) return (TriggerState.Triggered, tick);
+        if (block.number > o.armedAtBlock + maxArmAgeBlocks) return (TriggerState.ArmExpired, tick);
+        if (block.number < o.armedAtBlock + minDwellBlocks) return (TriggerState.Arming, tick);
+        return (TriggerState.Ready, tick);
     }
 
     /// @dev Solidity's auto-generated getter for `orders` omits the nested PoolKey, so a keeper

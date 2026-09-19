@@ -8,6 +8,7 @@ export const orderBookAbi = parseAbi([
   "struct PoolKey { address currency0; address currency1; uint24 fee; int24 tickSpacing; address hooks; }",
   "struct Order { address owner; address tokenIn; uint128 amountIn; uint128 minAmountOut; PoolKey key; int24 triggerTick; bool triggerBelow; uint64 expiry; uint8 status; uint64 armedAtBlock; int24 armedTick; }",
   "function getOrder(uint256 id) view returns (Order)",
+  "function checkOrders(uint256[] ids) view returns (uint8[] states, int24[] ticks)",
   "function armOrder(uint256 id)",
   "function execute(uint256 id, address router, bytes routeData) returns (uint256 amountOut, uint256 fee)",
   "event OrderCreated(uint256 indexed id, address indexed owner, address tokenIn, uint128 amountIn, int24 triggerTick, bool triggerBelow)",
@@ -30,4 +31,16 @@ export enum Status {
   Open = 1,
   Filled = 2,
   Cancelled = 3,
+}
+
+/** Mirrors OrderBook.TriggerState. PoolUnreadable is deliberately distinct from NotTriggered. */
+export enum TriggerState {
+  NotOpen = 0,
+  Expired = 1,
+  PoolUnreadable = 2,
+  NotTriggered = 3,
+  Triggered = 4,
+  Arming = 5,
+  ArmExpired = 6,
+  Ready = 7,
 }
