@@ -196,7 +196,8 @@
     "3 - OrderBook + on-chain trigger (fires at trigger, refuses above it)",
     "4 - route adapters (OrderBook tests pass unchanged against a real Uniswap V4 swap)",
     "4b - trigger hardening (arm/dwell defeats single-block manipulation)",
-    "5 - keeper (observe/simulate/execute; full cycle autonomous on a fork)"
+    "5 - keeper (observe/simulate/execute; full cycle autonomous on a fork)",
+    "6 - testnet (live cycle with transaction hashes, both a fill and a refusal)"
   ],
   "testPool": {
     "poolId": "0xacea282c439a359cb659855961bdc2e01c6b62dbef811f1c7ac6c79c4fd5583a",
@@ -263,5 +264,46 @@
   "designNotes": {
     "orderCarriesPoolKey": "Orders store the full PoolKey, not just the PoolId. The id is derivable from the key but not the reverse, and a keeper that cannot reconstruct the key cannot route the swap. Found by running the keeper against a pool older than its log lookback - the unit tests could not have caught it.",
     "getOrderExists": "Solidity's auto-generated getter for a mapping to a struct OMITS nested structs, so orders() does not return the key. getOrder() exists for the keeper."
+  },
+  "testnetDeployment": {
+    "network": "Arc Testnet (5042002)",
+    "explorer": "https://explorer.testnet.arc.io",
+    "orderBook": "0x55EC8907f937fEA942c5f98039a218708E965280",
+    "swapAdapter": "0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f",
+    "keeper": "0x364EDC06254874e62FF4AD8fA4d9a45238cb5609",
+    "demoPool": {
+      "poolId": "0x96bde8368b72f805a1cdcfc365fdf8e238c3fdb7d54db95b93e640ccc76d9c00",
+      "currency0": "0x3600000000000000000000000000000000000000",
+      "currency1": "0xc9020C4Bd8Ea5de25548AfAC8457469EecAB2360",
+      "fee": 0,
+      "tickSpacing": 200,
+      "hooks": "0xf825EeB04b2B258Ac6314Dd05CB91dB0ea0e6AEC",
+      "note": "Has a hook with BEFORE_SWAP + AFTER_SWAP and both delta flags, so the fill exercises the transient-delta settlement path."
+    },
+    "transactions": {
+      "realSwapThroughHookPool": "0x718a6a366f41e82c6e1e531b9f1622ee3b8daa60ae08f863b720a517586b776f",
+      "createOrder1": "0x6cf50c7a8b3026301f51e1540a57d106ec6aec9c65b11bcef413a6818309ca26",
+      "armOrder1_rejected": "0x6c6f3582c37dfbe82cf30a9306a8846c8b78bd8f54403b732ebeee4f67de6052",
+      "armOrder2": "0x2a2928de338fd6a0aefa126987889174501bff75d5e313f32d0178e2fbf90bab",
+      "fillOrder2": "0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d"
+    },
+    "theRejection": {
+      "_why": "More persuasive than the successful fill: it is the invariant refusing to act, which is the thing the design claims.",
+      "amountOut": "0.396122 USDC",
+      "feeAt50bps": "0.001980 USDC",
+      "gasCost": "0.01282902 USDC",
+      "profit": "-0.01084902 USDC",
+      "outcome": "keeper refused; caught in simulation before spending gas"
+    },
+    "theFill": {
+      "amountOut": "10.297301 USDC",
+      "feeAt50bps": "0.051486 USDC",
+      "gasUsed": 351348,
+      "effectiveGasPrice": "25 Gwei",
+      "gasCost": "0.00878370 USDC",
+      "keeperProfit": "0.04270230 USDC",
+      "margin": "5.9x",
+      "block": 62936970
+    }
   }
 }

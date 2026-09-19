@@ -4,8 +4,28 @@ Stop-loss, take-profit, limit and time-sliced orders for spot traders on
 [Arc](https://arc.io) — settled by a contract that proves on-chain that the fee it charged
 exceeded the gas it burned.
 
-> **Status: early.** Phases 0–2 complete, 14/14 tests passing against an Arc mainnet fork.
-> Unaudited. Not deployed. Do not put money in this.
+> **Status: live on Arc testnet.** 42/42 tests passing against an Arc mainnet fork.
+> Unaudited. Do not put money in this.
+
+## Live on Arc testnet
+
+A keeper autonomously filled a conditional order, and refused an unprofitable one.
+
+| | |
+| --- | --- |
+| OrderBook | [`0x55EC8907f937fEA942c5f98039a218708E965280`](https://explorer.testnet.arc.io/address/0x55EC8907f937fEA942c5f98039a218708E965280) |
+| Swap adapter | [`0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f`](https://explorer.testnet.arc.io/address/0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f) |
+| **Fill** | [`0x4e3998e4…`](https://explorer.testnet.arc.io/tx/0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d) |
+| Arm | [`0x2a2928de…`](https://explorer.testnet.arc.io/tx/0x2a2928de338fd6a0aefa126987889174501bff75d5e313f32d0178e2fbf90bab) |
+
+**The fill:** 10.297301 USDC out, 0.051486 USDC fee at 50bps, 351,348 gas at 25 Gwei
+= 0.00878370 USDC of gas. Keeper profit 0.0427 USDC, a 5.9x margin.
+
+**The refusal is the better demonstration.** A second order was too small: 0.396122 USDC
+out, so a 0.5% fee of 0.001980 USDC against 0.01282902 USDC of gas — a loss of
+0.0108 USDC. The keeper refused it, and `CostFloor` would have reverted it on-chain had
+it been submitted anyway. A system that only ever succeeds proves nothing about its
+safety property.
 
 ## Why
 
