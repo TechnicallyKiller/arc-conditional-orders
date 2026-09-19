@@ -217,6 +217,27 @@
     "conclusion": "~85% of newly created pools never trade. The 'token launched an hour ago goes to zero overnight' scenario is rare in new launches. Demand for stop-losses on new launches is NOT established.",
     "activeTradedUniverse": "~570 pools, 6430 swaps per 10 min, volume dispersed (top 8 = 26%)",
     "assetMix": "87.2% memecoins (BEORN, ARGUS, PI), 12.8% tokenized equity/ETF (SPYx SP500 xStock, USO United States Oil Fund)",
-    "openMeasurement": "Drawdowns on the ACTIVELY TRADED pools are still unmeasured. tools/snapshot.py exists to produce that number over days."
+    "openMeasurement": "Drawdowns on the ACTIVELY TRADED pools are still unmeasured. tools/snapshot.py exists to produce that number over days.",
+    "measuredDrawdowns24h": {
+      "_note": "Measured 2026-09-19 via ARCHIVE state reads (tick at 13 points over 24h) on the 150 most-traded pools. No waiting required - the RPC serves historical eth_call.",
+      "poolsWithHistory": 140,
+      "maxDrawdownWithin24h": {
+        "ge20pct": "17.9%",
+        "ge30pct": "12.9%",
+        "ge50pct": "5.0%",
+        "ge70pct": "1.4%",
+        "ge90pct": "0.7%",
+        "median": "0.0%",
+        "p90": "37.6%"
+      },
+      "priceNowVs24hAgo": {
+        "down_ge50pct": "1.4%",
+        "down_ge20pct": "6.4%",
+        "up": "90.0%",
+        "medianMultiple": 1.004
+      },
+      "conclusion": "Stop-loss demand is REAL BUT MODEST: ~1 in 6 actively-traded tokens draws down >=20% in a day, ~1 in 20 draws down >=50%. The median pool never draws down at all. Crucially 90% of pools are UP over 24h - this is an accumulation market, so the more wanted order type is TAKE-PROFIT (sell into strength), not crash protection. OrderBook already supports both via triggerBelow; only the positioning changes.",
+      "method": "tools/history.py"
+    }
   }
 }

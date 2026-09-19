@@ -1,0 +1,860 @@
+{
+ "head": 21675515,
+ "hours": [
+  24,
+  20,
+  16,
+  12,
+  10,
+  8,
+  6,
+  4,
+  3,
+  2,
+  1,
+  0.5,
+  0
+ ],
+ "stats": [
+  {
+   "pool": "0xcb1840df698933aa72e400624a5705148bef3de331ad4fc3dda2eea660472d9d",
+   "age_pts": 6,
+   "final": 1.0141991588920507,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xffc14015e15378de5ef05e9ebe5fc410e8aebb5fcf5dbfba6589e826021a1f84",
+   "age_pts": 13,
+   "final": 1.396659475035677,
+   "maxdd": 0.17518022465716376
+  },
+  {
+   "pool": "0xb3f441e8871840ecfcb284e5cbb5b9c21a50e961e1c50109bdced25e429f00cc",
+   "age_pts": 13,
+   "final": 1.4410640022841912,
+   "maxdd": 0.16664110695273404
+  },
+  {
+   "pool": "0x5e794e5d3d01c045ddfb2448c4afd557ec297d1dee49b28923dc0ada3425f780",
+   "age_pts": 13,
+   "final": 9.09195205225739,
+   "maxdd": 0.4204902096218519
+  },
+  {
+   "pool": "0xd77a1efbc8d143b100cf2496ff970da0a616a6796886e6ba1f45e7d7e09bb150",
+   "age_pts": 13,
+   "final": 0.7322857875691225,
+   "maxdd": 0.5184106347894764
+  },
+  {
+   "pool": "0xba9840bc80d525071b6f1c36fccf13c9f1c630a1e6e6edf07ebf17df8425a66d",
+   "age_pts": 13,
+   "final": 1.43947978257192,
+   "maxdd": 0.16930346025798892
+  },
+  {
+   "pool": "0x3664e34418868c4e64c59c0e45f23c1f9361c4f4b6c23b3793d336be1d675a24",
+   "age_pts": 13,
+   "final": 0.7318465698355977,
+   "maxdd": 0.5017060785387446
+  },
+  {
+   "pool": "0x1857b4a03254e13d44f1fd50010c4eb2e6de774681d960f83d1ccd728e802602",
+   "age_pts": 13,
+   "final": 1.314670837899774,
+   "maxdd": 0.30669252146233417
+  },
+  {
+   "pool": "0x54d5fe8ee7a9546ce74ebe06c1d040defb7757410a627d4793d62a77eaaae4bf",
+   "age_pts": 13,
+   "final": 3.0145327066903613,
+   "maxdd": 0.23821155715672193
+  },
+  {
+   "pool": "0x4b24b65253e16886fedf4f2c4c70a18b37b58d3ae41a69fe970f7d674cb81bb0",
+   "age_pts": 13,
+   "final": 0.802206694316015,
+   "maxdd": 0.4144321634594966
+  },
+  {
+   "pool": "0xe25480f3cc5556c0aec28d781738e066455554e0b450b4715226b047fac6bcb2",
+   "age_pts": 13,
+   "final": 1.41154205970962,
+   "maxdd": 0.08515035562506357
+  },
+  {
+   "pool": "0x971d66fcc2f16bc1b11ca254ad600d2ad8432ff134669169d35f48303063dcff",
+   "age_pts": 13,
+   "final": 1.325229856423047,
+   "maxdd": 0.198915553188043
+  },
+  {
+   "pool": "0xd86a9e58d668acc7c13bd547f9fa5cc113ae0083a9fc39f97aab857349ee343d",
+   "age_pts": 13,
+   "final": 1.3744918457164206,
+   "maxdd": 0.196910436974165
+  },
+  {
+   "pool": "0xcd85a7c2298d8a72c6e0aea3d83dc2f01131f0135fde68b2b502aff81492b589",
+   "age_pts": 13,
+   "final": 0.9707381523319824,
+   "maxdd": 0.5234882691798328
+  },
+  {
+   "pool": "0x4970e2d971473eb1b43e3a25d901a473caa23a52e8f8fa586e4af46e72128c38",
+   "age_pts": 13,
+   "final": 3.1275282271961737,
+   "maxdd": 0.05804427841683346
+  },
+  {
+   "pool": "0x5113edb1d418c9fec0008a3f7ffa97ef8d5852167164f4e7be9b0615b7f50d5d",
+   "age_pts": 12,
+   "final": 0.16443996315482834,
+   "maxdd": 0.9103623102610572
+  },
+  {
+   "pool": "0xe4c4b7da3706193e7bf6e7b236156718a5856bc6d6866440661969ae3dcb0a77",
+   "age_pts": 13,
+   "final": 2.3199785102337316,
+   "maxdd": 0.20902449259337208
+  },
+  {
+   "pool": "0xa3abdb2721cd343da530ff6fd0ad73f3caa77163ea2fb8206847249f9bba57d5",
+   "age_pts": 13,
+   "final": 1.5364560933622826,
+   "maxdd": 0.006279883608023784
+  },
+  {
+   "pool": "0x5e2efe267cdaa27c2ed7ea3f3369f9f891ca67a069e9419e1d0ba41c7f4f0e17",
+   "age_pts": 13,
+   "final": 0.5438566667783172,
+   "maxdd": 0.45614333322168277
+  },
+  {
+   "pool": "0xf53f02d9041d00bbd92235b4c902b9f350c554a8ed2dc64fa0a4585aac413f09",
+   "age_pts": 10,
+   "final": 3.546767762203659,
+   "maxdd": 0.33020257384477325
+  },
+  {
+   "pool": "0x0b856af74fdf58b85f6125ff8ea9bbf6e0a782a73789b7035c3fc1fcb4b76d67",
+   "age_pts": 10,
+   "final": 1.4498809161085475,
+   "maxdd": 0.06208579046950924
+  },
+  {
+   "pool": "0xc362f08b2d304500e7299eaaf6184492ba3653d831615fe521d0791147f5a0f2",
+   "age_pts": 10,
+   "final": 1.656943684893558,
+   "maxdd": 0.23078662780871706
+  },
+  {
+   "pool": "0xdcb7418c5bd70bdfc17e5c975b5c7b2d21d9f1338e165a92db85577ddb6448ab",
+   "age_pts": 10,
+   "final": 2.0086545650584204,
+   "maxdd": 0.23859233713653438
+  },
+  {
+   "pool": "0xf26ed425bae6cb71d65a14115f7af4d315e3fb70fcc0db22195d38c2c09f8295",
+   "age_pts": 13,
+   "final": 3.49501418443424,
+   "maxdd": 0.40182642425921167
+  },
+  {
+   "pool": "0x2f4040d563fc000f9d0ee449f21c6d551e471ecdce0e618a14507af43b18101f",
+   "age_pts": 13,
+   "final": 2.9575043378981807,
+   "maxdd": 0.23193952533378703
+  },
+  {
+   "pool": "0xd9133187331e20885fd1b4ff2f18b892f94793ddaf808b1db6d4ef29ca58b943",
+   "age_pts": 13,
+   "final": 1.0239818635453684,
+   "maxdd": 0.24579110173175767
+  },
+  {
+   "pool": "0xc963c6dec1185197ecbe007858b52f67b8b819562027b4d3b94466759d67f6d1",
+   "age_pts": 13,
+   "final": 1.738934095708633,
+   "maxdd": 0.01360590646034976
+  },
+  {
+   "pool": "0xd4dda59a2eabd6ab93fff6cc7112e00cc2ec558a353923884e1942edb80e85ef",
+   "age_pts": 13,
+   "final": 0.7467794381467865,
+   "maxdd": 0.5094678159625762
+  },
+  {
+   "pool": "0x68266e6f53ce72b90272a7598fae8a5544c376ff4bc6c3c5d7fdf3e488f382a9",
+   "age_pts": 13,
+   "final": 0.7765553513201655,
+   "maxdd": 0.32475545599758404
+  },
+  {
+   "pool": "0xd46b6f7c126c13a335e7125bafad9cbb27252e3ba527a62537809e01e38df423",
+   "age_pts": 13,
+   "final": 1.8903616540632595,
+   "maxdd": 0.12426641887801448
+  },
+  {
+   "pool": "0x27b37d8ba66027716bc4bccdce7b797e4ecd9d2dc7e59df3eb5c8cf473b4081b",
+   "age_pts": 13,
+   "final": 0.9374453930800366,
+   "maxdd": 0.0625546069199634
+  },
+  {
+   "pool": "0x1c0523377296238f6a2fd25cb3b15f75e280eb330ad29f843b974eec264dfe31",
+   "age_pts": 13,
+   "final": 0.9307203616595999,
+   "maxdd": 0.43241892811791083
+  },
+  {
+   "pool": "0x901708ff8e6e4b419826e64e3513fde072d320dc069d509fbf7cbad15223a26a",
+   "age_pts": 13,
+   "final": 0.8580504810431692,
+   "maxdd": 0.14194951895683083
+  },
+  {
+   "pool": "0x4d5ebb48eaac668d0125d7c50d67866ae1aa10dc452a3f035d184a8720f9b404",
+   "age_pts": 13,
+   "final": 1.176556404358152,
+   "maxdd": 0.3755452790754955
+  },
+  {
+   "pool": "0x778029e36cae80284b8395eb524d166bb54ccd46461918b379c21ea018db2a64",
+   "age_pts": 13,
+   "final": 1.354300162965234,
+   "maxdd": 0.16689106462744685
+  },
+  {
+   "pool": "0x16ed5aa447912bb60b0be1ece9211fe7592bef3d4dbed287839c0eeff693a90f",
+   "age_pts": 11,
+   "final": 7.110708743933959,
+   "maxdd": 0.20949891183724412
+  },
+  {
+   "pool": "0x64761eeeaf3795b33817c71970dd8f495cd0135702026ed8b6acef632c3a599a",
+   "age_pts": 4,
+   "final": 0.25585821270893877,
+   "maxdd": 0.7441417872910612
+  },
+  {
+   "pool": "0xc0dbe4758c12a5c20d3680b5009eea3174613d8dbf0d8a590b8e448110c6d943",
+   "age_pts": 13,
+   "final": 4.126085491915544,
+   "maxdd": 0.30363540067643835
+  },
+  {
+   "pool": "0x7ae9239316ceb512119a85220edfed99cb037179779a0c72bae3be54222953fc",
+   "age_pts": 13,
+   "final": 1.2882533850333944,
+   "maxdd": 0.061147454086015185
+  },
+  {
+   "pool": "0x787e1e49f100e491d40d71290b4763f7e1be3d8c5b1b0e95d57a3aa9c9b00ee0",
+   "age_pts": 13,
+   "final": 0.7415704950920334,
+   "maxdd": 0.5235835572325507
+  },
+  {
+   "pool": "0x18e747caf6aa44021eec3c58c41f482f7c85413d60f55a243df544533b057282",
+   "age_pts": 13,
+   "final": 0.771215828903545,
+   "maxdd": 0.4917420385988853
+  },
+  {
+   "pool": "0xeb0fd02fb8044d5514fb6e165ee134fd547eff0378bb33b76f4b81d8b03bd1ae",
+   "age_pts": 13,
+   "final": 1.002904063656376,
+   "maxdd": 0.0008995501649504689
+  },
+  {
+   "pool": "0x2071187bc5322773bd9b2f272035d93fb443c650af7b92742fb0a66f4db59dbe",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x316ca6e9dc79d2630f80fb6407c96cb9c6102d8eddca4a229e15280c2cf697e5",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x58ca2441b499cd4cca9d4837772c4dd9796e91d37b1d3aadaf8a4a281e4ecc8a",
+   "age_pts": 9,
+   "final": 1.0039074191472304,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x862919f98dac9d3ad6da26e0afc41acd573bdf2617ed1f1f4ef0f66d8c3dc1bc",
+   "age_pts": 6,
+   "final": 1.0032049649635977,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x911f8aee92af88c5e80569f416fcd40027acde39a6c08ec4066987880b3defb9",
+   "age_pts": 5,
+   "final": 1.002904063656376,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xaa59d5f74819a5140f04fbbec58778283aeaaf083ea98ccabe707780554ddb4e",
+   "age_pts": 5,
+   "final": 1.002904063656376,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x1171b11a6bb9953f3e5c78401e5c8e7977858edce03a2772ad44d8cb8fec130d",
+   "age_pts": 5,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xc7c4a1ab63613c2ba6556ed3c5500223a8d302391d6fa22fdefb3e560dd8f3bb",
+   "age_pts": 9,
+   "final": 1.0032049649635977,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x1d49e2872cead64cb8a012bf98e8de803c715bf083ad9560c55eb5aae4474be9",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x3eb223398a333e782a7aa6386a66bb65ddc91bf64ed20994871af959b70fa9f1",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x5214209205c326b7f38c6a741e70849fa567b53a403a511efc518c8ec2a688fe",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x3c2f1b36bc6828ae2483871f5b7b7280f3c17af3cee9b9ff2190a7c47a523c7d",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xcbfbcd5ebfe6bbfa4f4d3bd417b316eaaf97ad61e34ac0beba6e57d48b01f086",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x7c0a2cdbf55c0cbeffff8fe1b0729e3ce9f39c8bc04d48d765e9154133a16805",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x5379c0bfcbfaec9712933ebd1a57ce53c92dc1d10afb59877aa14f46cc6e26ad",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x8f7d45b166d0d6d081681ea7fd1f538ca775a1c89860b3086682ce29512a0f8b",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x65c48a7a59673f5eab83fc277aa214be923697eee4ce297e6f526bba701f4fa0",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xe744a1546fcd4a8e12866929a733d3cc2b7130a3fbf5d839eeddca4e1fad907e",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x44c453a1f64fe2a25a5295411f6cc84e15129e2b167977dc613c595081754738",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xb1963036298a8bc01480b098ab891023ff1b881a9339bf709d00a809dd6cd76d",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x585955f084765fbe9d5801609ffcad6642c4d179a06d381678818701b613ee49",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x1b6b2d4680e7c238252dd36a00f095a167688bda2daee56d2b648655bbbb9b3b",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xf62b614c3e90b0cab66dcdaabdcd9a295b071e07ebb9c247e0687152886bfb85",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x94653b2e9efd4c387892fe3d346793bbfaad126b9d3f86b139ab048f0c9802da",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x39dc3ee9edde44e7014a9d649b1c2d61655ce447ff6d03f5e4696266d04a62cc",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x45e399cb88780b9a38dddef9793365679351aba35d4672e12d5fe426db0c9b3e",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xe38ffddba427155899ed0215bf9f78f34b6c91f91e643d73c9022238021314dd",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xd613ed71a7f651c4e9796770661ba5d82a4bdaabf229fbf44a19c5820aed3684",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x5e6e77a7df62387dba08d482ef06e3ae8190b9f093915bd6c6b312a3b462e69f",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x2fb69b898855f44f4457a21c7a3744cc5f2e0064d96d04432ba58c00c1a9808c",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x84a1732ae7f0f6734d88dd4c8231f7e4abd99430d5a38c2ac80fa00b69e6134b",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x911bcfb7cbc533bb516ce2f05a8831b287368d2ef068d5b8e83ebf56c3215881",
+   "age_pts": 10,
+   "final": 1.004108210670134,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x5cff186c87bdfd54a40ee3c6a35fc1b1122b49599e959028527f5ad6e17038a9",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xe213981b00daa502ddf751b6222675bb9336d7f539b4e6b18cbc789b2240e65c",
+   "age_pts": 8,
+   "final": 1.0037066677766084,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x0a4475ecc990d658477ec40d3b560a427ca612bed18c09ce27406a8d6d782c0c",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x40d03f967733db6ec829ade63154e91c5df185dbd44c112cb2f9994128353015",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x9653a22dd864360b71399f070eaf3a101653b74215a23ee640f75a9a1de4c690",
+   "age_pts": 5,
+   "final": 1.0009003600840125,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x288ab49e16f1b3ae5c2cf86d0650a6563eec804728cfee3899d8de4e671b5fda",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xc7bf838a81c1e582d75da4b9f4603cf2120e9ca4171485fb9478d8164ed99d64",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x383e68567e1e1061fa2cf2db4322b76a8cae44991c38c6d3a8959b520372df3c",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x9f108f378a97820721b0f9abc5c52d9ddf79aa7b43c0f7372cc2c1a184fea23e",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x2782a475cbfaf66a4897a338923ba144bd6dd5bd950ccaf1a997e39467863c63",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x54fe2e4b832e77f3bde47db80c0f73a3ee4e30c89bc0446b35705451533f77b1",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x31199204b9b4ac4bb1b9c8f0bada452deb0f8f94d693641c6bfbb27bd6c963dd",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x877b784d6dbac0c81adf74ba9689536271c205d84a7cef599d882d3553132c9b",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x43165d4179fcafdccf4b15981fe0e06c7dd2904560ef2bdfb2a475b2250626cc",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x71f8fd483e8c4f6b02673da93dc62c6dc3bc6c0c90b95b3a8aa61cfa399a5989",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xa3a5cdee6b7f39f7e75c009af4849c54f9e69ea8cfc992f282369227c9e22ae0",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x2abc672154e363e04c8ef6b93b46679729bc75edff510331992ed2b723ba8578",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x6069b835d7b105f30448b3e115b2c2c2b70c7a87e6b33afc0922d93d04cc11eb",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x9479e9b103c7c5bbd03505a82f2078dd9e7c0b5b9a20c898035257c41256101e",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x75c0bb8b65294c466b272046d95a2cccf469003aacce7f01bd54e97967368d9a",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xcdc5d223088b9ce356bd5eb6ec2b343bf48b81ae750d545e28e07686927f970d",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xdd60ffcd5846370e500c6aab89f7e5683f88f80db1017804d11621c42971f5df",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x721bcd3bfe288203e9203e4785d25ea23943f00565200d898849f3a0502e963c",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x418d1c7428c409fec973a3efc2b6b73a2397bf0e20edd39aecbbe204d283efb9",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x946256a5755b91039babff0b36c367b934a8f4559c00596a0a4b0b371fbfca3f",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x8c9dec53ba2ff8e348c97314ba9833c12e0c6dc8237cf5d69db2770dd6cd0e4d",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x03c0a3b5bd01eca25097f8b79f1e58bcc685af4dc32a29217d269f9788aa2064",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x41d37296daf1f2157737f22940a81942435f134b56bce7d9a75aa64aa6627960",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x2f45877dc1c6315880e5ab806439e3a76c54a37e949d1dd6a5de49df8e26209f",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xfb2538c7bf403e8e45c73eda9890b56627928e5a214308f2815b427fc9924fd9",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x73e43ac7aeee68bd93f437092b19e453647e178c8c289a1ef669d724190227ff",
+   "age_pts": 5,
+   "final": 1.002803783278048,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x6c322c9f3bfeafc47b98eafe07a4a5882fd52a56abfa4917f5d4b80cc29cc712",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xfed069a817803e852beecb6f6be390245f2212c50e3ec3bb993b4c956b4e00e6",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x5dafe046cf2f86af2792080df0f38e020c8021ade2538ccbbcaa77fcce521887",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x964872785f75087afc68f6968f025de3779f6b00766419ca7079d18980104a95",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x447009630c31faac21b05dc2d1a03038bc85da34b4ad0703e0fc6d92881a5241",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x5075839d54ac104d3500369807a1d7b5d25e088e053a15f2d454bf9a841f066d",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xfea316084d166ce76a1f1d1e2be087e5a65562a6a1e25b4f54fed30d94805821",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xda2b5b0913f8ec7005ab7766e3c6e6a56db3e1c1583b7eef9eed414fa80dd520",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x0c165b62a5373fb15607b0d4e73d5afab42cd792f28aa56a6990e390a7b05dc7",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xc39b48af4e56be63974546851583027cff3634745d4ed3d7b005742538233549",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x42777e6e55f6839e7645cdf0b9019fa675172bfe87fb239311f38d05e3154d08",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xe6232be3fd1d0d0746541d400b02d41350c1b05092ec886c879cf887604c98b0",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xc571ec977124e56f86d2f66c791800e579bb07cc446938d35d0708a698a155a0",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x0a219204a9137d892a50edfb9f8b6d61e37aff4b78c68a2b6fa3411a1fcdd435",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x693fe309a123968b966f2ba16559e9485542cc437c607090a64ad538c6152a17",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xacdd23d5a05fbb84394fb7bfbc2c37672f74940a46c7d692c22190407aea2b03",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x1273b32ccf73489d034348585d8ff697a2cdf17446ed953cac31c74165e855df",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xa968b9df38e323e7c14e87ffaa1b6f20132fa8611caa95272c59d9327157deb0",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xcdd86ca852eafec499c0a563f9a7e122a989343caaa7519aa9c58fe8e2063b94",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xd480f1a55a963fcd79b07981110c0b725eb352109d50c41d54e3003e27c3de48",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x2031b004e52baee26d175666d153886e440d4c14e0dd91559cb5d449a62300b1",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x6750931aa81db8f858f9ec02a4438a9450d11d974e8a970405b666d3a5a6729f",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x0b61a6f9b3bd8ee398b25141c47b611cf7c17bfd6bf0d3aa63fafbd827ec1a85",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xbc180724b3bd147b75a4cfb1c970a5dc9e94c98de4c0b9603255f43c8162478a",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x556692c087ad46be7aa5a76136709286b4312dbb80aa531166f54745c653cd65",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x1d462b1507e13988d1af976d77786b53c31dfd936a93ff2db92693adb7aa5391",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x81cd8e4da4b53ffcbb7bec22dc6e5f437d90058c5943d6d46bdfc2595acd5aed",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x225b5bd228668fe0d24617b285ed29bcfa7a57ad0a4e536161e1df31fdd7805f",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xf16f22bcf5b3fa3ae70442431c91f7b4f1d5fb6d51c5c18c10b31789e8718dee",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xdf77742305f41ea2fe68f5d1c0d6eb8eecec358da62dfe284ba7cf2d19ba0d26",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xc88b44184ce6d6dfd92440b6b5e890cf02524e6a63cf816c6a5b42988f929503",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x71b76766b9e9c304e6ebfc3766980fe3c8ffbe1ff5096b4fe61e607ef90e4894",
+   "age_pts": 5,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0xd17cc363f0157b7f25145d1458c6e2dd11e59f921bed3d62d28929a1b8e9bf25",
+   "age_pts": 7,
+   "final": 1.001801530816306,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x0c96455c45c2e3645a3fa32bd0af0950c251a9cb0736135ab99b76d3c8f90424",
+   "age_pts": 8,
+   "final": 1.0024027620250628,
+   "maxdd": 0.0
+  },
+  {
+   "pool": "0x352abba1cdb0bf9d39a49e9fe29c0e0fd10d19d61b967106aed3b944f974efd6",
+   "age_pts": 10,
+   "final": 1.0040078098891452,
+   "maxdd": 0.0
+  }
+ ]
+}
