@@ -1,0 +1,2006 @@
+{
+ "takenAt": "2026-09-19T13:31:41.250593+00:00",
+ "block": 21675515,
+ "pools": {
+  "0xcb1840df698933aa72e400624a5705148bef3de331ad4fc3dda2eea660472d9d": {
+   "tick": 405258,
+   "liquidity": "1575037795897358225",
+   "swaps": 583
+  },
+  "0xffc14015e15378de5ef05e9ebe5fc410e8aebb5fcf5dbfba6589e826021a1f84": {
+   "tick": 381903,
+   "liquidity": "2483610924314602",
+   "swaps": 170
+  },
+  "0xb3f441e8871840ecfcb284e5cbb5b9c21a50e961e1c50109bdced25e429f00cc": {
+   "tick": 314888,
+   "liquidity": "4209637122862314272",
+   "swaps": 159
+  },
+  "0x79c502e4b5a43b22923b72537b46c47f2df4ac68892a7c429f7ab5fe9363e9ad": {
+   "tick": 69242,
+   "liquidity": "0",
+   "swaps": 119
+  },
+  "0x821368598ad40809224b9e7e20ec00a0d4c169b32300326be1facee5fbe0249e": {
+   "tick": 102635,
+   "liquidity": "0",
+   "swaps": 115
+  },
+  "0x5e794e5d3d01c045ddfb2448c4afd557ec297d1dee49b28923dc0ada3425f780": {
+   "tick": 357339,
+   "liquidity": "1582694883651413524",
+   "swaps": 99
+  },
+  "0x5480baf7cdeb183856e53b4246bc01adb25cc24c8ef04b6d311fce977149a8b8": {
+   "tick": -61322,
+   "liquidity": "11335951954297083418919555",
+   "swaps": 95
+  },
+  "0xd77a1efbc8d143b100cf2496ff970da0a616a6796886e6ba1f45e7d7e09bb150": {
+   "tick": 85366,
+   "liquidity": "2052055653540083984003185",
+   "swaps": 92
+  },
+  "0xba9840bc80d525071b6f1c36fccf13c9f1c630a1e6e6edf07ebf17df8425a66d": {
+   "tick": 314868,
+   "liquidity": "812667126589956044",
+   "swaps": 91
+  },
+  "0x3664e34418868c4e64c59c0e45f23c1f9361c4f4b6c23b3793d336be1d675a24": {
+   "tick": -348393,
+   "liquidity": "1667772879034615371",
+   "swaps": 84
+  },
+  "0x1857b4a03254e13d44f1fd50010c4eb2e6de774681d960f83d1ccd728e802602": {
+   "tick": 75066,
+   "liquidity": "2054476541049100692084379",
+   "swaps": 83
+  },
+  "0x54d5fe8ee7a9546ce74ebe06c1d040defb7757410a627d4793d62a77eaaae4bf": {
+   "tick": 330860,
+   "liquidity": "1758924297988904206",
+   "swaps": 79
+  },
+  "0x4b24b65253e16886fedf4f2c4c70a18b37b58d3ae41a69fe970f7d674cb81bb0": {
+   "tick": 85930,
+   "liquidity": "1689986787737542821079490",
+   "swaps": 63
+  },
+  "0x726a2376f74659cedec11f3bf16be6870b36c3f5111535ad8d59bdaeb4415ea5": {
+   "tick": 104889,
+   "liquidity": "0",
+   "swaps": 61
+  },
+  "0xe25480f3cc5556c0aec28d781738e066455554e0b450b4715226b047fac6bcb2": {
+   "tick": 314852,
+   "liquidity": "137799614366539126",
+   "swaps": 57
+  },
+  "0x971d66fcc2f16bc1b11ca254ad600d2ad8432ff134669169d35f48303063dcff": {
+   "tick": 339175,
+   "liquidity": "59241206584161593",
+   "swaps": 57
+  },
+  "0x3e6767348351302ac5ec9c5764206cddad0e71e1235eb160cc5a527e6ee97a59": {
+   "tick": 147120,
+   "liquidity": "0",
+   "swaps": 55
+  },
+  "0xd86a9e58d668acc7c13bd547f9fa5cc113ae0083a9fc39f97aab857349ee343d": {
+   "tick": 338933,
+   "liquidity": "2451758353686544966",
+   "swaps": 54
+  },
+  "0x0469a7517d65883d8f3c5a01ff2bf5d3cd7909f8aa2bffead1b68331ca0bb998": {
+   "tick": 105989,
+   "liquidity": "0",
+   "swaps": 51
+  },
+  "0xd8607672a369a50f17fe93cf843c53ca4ac52b632cc0b1dec56bbe8236840ad0": {
+   "tick": 104965,
+   "liquidity": "4571162944137684094771075",
+   "swaps": 45
+  },
+  "0xcd85a7c2298d8a72c6e0aea3d83dc2f01131f0135fde68b2b502aff81492b589": {
+   "tick": 364902,
+   "liquidity": "2440869107694356627",
+   "swaps": 44
+  },
+  "0x4970e2d971473eb1b43e3a25d901a473caa23a52e8f8fa586e4af46e72128c38": {
+   "tick": 387830,
+   "liquidity": "1575037795897358225",
+   "swaps": 41
+  },
+  "0x5113edb1d418c9fec0008a3f7ffa97ef8d5852167164f4e7be9b0615b7f50d5d": {
+   "tick": -50680,
+   "liquidity": "13039357248396731547199586",
+   "swaps": 41
+  },
+  "0xc3f1e6297d52d5815336e0b3413a34eedfffa67b1709a4f0a86ad3af453b6e8f": {
+   "tick": 75117,
+   "liquidity": "0",
+   "swaps": 41
+  },
+  "0xe4c4b7da3706193e7bf6e7b236156718a5856bc6d6866440661969ae3dcb0a77": {
+   "tick": 96895,
+   "liquidity": "2050462634482935276160925",
+   "swaps": 37
+  },
+  "0xa3abdb2721cd343da530ff6fd0ad73f3caa77163ea2fb8206847249f9bba57d5": {
+   "tick": 329399,
+   "liquidity": "1264911064143246396",
+   "swaps": 36
+  },
+  "0x5e2efe267cdaa27c2ed7ea3f3369f9f891ca67a069e9419e1d0ba41c7f4f0e17": {
+   "tick": 384194,
+   "liquidity": "1575037795897358225",
+   "swaps": 36
+  },
+  "0x6327ede7ab0221d87380ae17fb00dcfb5a86f4619d6a8e2575555408f739d1fc": {
+   "tick": 450955,
+   "liquidity": "55268439824864153",
+   "swaps": 34
+  },
+  "0xf53f02d9041d00bbd92235b4c902b9f350c554a8ed2dc64fa0a4585aac413f09": {
+   "tick": 346350,
+   "liquidity": "355560861231297445",
+   "swaps": 34
+  },
+  "0x0b856af74fdf58b85f6125ff8ea9bbf6e0a782a73789b7035c3fc1fcb4b76d67": {
+   "tick": 314838,
+   "liquidity": "46482725556116808",
+   "swaps": 30
+  },
+  "0xc362f08b2d304500e7299eaaf6184492ba3653d831615fe521d0791147f5a0f2": {
+   "tick": 358681,
+   "liquidity": "1624914426280452202",
+   "swaps": 27
+  },
+  "0xdcb7418c5bd70bdfc17e5c975b5c7b2d21d9f1338e165a92db85577ddb6448ab": {
+   "tick": 353916,
+   "liquidity": "1575037795897358225",
+   "swaps": 26
+  },
+  "0xf26ed425bae6cb71d65a14115f7af4d315e3fb70fcc0db22195d38c2c09f8295": {
+   "tick": 346552,
+   "liquidity": "1601645879448222158",
+   "swaps": 26
+  },
+  "0x2f4040d563fc000f9d0ee449f21c6d551e471ecdce0e618a14507af43b18101f": {
+   "tick": 331603,
+   "liquidity": "876699117410954463",
+   "swaps": 24
+  },
+  "0xd9133187331e20885fd1b4ff2f18b892f94793ddaf808b1db6d4ef29ca58b943": {
+   "tick": 58368,
+   "liquidity": "1975311167961348620457910",
+   "swaps": 21
+  },
+  "0xc963c6dec1185197ecbe007858b52f67b8b819562027b4d3b94466759d67f6d1": {
+   "tick": 388839,
+   "liquidity": "1575037795897358225",
+   "swaps": 20
+  },
+  "0xd4dda59a2eabd6ab93fff6cc7112e00cc2ec558a353923884e1942edb80e85ef": {
+   "tick": 361600,
+   "liquidity": "946996236956469592",
+   "swaps": 20
+  },
+  "0x68266e6f53ce72b90272a7598fae8a5544c376ff4bc6c3c5d7fdf3e488f382a9": {
+   "tick": -369552,
+   "liquidity": "2002241434318933123",
+   "swaps": 20
+  },
+  "0xd46b6f7c126c13a335e7125bafad9cbb27252e3ba527a62537809e01e38df423": {
+   "tick": 391870,
+   "liquidity": "1575037795897358225",
+   "swaps": 19
+  },
+  "0xac5839bd85413795c4bc478a80335b6620d146718d45bf22a4e655acf17d942c": {
+   "tick": 68214,
+   "liquidity": "0",
+   "swaps": 19
+  },
+  "0x27b37d8ba66027716bc4bccdce7b797e4ecd9d2dc7e59df3eb5c8cf473b4081b": {
+   "tick": -231101,
+   "liquidity": "80177814612054198",
+   "swaps": 18
+  },
+  "0x1c0523377296238f6a2fd25cb3b15f75e280eb330ad29f843b974eec264dfe31": {
+   "tick": 86425,
+   "liquidity": "1527525230256910870518066",
+   "swaps": 18
+  },
+  "0x901708ff8e6e4b419826e64e3513fde072d320dc069d509fbf7cbad15223a26a": {
+   "tick": 396667,
+   "liquidity": "2241760782196393590",
+   "swaps": 17
+  },
+  "0x4d5ebb48eaac668d0125d7c50d67866ae1aa10dc452a3f035d184a8720f9b404": {
+   "tick": 395221,
+   "liquidity": "1575037795897358225",
+   "swaps": 17
+  },
+  "0x778029e36cae80284b8395eb524d166bb54ccd46461918b379c21ea018db2a64": {
+   "tick": -354489,
+   "liquidity": "1584143720936604945",
+   "swaps": 16
+  },
+  "0x16ed5aa447912bb60b0be1ece9211fe7592bef3d4dbed287839c0eeff693a90f": {
+   "tick": 380793,
+   "liquidity": "1575037795897358225",
+   "swaps": 15
+  },
+  "0x64761eeeaf3795b33817c71970dd8f495cd0135702026ed8b6acef632c3a599a": {
+   "tick": -67964,
+   "liquidity": "11798557334194424342731902",
+   "swaps": 15
+  },
+  "0xc0dbe4758c12a5c20d3680b5009eea3174613d8dbf0d8a590b8e448110c6d943": {
+   "tick": 165204,
+   "liquidity": "23951777123437323173170",
+   "swaps": 14
+  },
+  "0x7ae9239316ceb512119a85220edfed99cb037179779a0c72bae3be54222953fc": {
+   "tick": 396105,
+   "liquidity": "1575037795897358225",
+   "swaps": 14
+  },
+  "0x787e1e49f100e491d40d71290b4763f7e1be3d8c5b1b0e95d57a3aa9c9b00ee0": {
+   "tick": 361560,
+   "liquidity": "2532470459960451",
+   "swaps": 13
+  },
+  "0x18e747caf6aa44021eec3c58c41f482f7c85413d60f55a243df544533b057282": {
+   "tick": 361513,
+   "liquidity": "109030789747313892",
+   "swaps": 13
+  },
+  "0xeb0fd02fb8044d5514fb6e165ee134fd547eff0378bb33b76f4b81d8b03bd1ae": {
+   "tick": -1399,
+   "liquidity": "7060558116264",
+   "swaps": 13
+  },
+  "0x2071187bc5322773bd9b2f272035d93fb443c650af7b92742fb0a66f4db59dbe": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x316ca6e9dc79d2630f80fb6407c96cb9c6102d8eddca4a229e15280c2cf697e5": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x58ca2441b499cd4cca9d4837772c4dd9796e91d37b1d3aadaf8a4a281e4ecc8a": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x862919f98dac9d3ad6da26e0afc41acd573bdf2617ed1f1f4ef0f66d8c3dc1bc": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x911f8aee92af88c5e80569f416fcd40027acde39a6c08ec4066987880b3defb9": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0xaa59d5f74819a5140f04fbbec58778283aeaaf083ea98ccabe707780554ddb4e": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x1171b11a6bb9953f3e5c78401e5c8e7977858edce03a2772ad44d8cb8fec130d": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0xc7c4a1ab63613c2ba6556ed3c5500223a8d302391d6fa22fdefb3e560dd8f3bb": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x1d49e2872cead64cb8a012bf98e8de803c715bf083ad9560c55eb5aae4474be9": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x3eb223398a333e782a7aa6386a66bb65ddc91bf64ed20994871af959b70fa9f1": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x5214209205c326b7f38c6a741e70849fa567b53a403a511efc518c8ec2a688fe": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x3c2f1b36bc6828ae2483871f5b7b7280f3c17af3cee9b9ff2190a7c47a523c7d": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0xcbfbcd5ebfe6bbfa4f4d3bd417b316eaaf97ad61e34ac0beba6e57d48b01f086": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x7c0a2cdbf55c0cbeffff8fe1b0729e3ce9f39c8bc04d48d765e9154133a16805": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x5379c0bfcbfaec9712933ebd1a57ce53c92dc1d10afb59877aa14f46cc6e26ad": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x8f7d45b166d0d6d081681ea7fd1f538ca775a1c89860b3086682ce29512a0f8b": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x65c48a7a59673f5eab83fc277aa214be923697eee4ce297e6f526bba701f4fa0": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0xe744a1546fcd4a8e12866929a733d3cc2b7130a3fbf5d839eeddca4e1fad907e": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x44c453a1f64fe2a25a5295411f6cc84e15129e2b167977dc613c595081754738": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0xb1963036298a8bc01480b098ab891023ff1b881a9339bf709d00a809dd6cd76d": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x585955f084765fbe9d5801609ffcad6642c4d179a06d381678818701b613ee49": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x1b6b2d4680e7c238252dd36a00f095a167688bda2daee56d2b648655bbbb9b3b": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0xf62b614c3e90b0cab66dcdaabdcd9a295b071e07ebb9c247e0687152886bfb85": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x94653b2e9efd4c387892fe3d346793bbfaad126b9d3f86b139ab048f0c9802da": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x39dc3ee9edde44e7014a9d649b1c2d61655ce447ff6d03f5e4696266d04a62cc": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x45e399cb88780b9a38dddef9793365679351aba35d4672e12d5fe426db0c9b3e": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0xe38ffddba427155899ed0215bf9f78f34b6c91f91e643d73c9022238021314dd": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0xd613ed71a7f651c4e9796770661ba5d82a4bdaabf229fbf44a19c5820aed3684": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x5e6e77a7df62387dba08d482ef06e3ae8190b9f093915bd6c6b312a3b462e69f": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x2fb69b898855f44f4457a21c7a3744cc5f2e0064d96d04432ba58c00c1a9808c": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x84a1732ae7f0f6734d88dd4c8231f7e4abd99430d5a38c2ac80fa00b69e6134b": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x911bcfb7cbc533bb516ce2f05a8831b287368d2ef068d5b8e83ebf56c3215881": {
+   "tick": 66980,
+   "liquidity": "71374646198089194",
+   "swaps": 12
+  },
+  "0x5cff186c87bdfd54a40ee3c6a35fc1b1122b49599e959028527f5ad6e17038a9": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xe213981b00daa502ddf751b6222675bb9336d7f539b4e6b18cbc789b2240e65c": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x0a4475ecc990d658477ec40d3b560a427ca612bed18c09ce27406a8d6d782c0c": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x40d03f967733db6ec829ade63154e91c5df185dbd44c112cb2f9994128353015": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x9653a22dd864360b71399f070eaf3a101653b74215a23ee640f75a9a1de4c690": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x288ab49e16f1b3ae5c2cf86d0650a6563eec804728cfee3899d8de4e671b5fda": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xc7bf838a81c1e582d75da4b9f4603cf2120e9ca4171485fb9478d8164ed99d64": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x383e68567e1e1061fa2cf2db4322b76a8cae44991c38c6d3a8959b520372df3c": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x9f108f378a97820721b0f9abc5c52d9ddf79aa7b43c0f7372cc2c1a184fea23e": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x2782a475cbfaf66a4897a338923ba144bd6dd5bd950ccaf1a997e39467863c63": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x54fe2e4b832e77f3bde47db80c0f73a3ee4e30c89bc0446b35705451533f77b1": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x31199204b9b4ac4bb1b9c8f0bada452deb0f8f94d693641c6bfbb27bd6c963dd": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x877b784d6dbac0c81adf74ba9689536271c205d84a7cef599d882d3553132c9b": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x43165d4179fcafdccf4b15981fe0e06c7dd2904560ef2bdfb2a475b2250626cc": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x71f8fd483e8c4f6b02673da93dc62c6dc3bc6c0c90b95b3a8aa61cfa399a5989": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xa3a5cdee6b7f39f7e75c009af4849c54f9e69ea8cfc992f282369227c9e22ae0": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x2abc672154e363e04c8ef6b93b46679729bc75edff510331992ed2b723ba8578": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x6069b835d7b105f30448b3e115b2c2c2b70c7a87e6b33afc0922d93d04cc11eb": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x9479e9b103c7c5bbd03505a82f2078dd9e7c0b5b9a20c898035257c41256101e": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x75c0bb8b65294c466b272046d95a2cccf469003aacce7f01bd54e97967368d9a": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xcdc5d223088b9ce356bd5eb6ec2b343bf48b81ae750d545e28e07686927f970d": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xdd60ffcd5846370e500c6aab89f7e5683f88f80db1017804d11621c42971f5df": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x721bcd3bfe288203e9203e4785d25ea23943f00565200d898849f3a0502e963c": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x418d1c7428c409fec973a3efc2b6b73a2397bf0e20edd39aecbbe204d283efb9": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x946256a5755b91039babff0b36c367b934a8f4559c00596a0a4b0b371fbfca3f": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x8c9dec53ba2ff8e348c97314ba9833c12e0c6dc8237cf5d69db2770dd6cd0e4d": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x03c0a3b5bd01eca25097f8b79f1e58bcc685af4dc32a29217d269f9788aa2064": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x41d37296daf1f2157737f22940a81942435f134b56bce7d9a75aa64aa6627960": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x2f45877dc1c6315880e5ab806439e3a76c54a37e949d1dd6a5de49df8e26209f": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xfb2538c7bf403e8e45c73eda9890b56627928e5a214308f2815b427fc9924fd9": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x73e43ac7aeee68bd93f437092b19e453647e178c8c289a1ef669d724190227ff": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x6c322c9f3bfeafc47b98eafe07a4a5882fd52a56abfa4917f5d4b80cc29cc712": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xfed069a817803e852beecb6f6be390245f2212c50e3ec3bb993b4c956b4e00e6": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x5dafe046cf2f86af2792080df0f38e020c8021ade2538ccbbcaa77fcce521887": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x964872785f75087afc68f6968f025de3779f6b00766419ca7079d18980104a95": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x447009630c31faac21b05dc2d1a03038bc85da34b4ad0703e0fc6d92881a5241": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x5075839d54ac104d3500369807a1d7b5d25e088e053a15f2d454bf9a841f066d": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xfea316084d166ce76a1f1d1e2be087e5a65562a6a1e25b4f54fed30d94805821": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xda2b5b0913f8ec7005ab7766e3c6e6a56db3e1c1583b7eef9eed414fa80dd520": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x0c165b62a5373fb15607b0d4e73d5afab42cd792f28aa56a6990e390a7b05dc7": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xc39b48af4e56be63974546851583027cff3634745d4ed3d7b005742538233549": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x42777e6e55f6839e7645cdf0b9019fa675172bfe87fb239311f38d05e3154d08": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xe6232be3fd1d0d0746541d400b02d41350c1b05092ec886c879cf887604c98b0": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xc571ec977124e56f86d2f66c791800e579bb07cc446938d35d0708a698a155a0": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x0a219204a9137d892a50edfb9f8b6d61e37aff4b78c68a2b6fa3411a1fcdd435": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x693fe309a123968b966f2ba16559e9485542cc437c607090a64ad538c6152a17": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xacdd23d5a05fbb84394fb7bfbc2c37672f74940a46c7d692c22190407aea2b03": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x1273b32ccf73489d034348585d8ff697a2cdf17446ed953cac31c74165e855df": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xa968b9df38e323e7c14e87ffaa1b6f20132fa8611caa95272c59d9327157deb0": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xcdd86ca852eafec499c0a563f9a7e122a989343caaa7519aa9c58fe8e2063b94": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xd480f1a55a963fcd79b07981110c0b725eb352109d50c41d54e3003e27c3de48": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x2031b004e52baee26d175666d153886e440d4c14e0dd91559cb5d449a62300b1": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x6750931aa81db8f858f9ec02a4438a9450d11d974e8a970405b666d3a5a6729f": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x0b61a6f9b3bd8ee398b25141c47b611cf7c17bfd6bf0d3aa63fafbd827ec1a85": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xbc180724b3bd147b75a4cfb1c970a5dc9e94c98de4c0b9603255f43c8162478a": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x556692c087ad46be7aa5a76136709286b4312dbb80aa531166f54745c653cd65": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x1d462b1507e13988d1af976d77786b53c31dfd936a93ff2db92693adb7aa5391": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x81cd8e4da4b53ffcbb7bec22dc6e5f437d90058c5943d6d46bdfc2595acd5aed": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x225b5bd228668fe0d24617b285ed29bcfa7a57ad0a4e536161e1df31fdd7805f": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xf16f22bcf5b3fa3ae70442431c91f7b4f1d5fb6d51c5c18c10b31789e8718dee": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xdf77742305f41ea2fe68f5d1c0d6eb8eecec358da62dfe284ba7cf2d19ba0d26": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xc88b44184ce6d6dfd92440b6b5e890cf02524e6a63cf816c6a5b42988f929503": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x71b76766b9e9c304e6ebfc3766980fe3c8ffbe1ff5096b4fe61e607ef90e4894": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xd17cc363f0157b7f25145d1458c6e2dd11e59f921bed3d62d28929a1b8e9bf25": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x0c96455c45c2e3645a3fa32bd0af0950c251a9cb0736135ab99b76d3c8f90424": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x352abba1cdb0bf9d39a49e9fe29c0e0fd10d19d61b967106aed3b944f974efd6": {
+   "tick": 68756,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xb3b83c1adca426dfea0b1b9d121f6ebc77efe299497ec23054cc16bc179dace8": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x1094120817a425d68d5e4ed83bffde0acf81a7011f61287d2738c917a1bbc922": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xaa1d6a5207b74047b0f73601665d5bba1d2ea140463748d222e5d4421fa9d67b": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x54caa09ef25447c8726ef4269ed8d999debb000a265df018f4c795106b892c98": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xc3e5b6221edf490db0a0e3232e27903ac69516ef5f467a56a6f381c777a17f09": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0xc7f4939bd292de0ac12d164ab1589eec68b018d537c983b37b4658b95f493e38": {
+   "tick": 68757,
+   "liquidity": "78000794579316299",
+   "swaps": 12
+  },
+  "0x841a366644082a9b9c2dbefa7b8a4ed8bd234407f9e7ae3e24e059303728c06e": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x3f48932aa98906eb7b1cc7803bec1ae257da27bafa9aa5ea260bd412bc0e9069": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x3a8fb47f3f19d9f3dd826ede191c78de633b313843df49cd10ed7b58d1ee4e7f": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x374736ce7af8689262e899ef63d35da7f1ef18813ae548a9fd14d720a8188e0d": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x6fdbf096e17f4930d6cc6f1bafae882c9899e5074c3ae9955725743a0c0d4e68": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xc0ece134ac936add7389a2a77cfa09236361bb1625e2cadd84733ff75269bd0a": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xc8ba23bbccd0f42e2dfd3a695ba2435c05909bfc9418c9d7d3ea9ef91e4b6166": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x2603b9cd985fc8b31eb90a432e00ab9b5ab636438c666ef021099c2e44239969": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x2f076c9e7aab6d46ca6409f2be15b0fd297dad6dd96eaed686ddead2d36d1dcf": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x2f4d48f39a1d2761976614d954e229cae1e4d538e1743cf84c17a18c35174e92": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x17e73660bc9b9b5703cc57cf6a79017efaa181e5797b63b48ed751bd71f51742": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x7ae7b8953ef8414d6d9e8ec46f2603a7cd2ab4f7505bf67b0f29fe3e8fa47956": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x2a8ffc84c8ccb7e05f9e18d7d420679666317aa5d5182f69e3a83aa2dc38e065": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xc334cafc447cc1946cedfa3710745b4173a69136274170ab100141b2c2948a37": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x5b0412e460253990969b941758f2efdd9bd0bf977c9165d40f1531dd3712e7ef": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xec527ce9d124da240f45cf7d0d29185ea03a0afed6bdbe610c072c5f063e13c1": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x22c9a850d9a6179c447e3845584010895bb12b953fa9df44442fcc6e639650e0": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xec04090a533cc936f8ddc4b15a8ebc70abecad6651a4e06dd18eb6aed74d8aa9": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xfb93453415241c72c01b1d07a132068eac56717251008032333daf189571b992": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xb793f6dfe0ba5712f216cde3dd4c173d82e521f673a2f4ed71eaba317a06aaeb": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xf3551dbdb0ee45356750b68e267fbe7e6ddeb45f6c14f2745387b0491664f2a8": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xdf0cc033597ffbecaf18c6a9795af7b6a4a2b897deb0c3f2fb2cdf507f391535": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x0d559e8f751346724417d953bb9a90c34841ba08cb60c4353ec880656c0c066c": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x288529cd4d84a51e47ceb164125f7f534405566a1c895c7f8c66fff34042d0fa": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x9a3286b66f56a17cb1c8beb2157fa781de3907ca155bc69daa9cf861f567cd15": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x18b8e8ceded47399ece6507b4777654ebb562623910e8144a1730417161191ba": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x9a19722daf425b7154df26adb6345bd85aff817f16b89b84b11fbdc8c7c68372": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x01c44544a7378e3da09ca7638c087ef465138945183d15ca1076785ff8b81a1d": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x3a788793edbb62662d76461a5a1ea5a06693768755c745e62202d2cc7c951e50": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xbd427d58eccf8e27b3c5b12646d110e1f70703f1825941719f66a221ae4423f3": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x900c0dfb00756cabb284b12095c5c4b4cb3624ab734ba39cb2f6821806a50fdc": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xdc3b326a4379c1d6441f1e4bf49ec9fe420a8f52c5d01e721672d7f61dfb7f18": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x52107ac1b90ea49065de9dd3f49ab1f417df580287429e2e58f88ea02d26ab43": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x30c080bfd9b56b7bedc6472d6cd7e8456bc196fa43999e8733067f1a92ce3782": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x42760552075c5605d95ecf7150ebccbcd0302a73fd5a3216bc5b7ea20b38ceb8": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x96481340d8f42df48e2211f4853b3385cfea9cc3af2022e3fec3a1cff96f8006": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x28f9d53c73b696fec078a48acdd295c18e41396586ba1c7169e073f5ad305839": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xf0c1aac2f4d4c06ec9280740800a92823a3c432a778305772eb981991f4c9d75": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xd567efd2a5f40535c48e0ccef6a7f3f0c6d331adef022a4f657f3e908708dd7a": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x2a8cf383be78feefef264332e45047541fae84bdb518c0c3fa49927ffa0e03dc": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xfe0446a4266bf44beb12050d7c131ee64e1033b293c5cd5b16b6f96c02abbc35": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xa149c7c456d8f1fbce27bbac09b67098fbb9d989a65eff7a8b0f3b16bef86517": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x9a5f7a6424b96c893a727684dcf6674f586a0aad04825c163239562548d5469b": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xea3c2c5d27598bf2b3c0b5cb034cc796ff2352eed87ae30892489058639a2cc8": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x5179fa88871389c79b6b0f9bd87578437469b7b4ede7c5fb2e7c8de6cd690773": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xedfe19eb42be488abc64ec72d31e576f8ad28f51f6e392d9edbb131a3a94eba3": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x8538f8821789b9f7f502de930c34dd7a7b310eaa35c8f0c16e5985bdda18e525": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x7d5ff3ebc2cbad66564ae4c0ac8e700e345203092329ebae223805e9103e2280": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xf61a436b24484f12fd37c2be01ebee9cf5783d52a137a28d6a584bb95a8ca906": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xb9d830275e9494833918411f7da75a4c3e571c743eb233166f99ef1c1201001e": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xc3c6dbb246d9130f97e7155b525edb96ec5ae0002b45ff7949716e08e439ebad": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xffa56b22818af1892c90602a2fc07d8a83b8104ba919677ff202d6513e62da5e": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x646adb4b3e7efa2d8ebfdc76f4646ee81a13d7f2aefa91926943beeab0f3e12c": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x6f64d7c2996a06306a5e362ac1f37f4ee42b60b0aa28cb282426810d9dd31b1c": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xe6c0961e47f9de499d426bfb062992b23b60d205e6c6e5416ceb823dee952113": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xe5ee8c7950fec41f2256d0a1cb263ca00a30c9b3e5a4318b5148ff47a3993b9b": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x6bdd5c68b641e4e11e9bf4fac881c5ccae523383eaf53ad3f796d67048612eeb": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x8d3ee72342afd8911a75f435f79579876f8f3cc68247e512408c1f6b877811e1": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xfb9b86461b19a22848eedf8cdbaa1e7766ccb1a80722c23fecff2cd18fa4cd4d": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xc854845f6cfa5b1db3ab903940682d3d79be4a905f91bec9c7b523448a820aa3": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x038df759ff28e7e8fd3528c64b883d535120fd08f38ed1fa8e25b6947300c8cf": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x002024adcc97d9ca94d6b6942e24885c15755afef72ef925f04b81e6395222da": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x9ad1c793baa3487398bb6306ee8a77d011d09c1723d745549f5440ecf83f279d": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x83a08fe2d5da24e562ba25e82630867b484e9e8cf604d37b39d5fdb58185deb9": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xc110b99b774205fa38169cfd13e760f94a3006e842aed565171e42a84121fd34": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x78afdf0ab76488d14ffb95e1478a0b6a2722eb8d339430d82bb02c78e2b31ff3": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xe02a77470fb2f6564c671063d8e19987c6f87c4d1b67ff2a5855d31ccde08cac": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x9acb2689173068ea4117123df74b1a5a8fa7de21348edfc6b79811386b67d3c1": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x13250581d518d5d60e16869df13557b8714638b82e5f78ba8b6aa771d4c171de": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x5f9a63baeaacaa10ab776dfaf7803bd9812412107d5181c90996d24aa1780131": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x1838e5d7b278a61ce2dd79baa008cb138b77c3d02f4b2fbec5825b9b498a52d3": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x7b5618c61c7afe8acd952f95733eb43925135395483fb985faf875f4eb17495c": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xc2181091cc233eacd052e6b89801cfd4ba4d9ecfa63a3b2357f824ced19a6d8a": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xd0737999f269611ada3408e465fcd1bc39bcc55fd4dfcabf9c57e0c7b0a4aa2f": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x614903be8ada9e32269bfcf99e04251ac06339caf5819cfbd8ba0eb625fb8382": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x171f9f0bad41931bb6742ecdbea1ff23268755aa91dcc91c9c21c584b9f760b5": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x5750d2c940c8bb036a1063d5f61becafc2961164b749122f6b6b3f37cc56c586": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xd9f178847508d188594783dcb6e26cbb58d096736662efcc74b72a5a7fe8745c": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x90265e8a5d65a6f2163fb6698ea241befec3ed0aee8431a23fb94122ec9a3759": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xc7aae653671232ffeccf87529478d6ab5f0d78009f2dddb705da631eca7155d0": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x695c085f58482cce0a6dc330339a535ea3349a0243eaca666c1621ade447eef2": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x0cf24e298a8b1d72d80205b8257784402f44d2a3ec8477a363120636a20e8931": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xd6188c6846752201ad87e66d98bb43a8dd24a4ec8b93614bcaddf48f930ee202": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x39c40fcea0f42524308c28c2bc7028a75b9cc492b89212b914a1e3d0fa1b5f02": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x3a06eb7ced52a42839d1a1d1810e3c322604c4570ffdd4c9254ade656144d9a1": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xa134fb28bfff532d470136223412c1eebc16442547a2fb317ad344fa843891d9": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xa045a294b39bcba110208ad539ae62285730cf3485615094156d7ab2a9dba106": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x47647b50f42d361c479df3efa65f5f091b38f27196a6329059a04ecd9f354fa2": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xbbaa9d0104aaf64b7d179bc5c82651754b3f4fcce9ab8c4df067a1f43647ef3b": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x1447cd118fad4748b4ea22b03b818e3c0dba20693b1fcbe28bae8e9bad4d656f": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x7b6e1154ca47c106884c27adef192fc356718fe7fb2a493316d681ab17852ca5": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x38782bfc7e35b6b2a44fd389f7221b100ec2cb199fe1ebb9b40dfe23daef0b29": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x6b82b5b3196aa3d845c5129d390b736a6bfd5ae8de2dcebd4f76a19d86416f44": {
+   "tick": 67315,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0xdf2c8531a73051641f46c02903a2ab4aa24a45c195073443c9d9ed839cdd4a66": {
+   "tick": 67316,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x51530435c2c83bc2dde12642cb3a22bda5a56381649b51ebcf020d7fc42786e3": {
+   "tick": 67316,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x938ff3e574101bb264927056348a1555c9d412fc3648bc204c9ee41de0a80109": {
+   "tick": 67316,
+   "liquidity": "72577539994156127",
+   "swaps": 12
+  },
+  "0x05da578909b48b824334b9192be508eea39d487ba33a4510325c522cc163efc8": {
+   "tick": 361559,
+   "liquidity": "32948090389161880",
+   "swaps": 12
+  },
+  "0xf8e19f6453a959175f7555a8d0a365ef1ad4afdf9a57cd9ad6ab15e7567a7c50": {
+   "tick": 361560,
+   "liquidity": "10764275753383857",
+   "swaps": 12
+  },
+  "0xc44924bc8f5d181383bcf3a4d1812c5588cf9485fdb164d990dfb9eef96c834d": {
+   "tick": 382291,
+   "liquidity": "3180263552334182710",
+   "swaps": 12
+  },
+  "0xe8124f328be26f5d078c6363a9dcd4e3c0fef73f2d58a2afbee0bed94540c960": {
+   "tick": -351268,
+   "liquidity": "281386563755347686",
+   "swaps": 11
+  },
+  "0x22bccf2f038cebcf6e27f2e185845b48bfeba370729fb421cc0d8b910202f14b": {
+   "tick": 338984,
+   "liquidity": "354892184691562087",
+   "swaps": 11
+  },
+  "0x9889182b0bcf2855e16075c66d5e8f423a8fde14cf61a0c1129b8e3b4596d031": {
+   "tick": 386936,
+   "liquidity": "1575037795897358225",
+   "swaps": 10
+  },
+  "0xf39c9d061c0367350dc910d9a1af376fbbc3b8e4accc76e0f480f0f989dbe80f": {
+   "tick": 43398,
+   "liquidity": "3654918434322037011329960",
+   "swaps": 10
+  },
+  "0xefe060b7f012c3f051f072be4b3d0eafefea9df1f18796b6d9b59d6749e21649": {
+   "tick": 376961,
+   "liquidity": "2002241434318933123",
+   "swaps": 10
+  },
+  "0xd67fdb79ceb19fe7c671b3def4fec48bef2322ec45e8e3b72ca918b77f1d218e": {
+   "tick": 97074,
+   "liquidity": "2050462634482935276160925",
+   "swaps": 10
+  },
+  "0xe15bf13a4959e46acf69ee86a2b3771de76ae86729d2c6f0c8b43c70edfe15ce": {
+   "tick": -348450,
+   "liquidity": "259361221445675726",
+   "swaps": 10
+  },
+  "0xf827e6bf06b5616737b2a1e3c51c0aa15924c052417d8fe56d2f0b9d379f9063": {
+   "tick": 58799,
+   "liquidity": "34053208857054175253314029",
+   "swaps": 9
+  },
+  "0x771b16f71e0086e673a5866ead7607855cc9cd4636fe789521b4cd80aa5958dc": {
+   "tick": 331363,
+   "liquidity": "313379670277073492",
+   "swaps": 9
+  },
+  "0xa09c59523879bdccc232413c151b78c8b5e52ee961b1226cb3e50975b7be8991": {
+   "tick": 361725,
+   "liquidity": "3731386988734065",
+   "swaps": 9
+  },
+  "0x500f907911600844c0b9ee8ee40635ea5641b5491b5bb4bb51ea2e64bd29176f": {
+   "tick": 403546,
+   "liquidity": "1575037795897358225",
+   "swaps": 9
+  },
+  "0x7e4c67d01a9ece4097688819b8162089632aaea14f2f3502069ce18cf57329da": {
+   "tick": -60853,
+   "liquidity": "36522217277686220065664300",
+   "swaps": 9
+  },
+  "0x2ea1adac39e68e236931f1ee43100df531cc1e3cc106e04904b4126df56187ee": {
+   "tick": 339035,
+   "liquidity": "75891639840077970",
+   "swaps": 9
+  },
+  "0xfa898eb0ad7630419336fc430da2e450ac6a6a9ad5b36cb0051ca015c25b7317": {
+   "tick": 338967,
+   "liquidity": "7283855000294233",
+   "swaps": 9
+  },
+  "0x84177748017cdb352323216bbae83925e8465c32970509e423aa206a1e045a0d": {
+   "tick": 338875,
+   "liquidity": "140096596581091861",
+   "swaps": 9
+  },
+  "0xf5a913528f0d4e0c68e63977c83ab901d88f1e05c76836707431ea08291863b8": {
+   "tick": 353756,
+   "liquidity": "1575037795897358225",
+   "swaps": 8
+  },
+  "0xc955cbfb9d03cde6f78901a81740264f895b9c00025beb9115cf2d7b86b3ee5a": {
+   "tick": 67005,
+   "liquidity": "4443216332",
+   "swaps": 8
+  },
+  "0x17c8effebb2b514b59bbea26b0b77a38f66e9f85d4f7da41955646c6d6a6d90e": {
+   "tick": 364704,
+   "liquidity": "5760192769759496",
+   "swaps": 8
+  },
+  "0x9641c77a40138fb1acc57f2623423dd988fe030defd8d88a70e44c8fbb984f59": {
+   "tick": 384226,
+   "liquidity": "1575037795897358225",
+   "swaps": 8
+  },
+  "0xc96ec046f0c094414e175ee751c1319dc2f22e685be5935e3406adbde85e6dda": {
+   "tick": -192365,
+   "liquidity": "474300598151549",
+   "swaps": 7
+  },
+  "0xb2455b9940eea9c24d2ad6f3705d8df3527d47b1d91362acb599cbc51daee5e4": {
+   "tick": -351639,
+   "liquidity": "16078567789752945",
+   "swaps": 7
+  },
+  "0xac859cd891713aac1db833d36870825e0fc6ac8fdb8a267272094908f235de64": {
+   "tick": 364664,
+   "liquidity": "1997098257874575",
+   "swaps": 7
+  },
+  "0x2b8e46ac7037705129ff8a82bb685a4aed55589b411c0b8cb2e7b82fa68def2e": {
+   "tick": 78397,
+   "liquidity": "2050462634482935276160925",
+   "swaps": 7
+  },
+  "0xa8849dcc3a29c6a3dbb4c9770c69a1bec84722a395ade58bd8a4233ea950fb84": {
+   "tick": 338863,
+   "liquidity": "1889318696362723",
+   "swaps": 7
+  },
+  "0x2c423f50e48914aedd6984669cb1ab0d985a366cd911adc467bdab87c3ba62e7": {
+   "tick": -348452,
+   "liquidity": "43107097915158565",
+   "swaps": 7
+  },
+  "0x6265fec05ed28172115dc7e1e6b1399862b11ad669a4f991bd4c8077fda7eff0": {
+   "tick": 387545,
+   "liquidity": "1575037795897358225",
+   "swaps": 7
+  },
+  "0x63ffba286d79e87b5f18b8d25e13d58b7299baa831d590460e4af66bd79d1999": {
+   "tick": 387640,
+   "liquidity": "1575037795897358225",
+   "swaps": 7
+  },
+  "0x1bd29e75ceac359120eb20377e5b503f72094c56239386d7d9694c40de6c23d9": {
+   "tick": 369420,
+   "liquidity": "1676318836053938920",
+   "swaps": 6
+  },
+  "0xddd3be58126308ecf4ff9906b497a7c90eb2cc66d9bbcac0f1df4579cec746b2": {
+   "tick": -351638,
+   "liquidity": "217683961046493692",
+   "swaps": 6
+  },
+  "0x153d783aaf1b233b422adfe9b7f8bc907bcfcd65a5e00c96e1c9cbbed6c0a717": {
+   "tick": 405399,
+   "liquidity": "1575037795897358225",
+   "swaps": 6
+  },
+  "0x0524891564755c3895fb6cca45787c530ccf0cfae4e6fad937c763f65822a400": {
+   "tick": -372064,
+   "liquidity": "1579673310823224705",
+   "swaps": 6
+  },
+  "0x9cbe95256e13d14c78e1697e7602f0db83b147a6b7e0b98b4679b5eb39d56c61": {
+   "tick": 50934,
+   "liquidity": "533747009480543395255589",
+   "swaps": 6
+  },
+  "0x0d751ec09f3af9db4a6ac50ca41ad1d236fcb77d8b8cfd069ae9738dc2563438": {
+   "tick": 381255,
+   "liquidity": "1575259080054300219",
+   "swaps": 6
+  },
+  "0x84436e4722a5a9a17f9198ed1ab62686b983757069545f5ce366ee3593e6aa1f": {
+   "tick": -338936,
+   "liquidity": "13739839784849169",
+   "swaps": 6
+  },
+  "0xaf31d66b2b660ebaf4b36a01b7c54cc118f61f5109547ce3519b1b2ddef04ed5": {
+   "tick": -350800,
+   "liquidity": "15115142643570598",
+   "swaps": 6
+  },
+  "0x7bf5daed7d3a93882395665758d0051aaafd84ba86605ce8e61a14b8f31b00cf": {
+   "tick": 176871,
+   "liquidity": "15714339318964820686636603",
+   "swaps": 5
+  },
+  "0x38f95a86b4b8ab9a79aec13a8ce06de2dbfa6314987932149284ef29e21124f9": {
+   "tick": -351660,
+   "liquidity": "23136839250631867",
+   "swaps": 5
+  },
+  "0x62048ba5a1ae633e1b2aef70a5261db53799ecf2e5754d680ed89d9c8e91c31d": {
+   "tick": 370382,
+   "liquidity": "1731996032964560734",
+   "swaps": 5
+  },
+  "0xd23885a94da9b7f202d564fbb0d4b49f3c0b8a0bb65b2aba72a5105da853a95a": {
+   "tick": 364601,
+   "liquidity": "4851135494057471",
+   "swaps": 5
+  },
+  "0x3ae3d3ab41aec10afd922701cbef8c7b980e09db9ad898bf92394ca2aee831ac": {
+   "tick": -45271,
+   "liquidity": "5688674054645774893600",
+   "swaps": 5
+  },
+  "0x556699cb203ce07463fd33f08accd880463c43dee0f25586ac4d6e642725f46d": {
+   "tick": 453938,
+   "liquidity": "72398714093978909",
+   "swaps": 5
+  },
+  "0x5ab9e488b9f6819d7aa514caf478a1e9123b236110597db9abb4cd4862ad1471": {
+   "tick": 377697,
+   "liquidity": "1575037795897358225",
+   "swaps": 5
+  },
+  "0x1a81b70aef20a111df2dda2be549fef7736b7ec2196856c0d6704bb0135cad47": {
+   "tick": 110030,
+   "liquidity": "2050462634482935276160925",
+   "swaps": 5
+  },
+  "0xcb6717372f4795cf9d6be3a72b39a2cc885cacb426792018612b5c901ba5eb4a": {
+   "tick": 377127,
+   "liquidity": "1575037795897358225",
+   "swaps": 5
+  },
+  "0x9a174475263510da7b2c30a6aab560d44851a4be6a12ff496e0b7c6e60328abc": {
+   "tick": -401946,
+   "liquidity": "1468560646623614074",
+   "swaps": 5
+  },
+  "0x682998111473665eef0dcebf54eb4735d6a3bb27e084529634379e92d4ad4517": {
+   "tick": 389899,
+   "liquidity": "1575037795897358225",
+   "swaps": 5
+  },
+  "0x7e2cd6aac80671ed2cf5879ba669bea1a5ee04115f3bdc6d384179ecd64c9675": {
+   "tick": 346326,
+   "liquidity": "20731850370173057",
+   "swaps": 5
+  },
+  "0x03d3a32cfbc4bf31304233b9b45a7c1e5847551149635ddaea4b2de171fda6cc": {
+   "tick": 103139,
+   "liquidity": "1400000000000000000001176",
+   "swaps": 5
+  },
+  "0x0b8d69ffa16ac8251b4ec7090a962ccee983b99afdc8eda99511b3f823986cea": {
+   "tick": 346773,
+   "liquidity": "10470641345570895",
+   "swaps": 5
+  },
+  "0x0b999bfb8f1d93d6af1d33b19ff7db66a6e51fae8aebb58f61d17e3f8a514aab": {
+   "tick": 338942,
+   "liquidity": "5816541667646896",
+   "swaps": 5
+  },
+  "0xd321e458fac3074ee262e1839725ee0ee6e79b121ae8a7d9d2bbe45998cd5736": {
+   "tick": -15501,
+   "liquidity": "115044534144065027946213",
+   "swaps": 5
+  },
+  "0xb40346f3847d281972497f8a522fc56b1462705f47e890e5b19fee6c2021969e": {
+   "tick": 392959,
+   "liquidity": "1575037795897358225",
+   "swaps": 5
+  },
+  "0xa121f7ac535a16e83e1f8d725e7df19fb33e45889240c0ad8e170f31485e615f": {
+   "tick": 144580,
+   "liquidity": "0",
+   "swaps": 5
+  },
+  "0x8d2ac2dbc1dbd2c3d9f9ef63e8aaafb96610b40436a9423040a7baaa2bac9cc9": {
+   "tick": 398715,
+   "liquidity": "1608491204168225098",
+   "swaps": 4
+  },
+  "0xe23d4375ab8ff605ed2e85d5626626a42a80cb98022e37431561737d85757221": {
+   "tick": 404985,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0x718a991e17569a99b2941fb60d1a4840a60d200e68debcfa2b70f03567ac9f06": {
+   "tick": 330353,
+   "liquidity": "26888810199475468",
+   "swaps": 4
+  },
+  "0x86c8b39b46a2b3ff7138ca40bc2535d6a410fa8525a98900db0f41b65d198bbe": {
+   "tick": -454891,
+   "liquidity": "57525877424573134",
+   "swaps": 4
+  },
+  "0xb2ad1647fab09346bbccb465451a46839ad08094340c9a161d22822c04eb5c8c": {
+   "tick": -397575,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0x1b20456aea82e48c106f21082a644ce8f4f98ee198d8ad5c9f10b0d71bc74b46": {
+   "tick": 402979,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0x399b4fe3a9d4688fb302d67cc5839d24271903e38c1573745cbcd8fa6f1702a0": {
+   "tick": 357171,
+   "liquidity": "141463717122770995",
+   "swaps": 4
+  },
+  "0xa6a31ae2492336bea7abce035ac10d149b2259265024037a37be4355923e3aa0": {
+   "tick": 352095,
+   "liquidity": "12694091972677467",
+   "swaps": 4
+  },
+  "0x57121e40ac6d62e366a4bf4f7fed4f7e8a658eb9f390da81801e98307022d0de": {
+   "tick": 314972,
+   "liquidity": "32371821790839658",
+   "swaps": 4
+  },
+  "0x1201d03bacbe8a9afd55d58b6ba52b21983268d6168612c091a07f9a31f05789": {
+   "tick": 371512,
+   "liquidity": "1658405899186699726",
+   "swaps": 4
+  },
+  "0xbedc196c251a8a47fa0e1c3f1a54319c6c88c0a8b276b96a7f1f4aef8a7ded37": {
+   "tick": 230886,
+   "liquidity": "2880559734821695",
+   "swaps": 4
+  },
+  "0x8c9a2ffaf275bd15bb97bb49313e13460185e8f8af52720a968bdbdfcd8e470a": {
+   "tick": -351659,
+   "liquidity": "3721149988290278",
+   "swaps": 4
+  },
+  "0xb7e8d3dd38b9a99954ae76fbd0c646f9c76e3ccb366b1262cfd3af24fe37232a": {
+   "tick": 405322,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0x3c59767fdaf0ee43d07453333a3b53c6c1e6f6a0ed0cee64c0213a34b99e5078": {
+   "tick": -384962,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0xbb2036e311345c9e33d4d46eb7370295a262f70e46c2ac07c116d95146abbb0a": {
+   "tick": -351480,
+   "liquidity": "166580017649450965",
+   "swaps": 4
+  },
+  "0x31e69e75d745d2bff182ba7cab2e6671e4fb38260789e3b47d7b3c307dbe89f4": {
+   "tick": 365274,
+   "liquidity": "404322484497217",
+   "swaps": 4
+  },
+  "0x0e3778957c57c367e7ea5513122d3e300a1ee635166e22d07c284b01dcea1f95": {
+   "tick": -197527,
+   "liquidity": "7581375569755166",
+   "swaps": 4
+  },
+  "0x06b973a5eb2ee19399c739216866b75765034aec379e687f8c38180aca7b7607": {
+   "tick": 405399,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0x0731189925aadb0df6f508385ffabea4e2b4dc45b778dd16add33dd35905b121": {
+   "tick": -405373,
+   "liquidity": "1575054921690585787",
+   "swaps": 4
+  },
+  "0x66b750a87211bc80755634a661c24d82d7af1d51aebfe84b255d72936b40d208": {
+   "tick": -405399,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0x6c9bbde888800cf7deb23a3bee970e28dcbf9c1051af70d6490e7a9bf41611f3": {
+   "tick": 375350,
+   "liquidity": "2257507369114461146",
+   "swaps": 4
+  },
+  "0xc7c82452ac9ba5f4de8a4c22d04e9978814d22db905040c742663ec0981c5969": {
+   "tick": 346032,
+   "liquidity": "20731062185244975",
+   "swaps": 4
+  },
+  "0x3725a6568c16ddd384e8c0a7534c0e481010d50d4002d1076838f807600a3312": {
+   "tick": 375727,
+   "liquidity": "2002241434318933123",
+   "swaps": 4
+  },
+  "0x90f452e777233ee0d37543261f1d3789c4241805c4d270cf8851920424cc7e56": {
+   "tick": 394204,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0x9c6bb77e2af3790e1389c2f8a07084d97b6e0127abadb0d86393b082c8d134f6": {
+   "tick": -61295,
+   "liquidity": "8688789559817636146294504",
+   "swaps": 4
+  },
+  "0x0f6f5ae60fdff4ec25578ab162a7c50aac72d7584d6faf2ea9fec500e5293937": {
+   "tick": 404826,
+   "liquidity": "1575610536914048173",
+   "swaps": 4
+  },
+  "0xd559fe1190e1600b5beded091485c002fc2a34f28ecf629235e91b3a21b306cc": {
+   "tick": 401657,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0x8646f73d1c2a0d7804f3823d27afa769f7e78a7d9634da99ac4749fe77ff1c81": {
+   "tick": 373303,
+   "liquidity": "35155795841982619",
+   "swaps": 4
+  },
+  "0x1cdb33344c2044b5324c4417c1b1d2978d62fc523d15ed2b2c8d55bd980f74e5": {
+   "tick": 373302,
+   "liquidity": "28567171310317818",
+   "swaps": 4
+  },
+  "0xf033a018ea496c4105a08c24accda5ed47465be4a93a2495aeeac6187af3f9d9": {
+   "tick": 338945,
+   "liquidity": "1514139793398512",
+   "swaps": 4
+  },
+  "0x7557f2e9784a78990035085febdef9a466b7197da62a4d8fbaa57b4af57b3d0f": {
+   "tick": -371332,
+   "liquidity": "1575037795897358225",
+   "swaps": 4
+  },
+  "0xca683aa46a590dc3914427db2adf4b3c8697545220c12f32e686f7d6c043c067": {
+   "tick": 406398,
+   "liquidity": "70709895800904",
+   "swaps": 4
+  },
+  "0xebde8959fac1a0a1f837189e7f00f40566f4c1fc6efa3b3c987222222fd31455": {
+   "tick": 314866,
+   "liquidity": "304584522055977327",
+   "swaps": 4
+  },
+  "0xad3189d786ff57cd16a9811351c1bea7f013487441526aaca34af77deac19cf9": {
+   "tick": 393108,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0xf062c0ad649de6fc7dcd79aae5a7dfd4de9de6b03d24b809546e6eb325d7ff11": {
+   "tick": -276325,
+   "liquidity": "19931260605532312214",
+   "swaps": 3
+  },
+  "0x4ab249bacee1ed0854d1932fa4ae6880c0f8707c37b31a443a221315a7872c52": {
+   "tick": 330750,
+   "liquidity": "213805172063999429",
+   "swaps": 3
+  },
+  "0xb7cbf368d8cc460d9f657affa1ffd2ef16ddb3afa080337c08d4ca2f5fc991b6": {
+   "tick": -400087,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0x0a222bbf85816c106e034c531284c888e1f6518cde54150a2a970f14f82c89d4": {
+   "tick": 403001,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0x79ccbd9dd0a25d4fc1a320cafaa9698f7fe2725774d166a2fa5e385d3ad88e78": {
+   "tick": 331211,
+   "liquidity": "2123534656686359",
+   "swaps": 3
+  },
+  "0x33d228d15c40bc1ec2f4d85f74d378e3018d05bd2563abbf242e5f2efdc8c384": {
+   "tick": 359431,
+   "liquidity": "2357566140368977",
+   "swaps": 3
+  },
+  "0x7d7780dbc78c1947c481e3329b070ec95045e7dd42fa969ef3ee7c77e701079f": {
+   "tick": 359881,
+   "liquidity": "19965408576688165",
+   "swaps": 3
+  },
+  "0x94bc0109fdb498fbf6fc661e9e6f58a1d9edb0bccc5f109066f43bfb7fb6327f": {
+   "tick": 390347,
+   "liquidity": "1629550656238502101",
+   "swaps": 3
+  },
+  "0xcec1efdbcfac4da172911b216a866bf061e075866355ac673a30f6b8f72a8915": {
+   "tick": 363444,
+   "liquidity": "1612002650963745",
+   "swaps": 3
+  },
+  "0x41e7edc0114ba1918d9a70f19e61ad630f30b2a4f0a4f2279db5458caa4c7942": {
+   "tick": 361759,
+   "liquidity": "11288306041691276",
+   "swaps": 3
+  },
+  "0xbb7aaeeb15a51ce28f9e397873cf3c88b85deeee1985d0a5d77c5399c6d661e9": {
+   "tick": 405236,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0x875907e122b43cea09e2f4ab18bd7c1bc8b71384c5bc48d963979d64634341f6": {
+   "tick": 391757,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0xcc0ee92bc1a9abc86f4fe60ba575d57ede6d91b6cbe32c92e277fb1e4b22d048": {
+   "tick": -352168,
+   "liquidity": "253523243097195",
+   "swaps": 3
+  },
+  "0x8a0637fb3591d6731f37b37ceb950aa9cf3b4c3c6e0d2127acb2f5ad0becac61": {
+   "tick": -351166,
+   "liquidity": "10584798117888352",
+   "swaps": 3
+  },
+  "0x84fc5f4b754f7ff3f7e551cd4b5294e83aa8d0c6b427ce3497913b105b6d2be2": {
+   "tick": -67754,
+   "liquidity": "33378943520224088609872043",
+   "swaps": 3
+  },
+  "0xb4aaac65bc542a3bf2e6bb693500c3ab53a06f3106497fab4ede80c4a62a8419": {
+   "tick": 362615,
+   "liquidity": "206048042941297",
+   "swaps": 3
+  },
+  "0x79f78ec187ae216292d38ed7e561adaba26ca060e86bbb3f08ca1bd9d45892bd": {
+   "tick": 364894,
+   "liquidity": "309709140843073",
+   "swaps": 3
+  },
+  "0x9dda2914b122c5761b3ae2f884726a24c743152cbd350ea2c7c2768b6616dc37": {
+   "tick": -385279,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0xb394215ed18fd77e0c53a9a84bc27f442d375e8653cd5e87414cdd0290c4fc1d": {
+   "tick": -369059,
+   "liquidity": "67183377307868512",
+   "swaps": 3
+  },
+  "0x81fca5f2667cb1c71ba3afe618156bb98517e24b3801f682324a900cbc6fd851": {
+   "tick": -369007,
+   "liquidity": "62542118604130286",
+   "swaps": 3
+  },
+  "0x9f4a5c081d6ae257fbd179e3b5f16e5e8e2c4b677c25a39d31679dc470e20190": {
+   "tick": -369064,
+   "liquidity": "25026409993398988",
+   "swaps": 3
+  },
+  "0xd2ffdf7500e2ca1604c8e3d08dbe30b754d36d6760b0af21f9cf34964d3bfbf2": {
+   "tick": 395400,
+   "liquidity": "1748092982225273",
+   "swaps": 3
+  },
+  "0x96f7dc7ce2c274415a1e098f085a15cfbf1616a091c0340b10088771ab0dd7c0": {
+   "tick": 377305,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0x537ff85e9dd71ec41fb9a610c859830208f8f2cc1e3becf962103f99deb92856": {
+   "tick": 361671,
+   "liquidity": "1786926932816412725",
+   "swaps": 3
+  },
+  "0x054d4110b3e14c9f1477e2b8aec6c0d231d8627782cd0e67fb877815f7d84ad5": {
+   "tick": 395404,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0xafe00822fb53820d7d82977ec6f153c0295996f2d9e4bff535af3992d7c5e07a": {
+   "tick": 314989,
+   "liquidity": "10749093666872977",
+   "swaps": 3
+  },
+  "0x5cabc6b372732bd607402df6a8a6a548f047a811e281a5298c9fb9156b94967e": {
+   "tick": 380667,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0x28dc13eb70d6dcfbe38727a1adec13bd034d3664a853a3e59e63e1cd567d6d7a": {
+   "tick": 339052,
+   "liquidity": "135106859433179481",
+   "swaps": 3
+  },
+  "0x765db83dd20a2a37358fea20c68aa2b6ce15538a638c24b8510b6c8b3625e632": {
+   "tick": 397229,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0x870728a1dee8290b0dcb7ce52c664433f63fc5243ced76c03bd2e6bba10d0cc9": {
+   "tick": 402340,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0xbfd2d62a7e19bae1393e6fe0a202d04617f90256b8ffc3407adb159092b98d6a": {
+   "tick": 396454,
+   "liquidity": "5351414091088123105",
+   "swaps": 3
+  },
+  "0x231f7a0caaebad9a05cf2b8919fa0617e78f04058973fb4395376eb5c83a0dd9": {
+   "tick": 405398,
+   "liquidity": "1575037795897358225",
+   "swaps": 3
+  },
+  "0x7defd22eaf6f9cfaa312d76d89a177c1ed8b88f4fcb3317396ddc65adca125df": {
+   "tick": 382841,
+   "liquidity": "269668225696376",
+   "swaps": 2
+  },
+  "0x4a18263c298afdffffeaba638cea5b5e46221539300a62ff0ab667b578cbadef": {
+   "tick": 399082,
+   "liquidity": "1575037795897358225",
+   "swaps": 2
+  },
+  "0x6c688dd3fce329d128fcd25f7f28a5e656e5ce5c0b60227c39cf4777cceded87": {
+   "tick": 390724,
+   "liquidity": "1575037795897358225",
+   "swaps": 2
+  },
+  "0x10d5e420fac5d0159279b324d9fb93a4d541435081125e2c6997945ad3ed658f": {
+   "tick": -349245,
+   "liquidity": "1264911064219141060",
+   "swaps": 2
+  },
+  "0x7d5737a9d3934098256ee6080a09a3e9c603b91df0ee9bbe17e632742dbbfaa9": {
+   "tick": 79029,
+   "liquidity": "131217076225394172927",
+   "swaps": 2
+  },
+  "0x54dba415388e11a7ab0b2e71d87c288259129d8d204c6b4427c5c451522784c2": {
+   "tick": 361933,
+   "liquidity": "28252881956477",
+   "swaps": 2
+  },
+  "0xd8a6758c4bbe7140a7f5540701740e587aaec591feb2190ab2b1dfc885a6f60b": {
+   "tick": 363433,
+   "liquidity": "1086994292137109",
+   "swaps": 2
+  },
+  "0x5e61e0abb3fa7a794b2c7c233f290a832803d4030b1c113200fa37c9472d79f8": {
+   "tick": 92529,
+   "liquidity": "2237951930639278694508308",
+   "swaps": 2
+  },
+  "0x2066373c30e74f50d6431b7d5490f199a622ebff1727ec97280ebeaf868b601a": {
+   "tick": 370791,
+   "liquidity": "1575752494272330405",
+   "swaps": 2
+  },
+  "0xf544de699eb958e3e93bf07e8bd7eae915a62d3529669552846c096f4c9656f5": {
+   "tick": 388092,
+   "liquidity": "1575037795897358225",
+   "swaps": 2
+  },
+  "0xf956b0f9fef5e179933d943b69036db8cb05c0370009a8300b57c6129fbe5575": {
+   "tick": 361873,
+   "liquidity": "967872913159252",
+   "swaps": 2
+  },
+  "0xb8f3fa8fdea09bd96c74a2ea791fa51dc47552e61bafbf091442e7927f2e62b5": {
+   "tick": 383245,
+   "liquidity": "2029162458405716659",
+   "swaps": 2
+  },
+  "0x9490ee52d091419dfa76374a978733b6f749ce31c44ebb96714936cd12cdf885": {
+   "tick": -85948,
+   "liquidity": "9954112313409936594793384",
+   "swaps": 2
+  },
+  "0xfaf077f879c351f5ac99032935337081f8692613652ee2f5bdd1d5c7e7aa98cb": {
+   "tick": 380114,
+   "liquidity": "1264911068393347565",
+   "swaps": 2
+  },
+  "0x8981190fbb3305a3399330d02d037c355c1ed524c0484f4ef9676b19100c3d18": {
+   "tick": 387101,
+   "liquidity": "1575037795897358225",
+   "swaps": 2
+  },
+  "0xc0d0600baeced5f2beec00169fb717517723e78529b4558450a0c0fb4449f5c3": {
+   "tick": 117272,
+   "liquidity": "2050462634482935276160925",
+   "swaps": 2
+  },
+  "0x4b75cf5c8984e874b7b812f4b2d8d968edfc495a362f4f859cc6b9706c8f9612": {
+   "tick": 365441,
+   "liquidity": "174937092972872",
+   "swaps": 2
+  },
+  "0xfbb11b8ea38fedeb2f50cdacdad6eff2d694f9e0bacc5dd9e48211940e2569af": {
+   "tick": 386057,
+   "liquidity": "613789003812705",
+   "swaps": 2
+  },
+  "0xff4b5a0caaec96f927546b3f3b255beb5d1ec8a17528d3fd5e6f13d768b90c53": {
+   "tick": 353748,
+   "liquidity": "32200494347420030",
+   "swaps": 2
+  },
+  "0x373bf238ed2b9bbded9d0fc69cd0f3997dd45ee3b9577df5b7f015472a49b21b": {
+   "tick": 353868,
+   "liquidity": "162160582933368550",
+   "swaps": 2
+  },
+  "0xac868df2dfd1da3fb694028fc7fad554e5dd3fdbc611c09c72b6fe173a27dd62": {
+   "tick": 402629,
+   "liquidity": "1575037795897358225",
+   "swaps": 2
+  },
+  "0x80c1bf703e25c2c75c2666486fe67f9128b8b991a1cc230241dc367aceb96c39": {
+   "tick": 117607,
+   "liquidity": "2132003734939994145666447",
+   "swaps": 2
+  },
+  "0xfead71199e11ce646d8473840be899fbb80b28810a0ecf7e8064d4de5123e220": {
+   "tick": 400686,
+   "liquidity": "1575037795897358225",
+   "swaps": 2
+  },
+  "0x69afe3fcc0b366449a3e9e3e65ae516cbdd3b6510e6104672762b348a4724b5c": {
+   "tick": 355341,
+   "liquidity": "8648991938689297",
+   "swaps": 2
+  },
+  "0x89b2a62db95290dacaf5f4f3a94a8a6bc5f69994cd165c04d6062ba6c6a69d99": {
+   "tick": -405400,
+   "liquidity": "1575037795897358225",
+   "swaps": 2
+  },
+  "0x4bb12ad73ab3d2edfaafe7d329c8349b28f0fac10e29276739d570236d94f02c": {
+   "tick": 345923,
+   "liquidity": "461025948979046",
+   "swaps": 2
+  }
+ }
+}
