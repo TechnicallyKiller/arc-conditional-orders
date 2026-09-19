@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "test": "forge test",
-    "keeper": "tsx src/keeper/index.ts"
+    "keeper": "tsx src/keeper/index.ts",
+    "pulse": "tsx tools/pulse.ts"
   },
   "dependencies": {
     "@privy-io/react-auth": "^3.44.0",

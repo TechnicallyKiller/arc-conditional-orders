@@ -7,37 +7,39 @@
 export const DEPLOY = {
   chainId: 5042002,
   mainnetChainId: 5042,
-  orderBook: "0x80C8B0b55827F0456564554E3A82F9B20ad6019F",
-  swapAdapter: "0x80FBe4f593fc33A102CC41e3aF158ED4Fb71864C",
+  orderBook: "0xEe22D840289d4a94B0E1Efd7A072854a74ED489C",
+  swapAdapter: "0x2958d7445C5D0Aa9D06EAc625C85072E81CA49a3",
   keeper: "0x364EDC06254874e62FF4AD8fA4d9a45238cb5609",
+  demoToken: "0xB828890c52F6d0436D9f601E78adB9E056e61ba8",
+  demoLiquidity: "0xdC49311dFF60b7D971a0ac9394115D545FD5Bafa",
 } as const;
 
 export const TX = {
-  fill: "0x2d8138e62b973c96b69bc6fe995b6edb4f423049c214554afdf9d2aced81f423",
-  arm: "0x3936113c7039323147131e9822fadf00ff0b0dc78a98582ed523e504e32fe752",
-  armRefused: "0x55801b9c1bd99299fc23715afaa76fd34a3a00baf8a5d2961164712200a66de3",
+  fill: "0xe6b66031b1cd20b8ebe3a63aaa7cc5ad788a1484c6361f8a8afe1788301e48af",
+  arm: "0x5d726af9d03c69f5357ebf218029be434928dc4cd5ece3a8b115fca1e3cea1b9",
+  armRefused: "0x93bc9da29afa50b5b47f00e22003e3c5759fcb7430aa8d223631b178fe3f0d09",
   swapThroughHookPool: "0x718a6a366f41e82c6e1e531b9f1622ee3b8daa60ae08f863b720a517586b776f",
 } as const;
 
 /** The fill that cleared. Block 62,936,970 on Arc testnet. */
 export const FILL = {
-  block: 62958859,
-  proceeds: "4.762711",
+  block: 62972903,
+  proceeds: "1.934340",
   feeBps: 50,
-  fee: "0.023813",
-  gasUsed: "372,711",
+  fee: "0.009671",
+  gasUsed: "238,700",
   gasPriceGwei: "25",
-  gasCost: "0.009318",
-  margin: "+0.014495",
-  marginX: "2.6x",
+  gasCost: "0.005968",
+  margin: "+0.003703",
+  marginX: "1.6x",
 } as const;
 
 /** The order that was refused. This is the more persuasive of the two. */
 export const REFUSAL = {
-  proceeds: "0.023764",
-  fee: "0.000118",
-  gasCost: "0.013109",
-  result: "-0.012991",
+  proceeds: "0.016998",
+  fee: "0.000084",
+  gasCost: "0.008065",
+  result: "-0.007981",
 } as const;
 
 export const ARITHMETIC = [
@@ -53,7 +55,7 @@ export const GAS_ROWS = [
   { call: "Uniswap V4 swap (no hook)", gas: "157,274", usdc: "0.003343" },
   { call: "Uniswap V4 swap (hook pool)", gas: "263,994", usdc: "0.005610" },
   { call: "Order fill, mainnet fork", gas: "357,845", usdc: "0.007604" },
-  { call: "Order fill, testnet", gas: "372,711", usdc: "0.009318" },
+  { call: "Order fill, testnet", gas: "238,700", usdc: "0.005968" },
 ] as const;
 
 export const RISKS = [

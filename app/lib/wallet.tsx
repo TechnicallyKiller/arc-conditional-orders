@@ -3,7 +3,18 @@
 import { createContext, useCallback, useContext, useMemo } from "react";
 import { createPublicClient, createWalletClient, custom, type Hex } from "viem";
 import { arc, arcTestnet } from "viem/chains";
-import { PrivyProvider, usePrivy, useWallets } from "@privy-io/react-auth";
+import dynamic from "next/dynamic";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+
+/**
+ * Privy is ~600 kB of the bundle, and nobody reading the app needs it — only someone who
+ * clicks Connect does. Loading it on demand keeps first paint fast, which matters because the
+ * first thing a visitor does is read, not sign.
+ */
+const PrivyProvider = dynamic(
+  () => import("@privy-io/react-auth").then((m) => m.PrivyProvider),
+  { ssr: false }
+);
 import { MIN_MAX_FEE_PER_GAS } from "./gas";
 
 export type Call = { to: Hex; data: Hex; value?: bigint };

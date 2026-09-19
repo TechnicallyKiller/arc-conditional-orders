@@ -199,7 +199,8 @@
     "4 - route adapters (OrderBook tests pass unchanged against a real Uniswap V4 swap)",
     "4b - trigger hardening (arm/dwell defeats single-block manipulation)",
     "5 - keeper (observe/simulate/execute; full cycle autonomous on a fork)",
-    "6 - testnet (live cycle with transaction hashes, both a fill and a refusal)"
+    "6 - testnet (live cycle with transaction hashes, both a fill and a refusal)",
+    "7 - demo market, app and landing shipped; three live order states on testnet"
   ],
   "testPool": {
     "poolId": "0xacea282c439a359cb659855961bdc2e01c6b62dbef811f1c7ac6c79c4fd5583a",
@@ -278,8 +279,8 @@
   "testnetDeployment": {
     "network": "Arc Testnet (5042002)",
     "explorer": "https://explorer.testnet.arc.io",
-    "orderBook": "0x80C8B0b55827F0456564554E3A82F9B20ad6019F",
-    "swapAdapter": "0x80FBe4f593fc33A102CC41e3aF158ED4Fb71864C",
+    "orderBook": "0xEe22D840289d4a94B0E1Efd7A072854a74ED489C",
+    "swapAdapter": "0x2958d7445C5D0Aa9D06EAc625C85072E81CA49a3",
     "keeper": "0x364EDC06254874e62FF4AD8fA4d9a45238cb5609",
     "demoPool": {
       "poolId": "0x96bde8368b72f805a1cdcfc365fdf8e238c3fdb7d54db95b93e640ccc76d9c00",
@@ -291,28 +292,30 @@
       "note": "Has a hook with BEFORE_SWAP + AFTER_SWAP and both delta flags, so the fill exercises the transient-delta settlement path."
     },
     "transactions": {
-      "armOrder1": "0x3936113c7039323147131e9822fadf00ff0b0dc78a98582ed523e504e32fe752",
-      "fillOrder1": "0x2d8138e62b973c96b69bc6fe995b6edb4f423049c214554afdf9d2aced81f423",
-      "armOrder2_refused": "0x55801b9c1bd99299fc23715afaa76fd34a3a00baf8a5d2961164712200a66de3"
+      "armOrder1": "0x5d726af9d03c69f5357ebf218029be434928dc4cd5ece3a8b115fca1e3cea1b9",
+      "fillOrder1": "0xe6b66031b1cd20b8ebe3a63aaa7cc5ad788a1484c6361f8a8afe1788301e48af",
+      "armOrder2_refused": "0x93bc9da29afa50b5b47f00e22003e3c5759fcb7430aa8d223631b178fe3f0d09"
     },
     "theRejection": {
-      "amountOut": "0.023764 USDC",
-      "feeAt50bps": "0.000118 USDC",
-      "gasCost": "0.013109 USDC",
-      "profit": "-0.012991 USDC",
-      "_note": "Order 2 is deliberately left OPEN and armed. The keeper re-simulates it every cycle and refuses it every time, so the app has a live example of the invariant holding rather than a screenshot of one."
+      "amountOut": "0.016998 USDC",
+      "fee": "0.000084 USDC",
+      "gasCost": "0.008065 USDC",
+      "profit": "-0.007981 USDC",
+      "_note": "Order 3 is left permanently open and armed. The keeper re-simulates and refuses it every cycle, so the app shows the invariant holding live."
     },
     "theFill": {
-      "amountOut": "4.762711 USDC",
-      "feeAt50bps": "0.023813 USDC",
-      "gasUsed": 372711,
-      "gasCost": "0.009318 USDC",
-      "keeperProfit": "0.014495 USDC",
-      "margin": "2.6x",
-      "block": 62958859
+      "amountOut": "1.934340 USDC",
+      "fee": "0.009671 USDC",
+      "gasUsed": 238700,
+      "gasCost": "0.005968 USDC",
+      "margin": "1.6x",
+      "block": 62972903
     },
-    "_note": "Redeployed 2026-09-19 after adding checkOrders, on-chain caps, and PoolKey-in-order. The earlier deployment (0x55EC8907...) predates all three and its checkOrders reverts.",
-    "supersededOrderBook": "0x55EC8907f937fEA942c5f98039a218708E965280"
+    "_note": "Redeployed after the native-units fix. Earlier deployments pulled input through the 6dp interface for native-currency pools and could not swap at all.",
+    "supersededOrderBook": "0x55EC8907f937fEA942c5f98039a218708E965280",
+    "demoToken": "0xB828890c52F6d0436D9f601E78adB9E056e61ba8",
+    "demoLiquidity": "0xdC49311dFF60b7D971a0ac9394115D545FD5Bafa",
+    "demoPoolId": "0xe80b25da52a114a7ea38fd23c13799e961f1d56169b325327455f3f488789852"
   },
   "liquidityIsNotStable": {
     "_status": "RESOLVED 2026-09-19 - liquidity IS stable. The earlier alarm was bad state reads.",
@@ -382,5 +385,22 @@
     "howItSurfaced": "A sell test compared an 18dp return value against a 6dp balanceOf delta and was wrong by exactly 1e12. The adapter was correct; the test was not.",
     "rule": "Never compare a V4 amount for a native currency against balanceOf. Compare against address(x).balance."
   },
-  "curatedListRule": "A pool qualifies only if an EXECUTED SELL swap (token -> USDC) succeeds at the size being offered. Not a liquidity read, not a buy. USO and SCHNOZ pass. BB fails in both directions despite 4.5e24 nominal liquidity and 135 swaps in 6h - unexplained, and excluded."
+  "curatedListRule": "A pool qualifies only if an EXECUTED SELL swap (token -> USDC) succeeds at the size being offered. Not a liquidity read, not a buy. USO and SCHNOZ pass. BB fails in both directions despite 4.5e24 nominal liquidity and 135 swaps in 6h - unexplained, and excluded.",
+  "demoMarket": {
+    "why": "Arc testnet has no organic trading - 14 pools with liquidity and zero swaps in 40,000 blocks - so a visitor sees a flat chart and assumes the app is broken.",
+    "what": "Our own worthless token and our own V4 pool, with tools/pulse.ts making small real trades so price moves and orders trigger while someone watches.",
+    "honesty": "The token is worth nothing by design and the UI states that the price is scripted. The fills, the gas and the refusals are all real."
+  },
+  "mainnetCost": {
+    "deployGas": 2691539,
+    "deployCostUsdc": 0.0572,
+    "armGas": "~50000",
+    "armCostUsdc": 0.0011,
+    "fillGasRange": "238700-372711",
+    "fillCostUsdcRange": "0.0060-0.0089",
+    "fullCycleUsdc": "~0.01",
+    "pollingCost": "free - checkOrders is an eth_call",
+    "budget": "Deploy $0.10, keeper float $10, redeploy buffer $5. The keeper earns 2.5x its gas per fill at 50bps on a $5 order, so the float is working capital rather than burn.",
+    "realRecurringCost": "The keeper host. Render's paid worker is $7/month; the free tier spins down and silently stops fills. That exceeds all gas combined."
+  }
 }

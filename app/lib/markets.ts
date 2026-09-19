@@ -49,12 +49,17 @@ export const MARKETS: Market[] = [
   },
 ];
 
-/** The pool the testnet deployment actually trades against. */
+/**
+ * The sandbox market. Our own token and our own pool, because Arc testnet has no organic
+ * trading — 14 pools with liquidity and zero swaps in 40,000 blocks. A visitor needs a market
+ * that moves, so tools/pulse.ts makes small real trades against this one. The token is
+ * worthless by design and the UI says the price is scripted.
+ */
 export const TESTNET_MARKET: Market = {
-  symbol: "TSTA", name: "Testnet demo token", network: "testnet",
-  token: "0xc9020C4Bd8Ea5de25548AfAC8457469EecAB2360",
-  currency0: "0x3600000000000000000000000000000000000000",
-  fee: 0, tickSpacing: 200,
-  hooks: "0xf825EeB04b2B258Ac6314Dd05CB91dB0ea0e6AEC",
-  decimals: 18, impactBps50: null, impactBps500: null, poolFeeBps: 0, sellTestPassed: true,
+  symbol: "ADEMO", name: "Arc Demo (sandbox)", network: "testnet",
+  token: "0xB828890c52F6d0436D9f601E78adB9E056e61ba8",
+  currency0: "0x0000000000000000000000000000000000000000",
+  fee: 3000, tickSpacing: 60,
+  hooks: "0x0000000000000000000000000000000000000000",
+  decimals: 18, impactBps50: null, impactBps500: null, poolFeeBps: 300, sellTestPassed: true,
 };
