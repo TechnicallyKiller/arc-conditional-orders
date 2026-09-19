@@ -91,7 +91,19 @@
     "poolsMappingSlot": 6,
     "extsloadSelector": "0x1e2eaeaf",
     "slot0Layout": "sqrtPriceX96(160) | tick(24) | protocolFee(24) | lpFee(24)",
-    "slotVerifiedBy": "Read pool 0x870728a1... on mainnet: tick 401996 and sqrtPriceX96 4.243e37 agree with each other (1.0001^401996 = 2.868e17). A wrong slot returns zero, so live-pool-nonzero AND unknown-pool-zero together prove the slot."
+    "slotVerifiedBy": "Read pool 0x870728a1... on mainnet: tick 401996 and sqrtPriceX96 4.243e37 agree with each other (1.0001^401996 = 2.868e17). A wrong slot returns zero, so live-pool-nonzero AND unknown-pool-zero together prove the slot.",
+    "poolIdDerivation": "keccak256(abi.encode(currency0,currency1,fee,tickSpacing,hooks)) - verified against live pool 0x3ecd366e...",
+    "selectors": {
+      "unlock(bytes)": "0x48c89491",
+      "swap((address,address,uint24,int24,address),(bool,int256,uint160),bytes)": "0xf3cd914c",
+      "take(address,address,uint256)": "0x0b0d9c09",
+      "settle()": "0x11da60b4",
+      "sync(address)": "0xa5841194",
+      "extsload(bytes32)": "0x1e2eaeaf",
+      "modifyLiquidity(...)": "0x5a6bcfda",
+      "initialize(...)": "0x6276cbbe"
+    },
+    "liquiditySlot": "stateSlot + 3"
   },
   "assets": {
     "cirBTC": {
@@ -129,7 +141,8 @@
     "Measured gas per operation from a real deployment - no public figure is trustworthy",
     "cirBTC redemption path with Circle - is there a non-DEX exit for seized collateral?",
     "Does single-block sqrtPriceX96 resist manipulation, or is a TWAP observation window needed before mainnet?",
-    "Settlement gas overhead constant (currently 30000) must be measured on a real deployment"
+    "Settlement gas overhead constant (currently 30000) must be measured on a real deployment",
+    "Pools with AFTER_SWAP_RETURNS_DELTA hooks (most launchpad pools) adjust the swap delta; V4SwapAdapter computes amountOut from the raw delta and must read the transient currency delta instead before it can serve those pools"
   ],
   "toolchain": {
     "required": "circlefin/arc-foundry v0.8.0-2",
@@ -152,12 +165,31 @@
       "note": "Includes test scaffolding; upper bound. Precise figure requires a real deployment.",
       "costCents": 0.647,
       "breakevenOrderSizeUsdcAt50bps": 1.29
+    },
+    "v4SwapDirect": {
+      "gas": 152375,
+      "costCents": 0.324
+    },
+    "orderFillRealRouter": {
+      "gas": 357845,
+      "costCents": 0.76,
+      "example": "94.10 USDC fill at 50bps -> 0.4705 USDC fee, 62x the gas cost"
     }
   },
   "phasesComplete": [
     "0 - ground truth",
     "1 - harness (arc-foundry, --network arc pinned)",
     "2 - CostFloor (negative tests pass)",
-    "3 - OrderBook + on-chain trigger (fires at trigger, refuses above it)"
-  ]
+    "3 - OrderBook + on-chain trigger (fires at trigger, refuses above it)",
+    "4 - route adapters (OrderBook tests pass unchanged against a real Uniswap V4 swap)"
+  ],
+  "testPool": {
+    "poolId": "0xacea282c439a359cb659855961bdc2e01c6b62dbef811f1c7ac6c79c4fd5583a",
+    "currency0": "0x3600000000000000000000000000000000000000",
+    "currency1": "0x70122C10800AE1905092157c21C0Df58802998F2",
+    "fee": 30000,
+    "tickSpacing": 200,
+    "hooks": "0x0000000000000000000000000000000000000000",
+    "note": "No hooks, real liquidity. Used for the real-swap tests. Most launchpad pools carry an AFTER_SWAP fee hook that adjusts the delta - supporting those is outstanding work."
+  }
 }
