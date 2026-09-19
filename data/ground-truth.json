@@ -142,7 +142,8 @@
     "Is Morpho deployed on Arc testnet? If not, deploy one for Phase 6",
     "Measured gas per operation from a real deployment - no public figure is trustworthy",
     "cirBTC redemption path with Circle - is there a non-DEX exit for seized collateral?",
-    "Settlement gas overhead constant (currently 30000) must be measured on a real deployment"
+    "Settlement gas overhead constant (currently 30000) must be measured on a real deployment",
+    "Reconcile transient pool liquidity with the absence of ModifyLiquidity events - JIT liquidity, RPC behaviour, or a wrong slot assumption. Blocks the curated list."
   ],
   "toolchain": {
     "required": "circlefin/arc-foundry v0.8.0-2",
@@ -313,5 +314,41 @@
       "margin": "5.9x",
       "block": 62936970
     }
+  },
+  "liquidityIsNotStable": {
+    "_severity": "HIGH - affects whether the product can work at all",
+    "observed": "Pools measured with 1e23-1e24 liquidity read ZERO liquidity minutes later, and real swaps against them revert with NothingReceived. Verified at head, not a historical-read artifact.",
+    "unresolved": "No ModifyLiquidity events appear in the blocks where liquidity apparently changed, and repeated reads of the same slot at the same block are consistent. Those two facts cannot both be true under any explanation I have. NOT resolved - do not build on either interpretation.",
+    "verifiedNow": "BB has 4.5e24 nominal liquidity and a real $50 swap returns nothing. Nominal depth is not tradeable depth.",
+    "productImplications": [
+      "A curated pool list CANNOT be a static snapshot; it must be a live simulated-swap check",
+      "A stop-loss pointed at a pool whose liquidity vanishes cannot fill - the user is unprotected exactly when they need it, and this must be stated in the UI, not buried",
+      "Fork tests against 'latest' are non-deterministic here; PoolDepth.t.sol is pinned to block 21694303"
+    ],
+    "castsDoubtOn": "The 24h drawdown study in demandEvidence used archive state reads. If historical state is unreliable in a way the consistency check did not catch, those numbers are softer than stated. Re-derive from Swap events (which carry tick in the log) before relying on them."
+  },
+  "measuredDepth": {
+    "_at": "block 21694303, realised via executed swaps",
+    "USO_50usdc": {
+      "totalBps": 99,
+      "poolFeeBps": 100,
+      "trueImpactBps": 0
+    },
+    "USO_500usdc": {
+      "totalBps": 100,
+      "poolFeeBps": 100,
+      "trueImpactBps": 0
+    },
+    "SCHNOZ_50usdc": {
+      "totalBps": 1,
+      "poolFeeBps": 1,
+      "trueImpactBps": 0
+    },
+    "erc20Pool_50usdc": {
+      "totalBps": 318,
+      "poolFeeBps": 300,
+      "trueImpactBps": 18
+    },
+    "BB": "NOT TRADEABLE despite 4.5e24 nominal liquidity"
   }
 }

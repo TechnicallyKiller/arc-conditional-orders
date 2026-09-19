@@ -3,6 +3,7 @@ pragma solidity ^0.8.28;
 
 import {IPoolManager, IUnlockCallback, PoolKey, SwapParams} from "../interfaces/IPoolManager.sol";
 import {IERC20} from "../interfaces/IERC20.sol";
+import {ArcGroundTruth as GT} from "../ArcGroundTruth.sol";
 
 /// @notice Swaps directly against Uniswap V4. Used for the long tail, where an aggregator's
 ///         fixed fee ($0.55 on LI.FI) would swamp a small order.
@@ -16,6 +17,16 @@ contract V4SwapAdapter is IUnlockCallback {
 
     error OnlyPoolManager();
     error NothingReceived();
+
+    /// @dev On Arc, native USDC and the ERC-20 at 0x3600... are ONE balance behind two
+    ///      interfaces. A V4 pool may name either as its currency; the deepest pools on Arc
+    ///      use the native one. So we always pull input through the ERC-20 interface (which
+    ///      moves the same money) and settle with value when the pool's currency is native.
+    address internal constant NATIVE = address(0);
+
+    function _erc20Of(address currency) internal pure returns (address) {
+        return currency == NATIVE ? GT.USDC : currency;
+    }
 
     struct CallbackData {
         PoolKey key;
@@ -39,7 +50,7 @@ contract V4SwapAdapter is IUnlockCallback {
         returns (uint256 amountOut)
     {
         address currencyIn = zeroForOne ? key.currency0 : key.currency1;
-        IERC20(currencyIn).transferFrom(msg.sender, address(this), amountIn);
+        IERC20(_erc20Of(currencyIn)).transferFrom(msg.sender, address(this), amountIn);
 
         bytes memory res = poolManager.unlock(
             abi.encode(CallbackData({key: key, zeroForOne: zeroForOne, amountIn: amountIn, recipient: recipient, caller: msg.sender}))
@@ -74,17 +85,22 @@ contract V4SwapAdapter is IUnlockCallback {
 
         if (owed < 0) {
             uint256 pay = uint256(-owed);
-            poolManager.sync(currencyIn);
-            IERC20(currencyIn).transfer(address(poolManager), pay);
-            poolManager.settle();
+            if (currencyIn == NATIVE) {
+                // Native currency settles by sending value; there is no sync step.
+                poolManager.settle{value: pay}();
+            } else {
+                poolManager.sync(currencyIn);
+                IERC20(currencyIn).transfer(address(poolManager), pay);
+                poolManager.settle();
+            }
         }
 
         uint256 amountOut = owing > 0 ? uint256(owing) : 0;
         if (amountOut > 0) poolManager.take(currencyOut, d.recipient, amountOut);
 
         // Any unspent input (a hook may not consume it all) goes back to the caller.
-        uint256 dust = IERC20(currencyIn).balanceOf(address(this));
-        if (dust > 0) IERC20(currencyIn).transfer(d.caller, dust);
+        uint256 dust = IERC20(_erc20Of(currencyIn)).balanceOf(address(this));
+        if (dust > 0) IERC20(_erc20Of(currencyIn)).transfer(d.caller, dust);
 
         return abi.encode(amountOut);
     }
