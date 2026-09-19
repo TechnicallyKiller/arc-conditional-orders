@@ -87,7 +87,11 @@
     "cirBtcExitLiquidityUsd": 34424,
     "exitLiquidityVsCollateralPercent": 0.215,
     "BLOCKER": "Exit liquidity for cirBTC is 0.215% of the collateral that would need to be sold. Atomic swap-based liquidation of this market is NOT viable at current depth. Re-read weekly.",
-    "verifiedBy": "balanceOf(PoolManager) for each collateral asset; V4 is a singleton so this is total on-DEX depth"
+    "verifiedBy": "balanceOf(PoolManager) for each collateral asset; V4 is a singleton so this is total on-DEX depth",
+    "poolsMappingSlot": 6,
+    "extsloadSelector": "0x1e2eaeaf",
+    "slot0Layout": "sqrtPriceX96(160) | tick(24) | protocolFee(24) | lpFee(24)",
+    "slotVerifiedBy": "Read pool 0x870728a1... on mainnet: tick 401996 and sqrtPriceX96 4.243e37 agree with each other (1.0001^401996 = 2.868e17). A wrong slot returns zero, so live-pool-nonzero AND unknown-pool-zero together prove the slot."
   },
   "assets": {
     "cirBTC": {
@@ -123,7 +127,9 @@
     "Enabled LLTVs and IRMs (isLltvEnabled / isIrmEnabled) - needed before creating a demo market",
     "Is Morpho deployed on Arc testnet? If not, deploy one for Phase 6",
     "Measured gas per operation from a real deployment - no public figure is trustworthy",
-    "cirBTC redemption path with Circle - is there a non-DEX exit for seized collateral?"
+    "cirBTC redemption path with Circle - is there a non-DEX exit for seized collateral?",
+    "Does single-block sqrtPriceX96 resist manipulation, or is a TWAP observation window needed before mainnet?",
+    "Settlement gas overhead constant (currently 30000) must be measured on a real deployment"
   ],
   "toolchain": {
     "required": "circlefin/arc-foundry v0.8.0-2",
@@ -140,10 +146,18 @@
       "gasPriceGwei": 21.25,
       "costUsdc": 0.0020102,
       "costCents": 0.201
+    },
+    "orderFill": {
+      "gas": 304292,
+      "note": "Includes test scaffolding; upper bound. Precise figure requires a real deployment.",
+      "costCents": 0.647,
+      "breakevenOrderSizeUsdcAt50bps": 1.29
     }
   },
   "phasesComplete": [
     "0 - ground truth",
-    "1 - harness (7/7 fork tests pass under arc-foundry)"
+    "1 - harness (arc-foundry, --network arc pinned)",
+    "2 - CostFloor (negative tests pass)",
+    "3 - OrderBook + on-chain trigger (fires at trigger, refuses above it)"
   ]
 }
