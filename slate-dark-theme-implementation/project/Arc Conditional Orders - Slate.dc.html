@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #16140F; }
+  a { color: #FF8A63; text-decoration: none; }
+  a:hover { color: #FF6B3D; text-decoration: underline; }
+  input { font: inherit; }
+  @keyframes arcPulse { 0%,100% { opacity: 1 } 50% { opacity: .28 } }
+  @keyframes arcDrop { from { transform: translateY(-12px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  @keyframes arcDrift { from { transform: translate3d(-3%, 2%, 0) scale(1) } to { transform: translate3d(4%, -3%, 0) scale(1.12) } }
+  @keyframes arcRise { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</helmet>
+
+<div style="min-height:100vh;position:relative;background:#0F0D0A;color:#F2EDE2;font-family:'Instrument Sans',system-ui,sans-serif;font-size:15px;line-height:23px;-webkit-font-smoothing:antialiased">
+
+  <div aria-hidden="true" style="position:fixed;inset:-20%;z-index:0;pointer-events:none;background:radial-gradient(48% 42% at 74% 86%, rgba(255,138,99,.20), rgba(255,107,61,0) 62%);animation:arcDrift 26s ease-in-out infinite alternate"></div>
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(52% 44% at 14% 4%, rgba(242,237,226,.10), rgba(242,237,226,0) 66%)"></div>
+  <div aria-hidden="true" style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;mix-blend-mode:overlay;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E&quot;);background-size:180px 180px"></div>
+
+  <header style="position:sticky;top:0;z-index:20;display:flex;justify-content:center;padding:16px;pointer-events:none">
+    <div style="pointer-events:auto;width:100%;max-width:1160px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 8px 16px;border:1px solid rgba(242,237,226,.10);border-radius:28px;background:rgba(24,21,17,.55);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);box-shadow:0 1px 2px rgba(0,0,0,.45)">
+
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="width:14px;height:14px;border-radius:999px;background:#FF6B3D"></span>
+        <span style="font-family:'Instrument Serif',serif;font-size:22px;line-height:28px;letter-spacing:-0.011em;color:#F2EDE2">Arc</span>
+        <span style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Conditional Orders</span>
+      </div>
+
+      <nav style="display:flex;gap:2px;overflow-x:auto">
+        <button onClick="{{ goMarkets }}" style="appearance:none;border:none;padding:8px 14px;border-radius:999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background 160ms ease,color 160ms ease;color:{{ cMarkets }};background:{{ bMarkets }}" style-hover="background:rgba(242,237,226,.08);color:#F2EDE2">Markets</button>
+        <button onClick="{{ goCreate }}" style="appearance:none;border:none;padding:8px 14px;border-radius:999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background 160ms ease,color 160ms ease;color:{{ cCreate }};background:{{ bCreate }}" style-hover="background:rgba(242,237,226,.08);color:#F2EDE2">Create order</button>
+        <button onClick="{{ goOrders }}" style="appearance:none;border:none;padding:8px 14px;border-radius:999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background 160ms ease,color 160ms ease;color:{{ cOrders }};background:{{ bOrders }}" style-hover="background:rgba(242,237,226,.08);color:#F2EDE2">Orders</button>
+        <button onClick="{{ goProof }}" style="appearance:none;border:none;padding:8px 14px;border-radius:999px;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background 160ms ease,color 160ms ease;color:{{ cProof }};background:{{ bProof }}" style-hover="background:rgba(242,237,226,.08);color:#F2EDE2">Proof</button>
+      </nav>
+
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(9,8,6,.45)">
+          <span style="width:7px;height:7px;border-radius:999px;animation:arcPulse 2s ease-in-out infinite;background:{{ keeperDot }}"></span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;font-variant-numeric:tabular-nums;color:{{ keeperText }}">{{ keeperLabel }}</span>
+        </div>
+        <div style="display:flex;gap:0;padding:3px;border-radius:999px;background:rgba(9,8,6,.45)">
+          <span style="padding:4px 11px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;transition:background 160ms ease,color 160ms ease;color:{{ netTestColor }};background:{{ netTestBg }}">Testnet</span>
+          <span style="padding:4px 11px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;transition:background 160ms ease,color 160ms ease;color:{{ netMainColor }};background:{{ netMainBg }}">Mainnet</span>
+        </div>
+        <button style="height:36px;padding:0 18px;border:none;border-radius:999px;background:#F2EDE2;color:#16140F;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 160ms ease,transform 80ms ease" style-hover="background:#FFFFFF" style-active="transform:translateY(1px)">Connect wallet</button>
+      </div>
+    </div>
+  </header>
+
+  <main style="position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:12px 24px 96px">
+
+    <!-- ORDERS -->
+    <sc-if value="{{ isOrders }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <h1 style="margin:0;font-family:'Instrument Serif',serif;font-size:44px;line-height:46px;letter-spacing:-0.02em;font-weight:400;color:#F2EDE2">Open orders</h1>
+        <p style="margin:6px 0 0;font-size:13px;line-height:19px;color:#A99F90;max-width:68ch">A keeper watches price and fills. Nothing here executes unless a keeper is running and the fee covers the gas.</p>
+      </div>
+      <button onClick="{{ goCreate }}" style="height:40px;padding:0 20px;border:none;border-radius:6px;background:#FF6B3D;color:#16140F;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 160ms ease,transform 80ms ease" style-hover="background:#FF8A63" style-active="transform:translateY(1px)">New order</button>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+
+      <div style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:0">
+
+        <!-- ARMED -->
+        <article style="border-top:1px solid #29241C;border-left:2px solid #FF6B3D;padding:26px 4px 30px 22px;animation:arcRise 240ms cubic-bezier(0,.7,.2,1) both">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:12px">
+              <h2 style="margin:0;font-size:19px;line-height:26px;font-weight:500;letter-spacing:-0.008em;color:#F2EDE2">ARCX <span style="color:#756C5E">/</span> USDC</h2>
+              <span style="padding:3px 10px;border-radius:999px;background:#33190F;color:#FF6B3D;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase">Armed</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;font-variant-numeric:tabular-nums;color:#756C5E">order #1042 · sell 13,000,000.000000</span>
+          </div>
+
+          <div style="position:relative;height:74px;margin:18px 0 4px">
+            <div style="position:absolute;left:0;right:0;top:34px;display:flex;justify-content:space-between">
+              <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="41"><div style="width:1px;height:5px;background:#332E25"></div></sc-for>
+            </div>
+            <div style="position:absolute;left:0;right:0;top:34px;height:1px;background:#4A4337"></div>
+            <div style="position:absolute;top:24px;width:1px;height:22px;background:#A99F90;left:38%"></div>
+            <div style="position:absolute;top:48px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;font-variant-numeric:tabular-nums;color:#A99F90;white-space:nowrap;left:38%">0.00003950</div>
+            <div style="position:absolute;top:29px;width:10px;height:10px;border-radius:2px;background:#FF6B3D;transform:translateX(-50%);transition:left 420ms cubic-bezier(.2,.8,.2,1);left:31%"></div>
+            <div style="position:absolute;top:2px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-weight:500;font-variant-numeric:tabular-nums;color:#FF6B3D;white-space:nowrap;left:31%">0.00003907</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E"><span>tick −102,897</span><span>trigger · tick −101,397</span><span>tick −99,659</span></div>
+
+          <div style="margin-top:20px;padding:16px;border-radius:2px;background:rgba(9,8,6,.42);display:flex;flex-wrap:wrap;gap:20px;align-items:center">
+            <div style="display:flex;gap:16px;perspective:600px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="animation:arcDrop 420ms cubic-bezier(.2,.8,.2,1) both">
+                  <div style="width:34px;height:34px;position:relative;transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(38deg)">
+                    <div style="position:absolute;inset:0;background:#FF6B3D;transform:translateZ(17px)"></div>
+                    <div style="position:absolute;inset:0;background:#FF8A63;transform:rotateX(90deg) translateZ(17px)"></div>
+                    <div style="position:absolute;inset:0;background:#C4502A;transform:rotateY(90deg) translateZ(17px)"></div>
+                  </div>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;color:#FF6B3D">1</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="width:34px;height:34px;position:relative;transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(38deg);opacity:.85">
+                  <div style="position:absolute;inset:0;background:#241F19;border:1px solid #332E25;box-sizing:border-box;transform:translateZ(17px)"></div>
+                  <div style="position:absolute;inset:0;background:#332E25;transform:rotateX(90deg) translateZ(17px)"></div>
+                  <div style="position:absolute;inset:0;background:#1A1611;transform:rotateY(90deg) translateZ(17px)"></div>
+                </div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;color:#756C5E">2</span>
+              </div>
+            </div>
+            <div style="flex:1 1 240px;min-width:0">
+              <div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#A99F90">Dwell window · 1 of 2 blocks</div>
+              <p style="margin:6px 0 0;font-size:13px;line-height:19px;color:#A99F90;max-width:68ch">Price crossed at block 4,182,991. The keeper re-checks after two blocks (~1s) before it may fill. If price recovers, the order disarms.</p>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;margin-top:16px">
+            <div><div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Trigger</div><div style="font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;color:#F2EDE2">0.00003950</div></div>
+            <div><div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Est. proceeds</div><div style="font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;color:#F2EDE2">511.959500</div></div>
+            <div><div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Gas floor</div><div style="font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;color:#4FBF92">clears by 2.249058</div></div>
+            <div><div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Depth $500</div><div style="font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;color:#F2EDE2">0 bps</div></div>
+          </div>
+        </article>
+
+        <!-- WATCHING -->
+        <article style="border-top:1px solid #29241C;border-left:2px solid #4A4337;padding:26px 4px 30px 22px">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:12px">
+              <h2 style="margin:0;font-size:19px;line-height:26px;font-weight:500;letter-spacing:-0.008em;color:#F2EDE2">WETH <span style="color:#756C5E">/</span> USDC</h2>
+              <span style="padding:3px 10px;border-radius:999px;background:#12100C;color:#A99F90;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase">Watching</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;font-variant-numeric:tabular-nums;color:#756C5E">order #1038 · sell 0.840000</span>
+          </div>
+          <div style="position:relative;height:74px;margin:18px 0 4px">
+            <div style="position:absolute;left:0;right:0;top:34px;display:flex;justify-content:space-between">
+              <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="41"><div style="width:1px;height:5px;background:#332E25"></div></sc-for>
+            </div>
+            <div style="position:absolute;left:0;right:0;top:34px;height:1px;background:#4A4337"></div>
+            <div style="position:absolute;top:24px;width:1px;height:22px;background:#A99F90;left:22%"></div>
+            <div style="position:absolute;top:48px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;font-variant-numeric:tabular-nums;color:#A99F90;white-space:nowrap;left:22%">3,480.00</div>
+            <div style="position:absolute;top:29px;width:10px;height:10px;border-radius:2px;background:#F2EDE2;transform:translateX(-50%);transition:left 420ms cubic-bezier(.2,.8,.2,1);left:64%"></div>
+            <div style="position:absolute;top:2px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-weight:500;font-variant-numeric:tabular-nums;color:#F2EDE2;white-space:nowrap;left:64%">3,791.42</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;margin-top:16px">
+            <div><div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Trigger</div><div style="font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;color:#F2EDE2">3,480.00</div></div>
+            <div><div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Distance</div><div style="font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;color:#A99F90">−8.21%</div></div>
+            <div><div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Last check</div><div style="font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;color:#F2EDE2">block 4,182,993</div></div>
+            <div><div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Depth $500</div><div style="font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:20px;font-variant-numeric:tabular-nums;color:#F2EDE2">2 bps</div></div>
+          </div>
+        </article>
+
+        <!-- POOL UNREADABLE -->
+        <article style="border-top:1px solid #29241C;border-left:2px solid #E6B54A;padding:26px 4px 30px 22px">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:12px">
+              <h2 style="margin:0;font-size:19px;line-height:26px;font-weight:500;letter-spacing:-0.008em;color:#F2EDE2">MNTA <span style="color:#756C5E">/</span> USDC</h2>
+              <span style="padding:3px 10px;border-radius:999px;background:#2A2110;color:#E6B54A;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase">Pool unreadable</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;font-variant-numeric:tabular-nums;color:#756C5E">order #1029 · sell 50,000.000000</span>
+          </div>
+          <p style="margin:12px 0 0;font-size:13px;line-height:19px;color:#A99F90;max-width:68ch"><code style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:#12100C;border:1px solid #332E25;border-radius:2px;padding:1px 5px">checkOrders</code> returned <code style="font-family:'IBM Plex Mono',monospace;font-size:12px;background:#12100C;border:1px solid #332E25;border-radius:2px;padding:1px 5px">PoolUnreadable</code> on the last 3 checks. This order cannot arm and will not fill. It is not cancelled — it is blind.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px">
+            <button style="height:32px;padding:0 16px;border:1px solid rgba(242,237,226,.14);border-radius:999px;background:rgba(242,237,226,.04);transition:background 160ms ease,border-color 160ms ease;color:#F2EDE2;font-size:13px;font-weight:500;font-family:'Instrument Sans',sans-serif;cursor:pointer" style-active="transform:translateY(1px)">Re-check pool</button>
+            <button style="height:32px;padding:0 16px;border:1px solid #E2603F;border-radius:6px;background:transparent;color:#E2603F;font-size:13px;font-weight:500;font-family:'Instrument Sans',sans-serif;cursor:pointer" style-active="transform:translateY(1px)">Cancel order</button>
+          </div>
+        </article>
+
+        <!-- FILLED -->
+        <article style="border-top:1px solid #29241C;border-left:2px solid #4FBF92;padding:26px 4px 30px 22px">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:12px">
+              <h2 style="margin:0;font-size:19px;line-height:26px;font-weight:500;letter-spacing:-0.008em;color:#F2EDE2">ARCX <span style="color:#756C5E">/</span> USDC</h2>
+              <span style="padding:3px 10px;border-radius:999px;background:#10241C;color:#4FBF92;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase">Filled</span>
+            </div>
+            <button onClick="{{ toggleFill }}" style="appearance:none;background:none;border:none;padding:0;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:#A99F90" style-hover="color:#F2EDE2">{{ fillToggleLabel }}</button>
+          </div>
+          <sc-if value="{{ fillOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:16px;border:1px solid #332E25;border-radius:2px;overflow:hidden">
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 14px;background:rgba(9,8,6,.5);font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#A99F90"><span>Arithmetic</span><span>USDC</span></div>
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 14px;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Proceeds from swap</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">512.408311</span></div>
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 14px;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Pool fee (0.30%)</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">−1.537225</span></div>
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 14px;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Gas used</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">214,882</span></div>
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 14px;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Gas cost (paid in USDC)</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">−0.318442</span></div>
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 14px;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Keeper fee (0.50%)</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">2.562042</span></div>
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 14px;border-top:1px solid #332E25;background:#12100C;font-size:13px;color:#A99F90"><span>Keeper margin (fee − gas)</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#4FBF92">+2.243600</span></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;margin-top:14px">
+            <span style="font-size:13px;line-height:19px;color:#756C5E">Filled at block 4,182,884 · dwell held 2 blocks</span>
+            <a href="https://explorer.testnet.arc.io/tx/0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d" target="_blank" rel="noreferrer" title="0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums">0x4e39…545d ↗</a>
+          </div>
+          </sc-if>
+        </article>
+
+        <!-- REFUSED -->
+        <article style="border-top:1px solid #29241C;border-left:2px solid #E2603F;padding:26px 4px 30px 22px">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:12px">
+              <h2 style="margin:0;font-size:19px;line-height:26px;font-weight:500;letter-spacing:-0.008em;color:#F2EDE2">TIDE <span style="color:#756C5E">/</span> USDC</h2>
+              <span style="padding:3px 10px;border-radius:999px;background:#2B1410;color:#E2603F;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase">Refused</span>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;font-variant-numeric:tabular-nums;color:#756C5E">order #1011</span>
+          </div>
+          <p style="margin:12px 0 0;font-size:13px;line-height:19px;color:#A99F90;max-width:68ch">Fee at fill was <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums;color:#F2EDE2">0.212004</span> against a gas cost of <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-variant-numeric:tabular-nums;color:#F2EDE2">0.318442</span>. The fill reverted and nobody was paid. The order is still open.</p>
+        </article>
+      </div>
+
+      <!-- RAIL -->
+      <aside style="flex:1 1 300px;min-width:0;max-width:360px;display:flex;flex-direction:column;gap:16px">
+        <section style="border:1px solid rgba(242,237,226,.08);border-radius:16px;background:rgba(31,28,22,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <h3 style="margin:0;font-size:15px;line-height:21px;font-weight:600;color:#F2EDE2">Keeper</h3>
+            <span style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:{{ keeperText }}"><span style="width:7px;height:7px;border-radius:999px;animation:arcPulse 2s ease-in-out infinite;background:{{ keeperDot }}"></span>{{ keeperWord }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:14px;font-size:13px;color:#A99F90"><span>Last seen block</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">4,182,993</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;color:#A99F90"><span>Age</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:{{ keeperText }}">{{ keeperAge }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;color:#A99F90"><span>Fills, 24h</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">7</span></div>
+          <p style="margin:14px 0 0;font-size:13px;line-height:19px;color:#756C5E">Fills depend on a keeper running. The contract is permissionless — anyone may run one — but if none does, orders sit and do not fire.</p>
+        </section>
+
+        <section style="border-top:1px solid #29241C;border-left:2px solid #E6B54A;padding:26px 4px 30px 22px">
+          <h3 style="margin:0;font-size:15px;line-height:21px;font-weight:600;color:#E6B54A">Unaudited</h3>
+          <p style="margin:8px 0 0;font-size:13px;line-height:19px;color:#A99F90">These contracts have not been audited. Testnet is a sandbox; on mainnet the value you can put at risk is capped on-chain.</p>
+        </section>
+
+        <section style="border:1px solid rgba(242,237,226,.08);border-radius:16px;background:rgba(31,28,22,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px">
+          <h3 style="margin:0 0 12px;font-size:15px;line-height:21px;font-weight:600;color:#F2EDE2">On-chain caps</h3>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;color:#A99F90"><span>maxOrderValueUsdc</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ capOrder }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;color:#A99F90"><span>maxTotalValueUsdc</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ capTotal }}</span></div>
+          <p style="margin:12px 0 0;font-size:12px;line-height:17px;color:#756C5E">Read from OrderBook at block 4,182,993.</p>
+        </section>
+
+        <section style="border:1px solid rgba(242,237,226,.08);border-radius:16px;background:rgba(31,28,22,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px">
+          <h3 style="margin:0 0 12px;font-size:15px;line-height:21px;font-weight:600;color:#F2EDE2">Contracts</h3>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;color:#A99F90"><span>OrderBook</span><a href="https://explorer.testnet.arc.io/address/0x55EC8907f937fEA942c5f98039a218708E965280" target="_blank" rel="noreferrer" title="0x55EC8907f937fEA942c5f98039a218708E965280" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums">0x55EC89…5280 ↗</a></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;color:#A99F90"><span>Swap adapter</span><a href="https://explorer.testnet.arc.io/address/0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f" target="_blank" rel="noreferrer" title="0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums">0xbaaB5e…653f ↗</a></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;color:#A99F90"><span>Chain</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ chainId }}</span></div>
+        </section>
+      </aside>
+    </div>
+    </sc-if>
+
+    <!-- MARKETS -->
+    <sc-if value="{{ isMarkets }}" hint-placeholder-val="{{ false }}">
+    <h1 style="margin:0;font-family:'Instrument Serif',serif;font-size:44px;line-height:46px;letter-spacing:-0.02em;font-weight:400;color:#F2EDE2">Markets</h1>
+    <p style="margin:6px 0 24px;font-size:13px;line-height:19px;color:#A99F90;max-width:68ch">Depth is measured, not assumed: each badge is the price impact of a real simulated sell against the pool at the current block. A stop-loss on a pool that cannot absorb the sale is worthless.</p>
+    <div style="border-top:1px solid #332E25;border-bottom:1px solid #332E25;overflow-x:auto;background:rgba(31,28,22,.42)">
+      <div style="min-width:900px">
+        <div style="display:grid;grid-template-columns:1.1fr .9fr .7fr 1.5fr 150px 110px;gap:16px;padding:10px 16px;background:rgba(9,8,6,.5);font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#A99F90">
+          <span>Token</span><span style="text-align:right">Price</span><span style="text-align:right">24h</span><span>Range</span><span style="text-align:right">Depth $500</span><span></span>
+        </div>
+        <sc-for list="{{ markets }}" as="m" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:1.1fr .9fr .7fr 1.5fr 150px 110px;gap:16px;align-items:center;padding:0 16px;height:56px;border-top:1px solid #332E25" style-hover="background:rgba(242,237,226,.045)">
+            <div style="min-width:0">
+              <div style="font-size:15px;font-weight:600;color:#F2EDE2">{{ m.sym }}</div>
+              <div style="font-size:12px;line-height:17px;color:#756C5E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</div>
+            </div>
+            <div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ m.price }}</div>
+            <div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:{{ m.chgColor }}">{{ m.chg }}</div>
+            <div style="position:relative;height:22px">
+              <div style="position:absolute;left:0;right:0;top:11px;display:flex;justify-content:space-between">
+                <sc-for list="{{ sparkTicks }}" as="t" hint-placeholder-count="21"><div style="width:1px;height:4px;background:#332E25"></div></sc-for>
+              </div>
+              <div style="position:absolute;left:0;right:0;top:11px;height:1px;background:#4A4337"></div>
+              <div style="position:absolute;top:4px;width:1px;height:15px;background:#756C5E;left:{{ m.triggerPct }}"></div>
+              <div style="position:absolute;top:7px;width:8px;height:8px;border-radius:2px;transform:translateX(-50%);background:{{ m.markerColor }};left:{{ m.markerPct }}"></div>
+            </div>
+            <div style="text-align:right"><span style="display:inline-block;padding:3px 10px;border-radius:999px;white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:12px;font-variant-numeric:tabular-nums;background:{{ m.depthBg }};color:{{ m.depthColor }}">{{ m.depth }}</span></div>
+            <div style="text-align:right"><button onClick="{{ goCreate }}" style="height:32px;padding:0 14px;border:1px solid rgba(242,237,226,.14);border-radius:999px;background:rgba(242,237,226,.04);transition:background 160ms ease,border-color 160ms ease;color:#F2EDE2;font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer" style-hover="border-color:rgba(242,237,226,.38);background:rgba(242,237,226,.09)" style-active="transform:translateY(1px)">Set stop</button></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- CREATE -->
+    <sc-if value="{{ isCreate }}" hint-placeholder-val="{{ false }}">
+    <h1 style="margin:0;font-family:'Instrument Serif',serif;font-size:44px;line-height:46px;letter-spacing:-0.02em;font-weight:400;color:#F2EDE2">Create order</h1>
+    <p style="margin:6px 0 24px;font-size:13px;line-height:19px;color:#A99F90;max-width:68ch">Sell <span style="font-style:italic;font-family:'Instrument Serif',serif;font-size:17px">ARCX</span> for USDC when price falls to your trigger. Everything below is checked before you sign.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+      <form style="flex:1 1 380px;min-width:0;border:1px solid rgba(242,237,226,.08);border-radius:16px;background:rgba(31,28,22,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px;display:flex;flex-direction:column;gap:20px">
+        <div>
+          <label style="display:block;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#A99F90;margin-bottom:6px">Amount to sell (ARCX)</label>
+          <input value="{{ amount }}" onChange="{{ onAmount }}" style="width:100%;box-sizing:border-box;height:40px;padding:0 12px;border:1px solid #332E25;border-radius:2px;background:#1F1C16;color:#F2EDE2;font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;outline:none" style-focus="border-color:#F2EDE2;outline:2px solid #33190F;outline-offset:1px" />
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#A99F90;margin-bottom:6px">Trigger price (USDC per ARCX)</label>
+          <input value="{{ trigger }}" onChange="{{ onTrigger }}" style="width:100%;box-sizing:border-box;height:40px;padding:0 12px;border:1px solid #332E25;border-radius:2px;background:#1F1C16;color:#F2EDE2;font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;outline:none" style-focus="border-color:#F2EDE2;outline:2px solid #33190F;outline-offset:1px" />
+        </div>
+        <div style="border-radius:2px;background:rgba(9,8,6,.42);padding:14px">
+          <div style="font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#A99F90">Decimals check</div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:13px;color:#A99F90"><span>Computed tick</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ tick }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:13px;color:#A99F90"><span>Tick converts back to</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:{{ backColor }}">{{ backPrice }}</span></div>
+          <p style="margin:10px 0 0;font-size:12px;line-height:17px;color:#756C5E">Read the second number. If it is not the price you meant, your decimals are wrong and no keeper will save you.</p>
+        </div>
+        <div style="border-left:3px solid #E6B54A;padding:0 0 0 12px">
+          <div style="font-size:13px;line-height:19px;color:#E6B54A;font-weight:600">Unaudited contracts</div>
+          <p style="margin:2px 0 0;font-size:13px;line-height:19px;color:#A99F90">You are about to approve a token to code that has not been audited, and the fill depends on a keeper running.</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <button type="button" style="height:48px;padding:0 24px;border:1px solid rgba(242,237,226,.14);border-radius:999px;background:rgba(242,237,226,.04);transition:background 160ms ease,border-color 160ms ease;color:#F2EDE2;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer" style-active="transform:translateY(1px)">1 · Approve ARCX</button>
+          <button type="button" style="height:48px;padding:0 24px;border:none;border-radius:6px;background:#FF6B3D;color:#16140F;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 160ms ease,transform 80ms ease" style-hover="background:#FF8A63" style-active="transform:translateY(1px)">2 · Sign order</button>
+        </div>
+      </form>
+
+      <section style="flex:1 1 340px;min-width:0;border:1px solid rgba(242,237,226,.08);border-radius:16px;background:rgba(31,28,22,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px">
+        <h3 style="margin:0;font-size:15px;line-height:21px;font-weight:600;color:#F2EDE2">Preview</h3>
+        <div style="position:relative;height:80px;margin:20px 0 4px">
+          <div style="position:absolute;left:0;right:0;top:38px;display:flex;justify-content:space-between">
+            <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="41"><div style="width:1px;height:5px;background:#332E25"></div></sc-for>
+          </div>
+          <div style="position:absolute;left:0;right:0;top:38px;height:1px;background:#4A4337"></div>
+          <div style="position:absolute;top:28px;width:1px;height:22px;background:#FF6B3D;transition:left 240ms cubic-bezier(.2,.8,.2,1);left:{{ previewTriggerPct }}"></div>
+          <div style="position:absolute;top:53px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:12px;font-variant-numeric:tabular-nums;color:#FF6B3D;white-space:nowrap;transition:left 240ms cubic-bezier(.2,.8,.2,1);left:{{ previewTriggerPct }}">trigger</div>
+          <div style="position:absolute;top:33px;width:10px;height:10px;border-radius:2px;background:#F2EDE2;transform:translateX(-50%);left:66%"></div>
+          <div style="position:absolute;top:6px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;color:#F2EDE2;white-space:nowrap;left:66%">0.00004128</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E;margin-bottom:18px"><span>0.0000340</span><span>now</span><span>0.0000470</span></div>
+
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Est. proceeds at trigger</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ proceeds }}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Pool fee (0.30%)</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ poolFee }}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Keeper fee (0.50%)</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ keeperFeeText }}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Gas cost at current basefee</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">0.318442</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;border-bottom:1px solid #332E25;font-size:13px;color:#A99F90"><span>Cost floor</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:{{ floorColor }}">{{ floorText }}</span></div>
+        <p style="margin:14px 0 0;font-size:13px;line-height:19px;color:#756C5E">Gas on Arc is USDC, so the contract compares fee against gas in one unit and refuses the fill itself. No oracle, no trust in the keeper's arithmetic.</p>
+      </section>
+    </div>
+    </sc-if>
+
+    <!-- PROOF -->
+    <sc-if value="{{ isProof }}" hint-placeholder-val="{{ false }}">
+    <h1 style="margin:0;font-family:'Instrument Serif',serif;font-size:44px;line-height:46px;letter-spacing:-0.02em;font-weight:400;color:#F2EDE2">Proof</h1>
+    <p style="margin:6px 0 24px;font-size:13px;line-height:19px;color:#A99F90;max-width:68ch">Every number on this page came from a transaction you can open. Nothing here is modelled.</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">
+      <div style="flex:1 1 460px;min-width:0">
+        <h2 style="margin:0 0 12px;font-size:19px;line-height:26px;font-weight:500;letter-spacing:-0.008em;color:#F2EDE2">Measured gas</h2>
+        <div style="border:1px solid #332E25;border-radius:2px;background:#1F1C16;overflow-x:auto">
+          <div style="min-width:520px">
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:16px;padding:10px 16px;background:rgba(9,8,6,.5);font-size:11px;line-height:14px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#A99F90"><span>Call</span><span style="text-align:right">Gas</span><span style="text-align:right">USDC</span><span style="text-align:right">Tx</span></div>
+            <sc-for list="{{ gasRows }}" as="g" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:16px;align-items:center;padding:0 16px;height:40px;border-top:1px solid #332E25" style-hover="background:rgba(242,237,226,.045)">
+                <span style="font-size:13px;color:#F2EDE2">{{ g.call }}</span>
+                <span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ g.gas }}</span>
+                <span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">{{ g.usdc }}</span>
+                <span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#A99F90">{{ g.tx }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <h2 style="margin:32px 0 12px;font-size:19px;line-height:26px;font-weight:500;letter-spacing:-0.008em;color:#F2EDE2">The fill, in full</h2>
+        <div style="border-top:1px solid #29241C;border-left:2px solid #4FBF92;padding:26px 4px 30px 22px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:17px;color:#A99F90;word-break:break-all">0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-top:16px">
+            <div><div style="font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Proceeds</div><div style="font-family:'IBM Plex Mono',monospace;font-size:23px;line-height:28px;font-weight:500;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;color:#F2EDE2">512.408311</div></div>
+            <div><div style="font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Gas cost</div><div style="font-family:'IBM Plex Mono',monospace;font-size:23px;line-height:28px;font-weight:500;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;color:#F2EDE2">0.318442</div></div>
+            <div><div style="font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#756C5E">Margin</div><div style="font-family:'IBM Plex Mono',monospace;font-size:23px;line-height:28px;font-weight:500;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;color:#4FBF92">+2.243600</div></div>
+          </div>
+          <a href="https://explorer.testnet.arc.io/tx/0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d" target="_blank" rel="noreferrer" style="display:inline-block;margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:14px">Open on explorer ↗</a>
+        </div>
+      </div>
+
+      <aside style="flex:1 1 300px;min-width:0;max-width:360px;border:1px solid rgba(242,237,226,.08);border-radius:16px;background:rgba(31,28,22,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <h3 style="margin:0;font-size:15px;line-height:21px;font-weight:600;color:#F2EDE2">Keeper status</h3>
+          <span style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:{{ keeperText }}"><span style="width:7px;height:7px;border-radius:999px;animation:arcPulse 2s ease-in-out infinite;background:{{ keeperDot }}"></span>{{ keeperWord }}</span>
+        </div>
+        <p style="margin:10px 0 16px;font-size:13px;line-height:19px;color:#A99F90">{{ keeperNote }}</p>
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Last seen block</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">4,182,993</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Age</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:{{ keeperText }}">{{ keeperAge }}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Orders watched</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#F2EDE2">14</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #332E25;font-size:13px;color:#A99F90"><span>Refused fills, 24h</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-variant-numeric:tabular-nums;color:#E2603F">2</span></div>
+      </aside>
+    </div>
+    </sc-if>
+
+  </main>
+
+  <footer style="position:relative;z-index:1;border-top:1px solid #29241C;padding:24px;margin-top:40px">
+    <p style="margin:0;font-size:12px;line-height:17px;color:#756C5E;max-width:68ch">Unaudited. Arc {{ netWord }}, chain {{ chainId }}. Fills require a running keeper; the contract refuses any fill whose fee does not cover its gas.</p>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;keeperState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;live&quot;,&quot;stale&quot;,&quot;down&quot;],&quot;default&quot;:&quot;live&quot;,&quot;tsType&quot;:&quot;'live' | 'stale' | 'down'&quot;,&quot;section&quot;:&quot;State&quot;},&quot;network&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;testnet&quot;,&quot;mainnet&quot;],&quot;default&quot;:&quot;testnet&quot;,&quot;tsType&quot;:&quot;'testnet' | 'mainnet'&quot;,&quot;section&quot;:&quot;State&quot;}}">
+class Component extends DCLogic {
+  state = { tab: 'orders', fillOpen: true, amount: '13000000.000000', trigger: '0.00003950' };
+
+  fmt(n, dp) { return n.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp }); }
+
+  sig(n) {
+    if (!isFinite(n) || n <= 0) return '—';
+    if (n >= 1) return this.fmt(n, 2);
+    const d = Math.min(12, Math.max(4, 5 - Math.floor(Math.log10(n))));
+    return n.toFixed(d).replace(/0+$/, '').replace(/\.$/, '');
+  }
+
+  renderVals() {
+    const tab = this.state.tab;
+    const keeper = this.props.keeperState ?? 'live';
+    const net = this.props.network ?? 'testnet';
+    const K = {
+      live:  { dot: '#4FBF92', text: '#4FBF92', word: 'Live', age: '0.8s ago', label: 'keeper · 4,182,993',
+               note: 'A keeper has reported within the last block. Orders that cross their trigger will arm.' },
+      stale: { dot: '#E6B54A', text: '#E6B54A', word: 'Stale', age: '94s ago', label: 'keeper stale · 94s',
+               note: 'No keeper report for 94 seconds. Orders may cross their trigger without arming. Treat protection as suspended.' },
+      down:  { dot: '#E2603F', text: '#E2603F', word: 'Down',  age: '41m ago', label: 'keeper down · 41m',
+               note: 'No keeper has reported for 41 minutes. Nothing will fill. Anyone can run a keeper — until someone does, these orders are inert.' }
+    }[keeper];
+
+    const price = 0.00004128;
+    const t = parseFloat(this.state.trigger);
+    const amt = parseFloat(this.state.amount);
+    const valid = isFinite(t) && t > 0;
+    const tickNum = valid ? Math.round(Math.log(t) / Math.log(1.0001)) : null;
+    const back = tickNum === null ? NaN : Math.pow(1.0001, tickNum);
+    const drift = valid ? Math.abs(back - t) / t : 1;
+
+    const lo = 0.0000340, hi = 0.0000470;
+    const pct = (v) => Math.max(2, Math.min(98, ((v - lo) / (hi - lo)) * 100)).toFixed(1) + '%';
+
+    const gross = (isFinite(amt) && valid) ? amt * t : 0;
+    const fee = gross * 0.003;
+    const netProceeds = gross - fee;
+    const gas = 0.318442;
+    const keeperFee = gross * 0.005;
+    const clears = keeperFee - gas;
+
+    return {
+      isOrders: tab === 'orders', isMarkets: tab === 'markets', isCreate: tab === 'create', isProof: tab === 'proof',
+      goOrders: () => this.setState({ tab: 'orders' }),
+      goMarkets: () => this.setState({ tab: 'markets' }),
+      goCreate: () => this.setState({ tab: 'create' }),
+      goProof: () => this.setState({ tab: 'proof' }),
+      cOrders: tab === 'orders' ? '#FF8A63' : '#A99F90', bOrders: tab === 'orders' ? 'rgba(255,107,61,.15)' : 'transparent',
+      cMarkets: tab === 'markets' ? '#FF8A63' : '#A99F90', bMarkets: tab === 'markets' ? 'rgba(255,107,61,.15)' : 'transparent',
+      cCreate: tab === 'create' ? '#FF8A63' : '#A99F90', bCreate: tab === 'create' ? 'rgba(255,107,61,.15)' : 'transparent',
+      cProof: tab === 'proof' ? '#FF8A63' : '#A99F90', bProof: tab === 'proof' ? 'rgba(255,107,61,.15)' : 'transparent',
+
+      keeperDot: K.dot, keeperText: K.text, keeperWord: K.word, keeperAge: K.age, keeperLabel: K.label, keeperNote: K.note,
+
+      netTestColor: net === 'testnet' ? '#F2EDE2' : '#756C5E',
+      netTestBg: net === 'testnet' ? 'rgba(242,237,226,.10)' : 'transparent',
+      netMainColor: net === 'mainnet' ? '#F2EDE2' : '#756C5E',
+      netMainBg: net === 'mainnet' ? 'rgba(242,237,226,.10)' : 'transparent',
+      netWord: net === 'mainnet' ? 'mainnet' : 'testnet',
+      chainId: net === 'mainnet' ? '5042' : '5042002',
+      capOrder: net === 'mainnet' ? '25,000.00' : 'uncapped',
+      capTotal: net === 'mainnet' ? '250,000.00' : 'uncapped',
+
+      ticks: Array.from({ length: 41 }, (_, i) => i),
+      sparkTicks: Array.from({ length: 21 }, (_, i) => i),
+
+      fillOpen: this.state.fillOpen,
+      fillToggleLabel: this.state.fillOpen ? 'Hide arithmetic' : 'Show arithmetic',
+      toggleFill: () => this.setState(s => ({ fillOpen: !s.fillOpen })),
+
+      amount: this.state.amount,
+      trigger: this.state.trigger,
+      onAmount: (e) => this.setState({ amount: e.target.value }),
+      onTrigger: (e) => this.setState({ trigger: e.target.value }),
+      tick: tickNum === null ? '—' : tickNum.toLocaleString('en-US'),
+      backPrice: this.sig(back),
+      backColor: !valid ? '#E2603F' : (drift > 0.005 ? '#E6B54A' : '#4FBF92'),
+      previewTriggerPct: valid ? pct(t) : '2%',
+      proceeds: gross ? this.fmt(netProceeds, 6) : '—',
+      poolFee: gross ? '−' + this.fmt(fee, 6) : '—',
+      keeperFeeText: gross ? this.fmt(keeperFee, 6) : '—',
+      floorColor: clears > 0 ? '#4FBF92' : '#E2603F',
+      floorText: !gross ? '—' : (clears > 0 ? 'clears by ' + this.fmt(clears, 6) : 'short by ' + this.fmt(Math.abs(clears), 6)),
+
+      markets: [
+        { sym: 'ARCX', name: 'Arc Index', price: '0.00004128', chg: '+2.14%', chgColor: '#4FBF92', triggerPct: '38%', markerPct: '62%', markerColor: '#FF6B3D', depth: '$500 → 0 bps', depthBg: '#12100C', depthColor: '#A99F90' },
+        { sym: 'WETH', name: 'Wrapped Ether', price: '3,791.42', chg: '−0.86%', chgColor: '#E2603F', triggerPct: '22%', markerPct: '64%', markerColor: '#F2EDE2', depth: '$500 → 2 bps', depthBg: '#12100C', depthColor: '#A99F90' },
+        { sym: 'TIDE', name: 'Tidewater', price: '0.184220', chg: '+11.40%', chgColor: '#4FBF92', triggerPct: '30%', markerPct: '81%', markerColor: '#F2EDE2', depth: '$500 → 147 bps', depthBg: '#2A2110', depthColor: '#E6B54A' },
+        { sym: 'MNTA', name: 'Momenta', price: '—', chg: '—', chgColor: '#756C5E', triggerPct: '50%', markerPct: '50%', markerColor: '#756C5E', depth: 'sell test failed', depthBg: '#2B1410', depthColor: '#E2603F' },
+        { sym: 'GAUS', name: 'Gauss', price: '1.002140', chg: '+0.02%', chgColor: '#4FBF92', triggerPct: '44%', markerPct: '52%', markerColor: '#F2EDE2', depth: '$500 → 1 bps', depthBg: '#12100C', depthColor: '#A99F90' }
+      ],
+
+      gasRows: [
+        { call: 'createOrder', gas: '148,204', usdc: '0.219742', tx: '0x91c4…8b02' },
+        { call: 'checkOrders (14)', gas: '61,338', usdc: '0.090944', tx: '0x2ad0…41ff' },
+        { call: 'armOrder', gas: '73,910', usdc: '0.109584', tx: '0x77be…c318' },
+        { call: 'fillOrder', gas: '214,882', usdc: '0.318442', tx: '0x4e39…545d' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

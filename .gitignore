@@ -11,3 +11,5 @@ node_modules/
 .claude/
 skills-lock.json
 pnpm-workspace.yaml
+.next/
+next-env.d.ts

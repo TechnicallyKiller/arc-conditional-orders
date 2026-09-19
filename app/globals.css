@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Slate — the dark theme from the design bundle. Tokens only; never hardcode a hex. */
+:root {
+  --bone: #0F0D0A;          /* page */
+  --paper: #16140F;         /* raised */
+  --paper-2: #1F1C16;       /* card */
+  --sunk: rgba(9, 8, 6, 0.45);
+
+  --ink: #F2EDE2;
+  --ink-2: #A99F90;
+  --ink-3: #756C5E;
+
+  --rule: #29241C;
+  --rule-2: #332E25;
+  --rule-3: #4A4337;
+  --hair: rgba(242, 237, 226, 0.10);
+
+  --vermilion: #FF6B3D;
+  --vermilion-2: #FF8A63;
+  --vermilion-deep: #C4502A;
+  --pine: #4FBF92;
+  --brick: #E2603F;
+  --ochre: #E6B54A;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 23px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: var(--vermilion-2); text-decoration: none; }
+a:hover { color: var(--vermilion); text-decoration: underline; }
+
+/* Every number in this app is tabular. A figure that reflows as it updates looks broken. */
+.num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.serif { font-family: var(--font-serif), Georgia, serif; }
+.label {
+  font-size: 11px; line-height: 14px; font-weight: 600;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3);
+}
+
+@keyframes arcPulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }
+@keyframes arcDrift {
+  from { transform: translate3d(-3%, 2%, 0) scale(1) }
+  to   { transform: translate3d(4%, -3%, 0) scale(1.12) }
+}
+.pulse { animation: arcPulse 2s ease-in-out infinite; }
+.drift { animation: arcDrift 26s ease-in-out infinite alternate; }
+
+.beat { opacity: 0; transform: translateY(14px);
+  transition: opacity 420ms cubic-bezier(0,.7,.2,1), transform 420ms cubic-bezier(0,.7,.2,1); }
+.beat.shown { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .beat { opacity: 1 !important; transform: none !important; }
+}
