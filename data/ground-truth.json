@@ -259,6 +259,14 @@
       "staleness": "maxArmAgeBlocks prevents replaying an old observation when price later revisits the trigger.",
       "defaults": "minDwellBlocks=2 (~1.0s at 0.507s blocks), maxArmAgeBlocks=300 (~2.5 min)",
       "residualRisk": "A well-capitalised attacker can still hold a price across a short dwell on a very thin pool. The dwell window is a cost multiplier, not a proof. Sizing it against real pool depth is outstanding work before mainnet."
+    },
+    "exposureCaps": {
+      "maxOrderValueUsdc": "per-fill cap on REALISED PROCEEDS, USDC 6dp, 0 = unlimited",
+      "maxTotalValueUsdc": "cumulative cap across all fills, USDC 6dp, 0 = unlimited",
+      "whyProceedsNotInput": "Valuing tokenIn would require a price oracle, which would undercut the design's central claim of needing none. Proceeds are known exactly at fill time, so the cap is exact.",
+      "setter": "setCaps(uint256,uint256), owner only",
+      "recommendedMainnet": "5_000000 per order (5 USDC), 100_000000 total (100 USDC)",
+      "testnet": "0 / 0 - uncapped, it is the sandbox"
     }
   },
   "designNotes": {

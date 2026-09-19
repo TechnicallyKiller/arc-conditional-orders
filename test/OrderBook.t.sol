@@ -44,7 +44,7 @@ contract OrderBookTest is Test {
 
         tokenIn = new MockERC20();
         router = new MockRouter(GT.USDC);
-        book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000, DWELL, MAX_ARM_AGE);
+        book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000, DWELL, MAX_ARM_AGE, 0, 0);
         book.setRouter(address(router), true);
 
         liveTick = IPoolManager(GT.UNIV4_POOL_MANAGER).currentTick(poolIdOf(_key()));
@@ -244,5 +244,52 @@ contract OrderBookTest is Test {
         uint256 typicalGasCost = 300_000 * 21.25 gwei;
         assertLt(fee, typicalGasCost, "unscaled fee looks smaller than gas - the trap");
         assertGt(feeNative, typicalGasCost, "scaled fee must clear gas cost");
+    }
+
+    // =================================================================
+    // Exposure caps - the mainnet safety rail
+    // =================================================================
+
+    /// A cap enforced only in the UI is a suggestion. This one is readable on-chain.
+    function test_perOrderCapBlocksAnOversizedFill() public {
+        book.setCaps(PAYOUT - 1, 0); // cap just below what this fill would deliver
+        uint256 id = _create(liveTick + 1000, true, 0);
+        _armAndWait(id);
+        vm.expectRevert(
+            abi.encodeWithSelector(OrderBook.OrderValueCapped.selector, PAYOUT, PAYOUT - 1)
+        );
+        vm.prank(keeper);
+        book.execute(id, address(router), _route());
+    }
+
+    function test_totalCapBlocksCumulativeExposure() public {
+        book.setCaps(0, PAYOUT - 1);
+        uint256 id = _create(liveTick + 1000, true, 0);
+        _armAndWait(id);
+        vm.expectRevert(
+            abi.encodeWithSelector(OrderBook.TotalValueCapped.selector, PAYOUT, PAYOUT - 1)
+        );
+        vm.prank(keeper);
+        book.execute(id, address(router), _route());
+    }
+
+    function test_totalFilledAccumulates() public {
+        book.setCaps(0, 0); // uncapped
+        uint256 id = _create(liveTick + 1000, true, 0);
+        _armAndWait(id);
+        vm.prank(keeper);
+        book.execute(id, address(router), _route());
+        assertEq(book.totalFilledUsdc(), PAYOUT, "total not tracked");
+    }
+
+    function test_zeroMeansUnlimited() public view {
+        assertEq(book.maxOrderValueUsdc(), 0);
+        assertEq(book.maxTotalValueUsdc(), 0);
+    }
+
+    function test_onlyOwnerCanSetCaps() public {
+        vm.expectRevert(OrderBook.NotOwner.selector);
+        vm.prank(keeper);
+        book.setCaps(1, 1);
     }
 }

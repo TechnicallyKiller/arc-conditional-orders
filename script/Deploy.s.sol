@@ -21,7 +21,9 @@ contract Deploy is Script {
             0,       // margin above gas cost, native 18dp
             30_000,  // settlement gas overhead - MEASURE this on a real deployment
             2,       // minDwellBlocks  (~1.0s at 0.507s blocks)
-            300      // maxArmAgeBlocks (~2.5 min)
+            300,     // maxArmAgeBlocks (~2.5 min)
+            vm.envOr("MAX_ORDER_USDC", uint256(0)), // per-fill cap, USDC 6dp. 0 = unlimited
+            vm.envOr("MAX_TOTAL_USDC", uint256(0))  // cumulative cap, USDC 6dp. 0 = unlimited
         );
         book.setRouter(address(adapter), true);
 

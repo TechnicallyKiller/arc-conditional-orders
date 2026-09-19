@@ -55,6 +55,16 @@ contract OrderBook is CostFloor {
     /// @dev An arm older than this is stale and must be redone, so a long-ago observation
     ///      cannot be replayed when price happens to revisit the trigger.
     uint64 public maxArmAgeBlocks;
+
+    /// @dev Exposure caps, in USDC 6dp. Zero means unlimited.
+    ///      Capped on REALISED PROCEEDS rather than the input amount: valuing tokenIn would
+    ///      need a price oracle, and the whole point of this design is that it needs none.
+    ///      The proceeds are known exactly, so the cap is exact and checkable on-chain rather
+    ///      than being a suggestion made by a frontend.
+    uint256 public maxOrderValueUsdc;
+    uint256 public maxTotalValueUsdc;
+    /// @dev Cumulative USDC delivered by fills, against which maxTotalValueUsdc binds.
+    uint256 public totalFilledUsdc;
     mapping(address => bool) public routerAllowed;
 
     uint256 public nextOrderId = 1;
@@ -80,6 +90,8 @@ contract OrderBook is CostFloor {
     error NotArmed();
     error DwellNotMet(uint64 armedAtBlock, uint64 currentBlock, uint64 required);
     error ArmStale(uint64 armedAtBlock, uint64 currentBlock);
+    error OrderValueCapped(uint256 amountOut, uint256 cap);
+    error TotalValueCapped(uint256 wouldBeTotal, uint256 cap);
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
@@ -100,7 +112,9 @@ contract OrderBook is CostFloor {
         uint256 _marginNative,
         uint256 _settlementGasOverhead,
         uint64 _minDwellBlocks,
-        uint64 _maxArmAgeBlocks
+        uint64 _maxArmAgeBlocks,
+        uint256 _maxOrderValueUsdc,
+        uint256 _maxTotalValueUsdc
     ) CostFloor(_settlementGasOverhead) {
         poolManager = IPoolManager(_poolManager);
         owner = msg.sender;
@@ -109,6 +123,8 @@ contract OrderBook is CostFloor {
         marginNative = _marginNative;
         minDwellBlocks = _minDwellBlocks;
         maxArmAgeBlocks = _maxArmAgeBlocks;
+        maxOrderValueUsdc = _maxOrderValueUsdc;
+        maxTotalValueUsdc = _maxTotalValueUsdc;
     }
 
     /// @dev On Arc an ERC-20 USDC transfer moves NATIVE value, so any contract that can hold
@@ -220,6 +236,17 @@ contract OrderBook is CostFloor {
         amountOut = IERC20(TOKEN_OUT).balanceOf(address(this)) - balanceBefore;
         if (amountOut < o.minAmountOut) revert SlippageExceeded(amountOut, o.minAmountOut);
 
+        // Exposure caps. The keeper simulates before submitting, so a capped order is skipped
+        // rather than burning gas on a revert.
+        if (maxOrderValueUsdc != 0 && amountOut > maxOrderValueUsdc) {
+            revert OrderValueCapped(amountOut, maxOrderValueUsdc);
+        }
+        uint256 newTotal = totalFilledUsdc + amountOut;
+        if (maxTotalValueUsdc != 0 && newTotal > maxTotalValueUsdc) {
+            revert TotalValueCapped(newTotal, maxTotalValueUsdc);
+        }
+        totalFilledUsdc = newTotal;
+
         fee = (amountOut * feeBps) / 10_000;
 
         // Fee is USDC in the 6dp ERC-20 view; gas cost is native 18dp. Scaling here is the
@@ -258,6 +285,12 @@ contract OrderBook is CostFloor {
 
     function setMargin(uint256 _marginNative) external onlyOwner {
         marginNative = _marginNative;
+    }
+
+    /// @notice Adjust exposure caps. Zero means unlimited. Owner only.
+    function setCaps(uint256 _maxOrderValueUsdc, uint256 _maxTotalValueUsdc) external onlyOwner {
+        maxOrderValueUsdc = _maxOrderValueUsdc;
+        maxTotalValueUsdc = _maxTotalValueUsdc;
     }
 
     function setDwell(uint64 _minDwellBlocks, uint64 _maxArmAgeBlocks) external onlyOwner {

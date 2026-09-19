@@ -39,7 +39,7 @@ contract OrderBookIntegrationTest is Test {
         vm.txGasPrice(21.25 gwei);
 
         adapter = new V4SwapAdapter(GT.UNIV4_POOL_MANAGER);
-        book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000, 2, 300);
+        book = new OrderBook(GT.UNIV4_POOL_MANAGER, feeRecipient, 50, 0, 30_000, 2, 300, 0, 0);
         book.setRouter(address(adapter), true);
 
         // Acquire real tokens for the trader by actually buying them on the pool.
