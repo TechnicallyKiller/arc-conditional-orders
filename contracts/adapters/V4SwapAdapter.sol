@@ -22,6 +22,7 @@ contract V4SwapAdapter is IUnlockCallback {
         bool zeroForOne;
         uint256 amountIn;
         address recipient;
+        address caller;
     }
 
     constructor(address _poolManager) {
@@ -41,7 +42,7 @@ contract V4SwapAdapter is IUnlockCallback {
         IERC20(currencyIn).transferFrom(msg.sender, address(this), amountIn);
 
         bytes memory res = poolManager.unlock(
-            abi.encode(CallbackData({key: key, zeroForOne: zeroForOne, amountIn: amountIn, recipient: recipient}))
+            abi.encode(CallbackData({key: key, zeroForOne: zeroForOne, amountIn: amountIn, recipient: recipient, caller: msg.sender}))
         );
         amountOut = abi.decode(res, (uint256));
         if (amountOut == 0) revert NothingReceived();
@@ -54,7 +55,7 @@ contract V4SwapAdapter is IUnlockCallback {
         address currencyIn = d.zeroForOne ? d.key.currency0 : d.key.currency1;
         address currencyOut = d.zeroForOne ? d.key.currency1 : d.key.currency0;
 
-        int256 delta = poolManager.swap(
+        poolManager.swap(
             d.key,
             SwapParams({
                 zeroForOne: d.zeroForOne,
@@ -64,20 +65,33 @@ contract V4SwapAdapter is IUnlockCallback {
             ""
         );
 
-        // BalanceDelta packs amount0 in the high 128 bits, amount1 in the low 128.
-        int128 amount0 = int128(delta >> 128);
-        int128 amount1 = int128(delta);
-        int128 outDelta = d.zeroForOne ? amount1 : amount0;
-        uint256 amountOut = uint256(uint128(outDelta > 0 ? outDelta : int128(0)));
+        // Settle against the PoolManager's own transient deltas rather than the delta the swap
+        // returned. Pools with an AFTER_SWAP_RETURNS_DELTA hook - which is most launchpad pools
+        // on Arc - let the hook adjust what is actually owed, so the returned delta is not what
+        // we can take. The transient delta is the truth for both sides.
+        int256 owed = _delta(currencyIn);    // negative: we owe the pool
+        int256 owing = _delta(currencyOut);  // positive: the pool owes us
 
-        // Pay what we owe: sync, transfer in, settle.
-        poolManager.sync(currencyIn);
-        IERC20(currencyIn).transfer(address(poolManager), d.amountIn);
-        poolManager.settle();
+        if (owed < 0) {
+            uint256 pay = uint256(-owed);
+            poolManager.sync(currencyIn);
+            IERC20(currencyIn).transfer(address(poolManager), pay);
+            poolManager.settle();
+        }
 
-        // Collect what we are owed.
-        poolManager.take(currencyOut, d.recipient, amountOut);
+        uint256 amountOut = owing > 0 ? uint256(owing) : 0;
+        if (amountOut > 0) poolManager.take(currencyOut, d.recipient, amountOut);
+
+        // Any unspent input (a hook may not consume it all) goes back to the caller.
+        uint256 dust = IERC20(currencyIn).balanceOf(address(this));
+        if (dust > 0) IERC20(currencyIn).transfer(d.caller, dust);
 
         return abi.encode(amountOut);
+    }
+
+    /// @dev V4 tracks what each locker owes or is owed in transient storage, keyed by
+    ///      keccak256(abi.encode(target, currency)).
+    function _delta(address currency) internal view returns (int256) {
+        return int256(uint256(poolManager.exttload(keccak256(abi.encode(address(this), currency)))));
     }
 }

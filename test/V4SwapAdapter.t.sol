@@ -80,4 +80,46 @@ contract V4SwapAdapterTest is Test {
     }
 
     receive() external payable {}
+
+    // ---------------------------------------------------------------
+    // Hook pools: most launchpad pools on Arc carry an AFTER_SWAP_RETURNS_DELTA hook that
+    // adjusts what is actually owed. Settling from the returned swap delta takes the wrong
+    // amount; settling from the transient currency delta is correct.
+    // ---------------------------------------------------------------
+
+    address constant HOOK_TOKEN = 0x7b433aBe57a1b7c520e8562B7262d2Ef502BCFb1;
+    address constant HOOK_ADDR = 0x0F5f4B60176E76F64A4AB0284e52bd68283eA044;
+    PoolId constant HOOK_POOL =
+        PoolId.wrap(0x153d783aaf1b233b422adfe9b7f8bc907bcfcd65a5e00c96e1c9cbbed6c0a717);
+
+    function _hookKey() internal pure returns (PoolKey memory) {
+        return PoolKey({
+            currency0: GT.USDC,
+            currency1: HOOK_TOKEN,
+            fee: 10000,
+            tickSpacing: 200,
+            hooks: HOOK_ADDR
+        });
+    }
+
+    function test_hookPoolKeyHashesToPoolId() public pure {
+        assertEq(PoolId.unwrap(poolIdOf(_hookKey())), PoolId.unwrap(HOOK_POOL), "hook PoolKey wrong");
+    }
+
+    function test_realSwapThroughHookPool() public {
+        uint256 amountIn = 1e6;
+        vm.deal(address(this), 1000e18);
+        IERC20(GT.USDC).approve(address(adapter), amountIn);
+
+        uint256 before = IERC20(HOOK_TOKEN).balanceOf(address(this));
+        uint256 amountOut = adapter.swapExactIn(_hookKey(), true, amountIn, address(this));
+
+        assertGt(amountOut, 0, "hook pool returned nothing");
+        assertEq(
+            IERC20(HOOK_TOKEN).balanceOf(address(this)) - before,
+            amountOut,
+            "delivered amount does not match what the adapter reported"
+        );
+        console.log("hook pool bought:", amountOut);
+    }
 }

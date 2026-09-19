@@ -26,6 +26,8 @@ struct SwapParams {
 ///      sync 0xa5841194 · extsload 0x1e2eaeaf
 interface IPoolManager {
     function extsload(bytes32 slot) external view returns (bytes32);
+    /// @dev Transient currency deltas. Selector 0xf135baaa, verified in the deployed bytecode.
+    function exttload(bytes32 slot) external view returns (bytes32);
     function unlock(bytes calldata data) external returns (bytes memory);
     function swap(PoolKey memory key, SwapParams memory params, bytes calldata hookData)
         external

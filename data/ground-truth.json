@@ -101,9 +101,11 @@
       "sync(address)": "0xa5841194",
       "extsload(bytes32)": "0x1e2eaeaf",
       "modifyLiquidity(...)": "0x5a6bcfda",
-      "initialize(...)": "0x6276cbbe"
+      "initialize(...)": "0x6276cbbe",
+      "exttload(bytes32)": "0xf135baaa"
     },
-    "liquiditySlot": "stateSlot + 3"
+    "liquiditySlot": "stateSlot + 3",
+    "currencyDeltaSlot": "keccak256(abi.encode(target, currency)) in transient storage, read via exttload"
   },
   "assets": {
     "cirBTC": {
@@ -141,8 +143,7 @@
     "Measured gas per operation from a real deployment - no public figure is trustworthy",
     "cirBTC redemption path with Circle - is there a non-DEX exit for seized collateral?",
     "Does single-block sqrtPriceX96 resist manipulation, or is a TWAP observation window needed before mainnet?",
-    "Settlement gas overhead constant (currently 30000) must be measured on a real deployment",
-    "Pools with AFTER_SWAP_RETURNS_DELTA hooks (most launchpad pools) adjust the swap delta; V4SwapAdapter computes amountOut from the raw delta and must read the transient currency delta instead before it can serve those pools"
+    "Settlement gas overhead constant (currently 30000) must be measured on a real deployment"
   ],
   "toolchain": {
     "required": "circlefin/arc-foundry v0.8.0-2",
@@ -167,13 +168,19 @@
       "breakevenOrderSizeUsdcAt50bps": 1.29
     },
     "v4SwapDirect": {
-      "gas": 152375,
-      "costCents": 0.324
+      "gas": 157274,
+      "costCents": 0.334,
+      "note": "no-hook pool, settles from transient deltas"
     },
     "orderFillRealRouter": {
       "gas": 357845,
       "costCents": 0.76,
       "example": "94.10 USDC fill at 50bps -> 0.4705 USDC fee, 62x the gas cost"
+    },
+    "v4SwapHookPool": {
+      "gas": 263994,
+      "costCents": 0.561,
+      "note": "AFTER_SWAP_RETURNS_DELTA hook pool"
     }
   },
   "phasesComplete": [
@@ -191,5 +198,25 @@
     "tickSpacing": 200,
     "hooks": "0x0000000000000000000000000000000000000000",
     "note": "No hooks, real liquidity. Used for the real-swap tests. Most launchpad pools carry an AFTER_SWAP fee hook that adjusts the delta - supporting those is outstanding work."
+  },
+  "hookTestPool": {
+    "poolId": "0x153d783aaf1b233b422adfe9b7f8bc907bcfcd65a5e00c96e1c9cbbed6c0a717",
+    "currency0": "0x3600000000000000000000000000000000000000",
+    "currency1": "0x7b433aBe57a1b7c520e8562B7262d2Ef502BCFb1",
+    "fee": 10000,
+    "tickSpacing": 200,
+    "hooks": "0x0F5f4B60176E76F64A4AB0284e52bd68283eA044"
+  },
+  "demandEvidence": {
+    "_note": "Measured 2026-09-19. This CONTRADICTS the memecoin crash-protection thesis and is recorded so it is not quietly forgotten.",
+    "newPoolsSampled": 216,
+    "pricedMovedAtAll": "31 (14.4%)",
+    "stillHaveLiquidity": "45 (20.8%)",
+    "fellOver50pct": 3,
+    "ofThoseThatMovedWentUp": "25 of 31 (81%)",
+    "conclusion": "~85% of newly created pools never trade. The 'token launched an hour ago goes to zero overnight' scenario is rare in new launches. Demand for stop-losses on new launches is NOT established.",
+    "activeTradedUniverse": "~570 pools, 6430 swaps per 10 min, volume dispersed (top 8 = 26%)",
+    "assetMix": "87.2% memecoins (BEORN, ARGUS, PI), 12.8% tokenized equity/ETF (SPYx SP500 xStock, USO United States Oil Fund)",
+    "openMeasurement": "Drawdowns on the ACTIVELY TRADED pools are still unmeasured. tools/snapshot.py exists to produce that number over days."
   }
 }
