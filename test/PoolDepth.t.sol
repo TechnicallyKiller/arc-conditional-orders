@@ -80,10 +80,12 @@ contract PoolDepthTest is Test {
         _measure("USO   ", k, 500e6);
     }
 
-    /// BB has large nominal liquidity but a real swap returns nothing, so it must NOT go on
-    /// the curated list. This is exactly why the list is gated by executed swaps rather than
-    /// by reading the liquidity field: nominal depth is not tradeable depth.
-    function test_depth_BB_isNotTradeable() public {
+    /// BB reports 4.5e24 liquidity, traded 135 times in 6h with a single stable liquidity
+    /// value in its Swap events, and yet a real swap here returns nothing in EITHER direction.
+    /// We do not know why, and that is recorded rather than guessed at. The point stands
+    /// regardless: only an executed swap reveals this, so the curated list must be gated by
+    /// executed swaps, never by reading the liquidity field.
+    function test_depth_BB_isNotTradeableAtThisBlock() public {
         PoolKey memory k = PoolKey(address(0), BB, 2500, 50, address(0));
         IERC20(GT.USDC).approve(address(adapter), 50e6);
         vm.expectRevert(V4SwapAdapter.NothingReceived.selector);
@@ -107,5 +109,59 @@ contract PoolDepthTest is Test {
         IERC20(GT.USDC).approve(address(adapter), 10e6);
         uint256 out = adapter.swapExactIn(k, true, 10e6, address(this));
         assertGt(out, 0, "native-currency pool must be tradeable");
+    }
+
+    // =================================================================
+    // THE DIRECTION THAT MATTERS
+    // A stop-loss SELLS the token for USDC. Buying is what a user does beforehand, on their
+    // own. Testing only the buy direction measured the wrong thing entirely.
+    // =================================================================
+
+    /// V4 accounts native USDC in 18dp, so a pool whose currency0 is address(0) pays out in
+    /// NATIVE units. Comparing that against a 6dp balanceOf delta is wrong by 1e12 - which is
+    /// exactly the mistake this codebase exists to avoid, and it bit this test first.
+    function _sell(string memory name, PoolKey memory key, uint256 tokenAmount)
+        internal
+        returns (uint256 out)
+    {
+        bool nativeOut = key.currency0 == address(0);
+        deal(key.currency1, address(this), tokenAmount);
+        IERC20(key.currency1).approve(address(adapter), tokenAmount);
+
+        uint256 nativeBefore = address(this).balance;
+        uint256 erc20Before = IERC20(GT.USDC).balanceOf(address(this));
+
+        out = adapter.swapExactIn(key, false, tokenAmount, address(this)); // oneForZero
+
+        if (nativeOut) {
+            assertEq(address(this).balance - nativeBefore, out, "native delivery mismatch");
+            console.log(name, "sold -> native 18dp:", out);
+            console.log("        same money, 6dp view:", IERC20(GT.USDC).balanceOf(address(this)) - erc20Before);
+        } else {
+            assertEq(IERC20(GT.USDC).balanceOf(address(this)) - erc20Before, out, "erc20 delivery mismatch");
+            console.log(name, "sold -> USDC 6dp:", out);
+        }
+    }
+
+    function test_canSellUSO() public {
+        PoolKey memory k = PoolKey(address(0), USO, 10000, 200, address(0));
+        uint256 out = _sell("USO   ", k, 1e18);
+        assertGt(out, 0, "cannot sell USO - stop-loss would be unfillable");
+    }
+
+    /// The sell direction fails too. A pool like this must never reach the curated list:
+    /// a stop-loss on it would sit armed and unfillable.
+    function test_cannotSellBB() public {
+        PoolKey memory k = PoolKey(address(0), BB, 2500, 50, address(0));
+        deal(BB, address(this), 1e18);
+        IERC20(BB).approve(address(adapter), 1e18);
+        vm.expectRevert(V4SwapAdapter.NothingReceived.selector);
+        adapter.swapExactIn(k, false, 1e18, address(this));
+    }
+
+    function test_canSellSCHNOZ() public {
+        PoolKey memory k = PoolKey(address(0), SCHNOZ, 100, 1, address(0));
+        uint256 out = _sell("SCHNOZ", k, 1e18);
+        assertGt(out, 0, "cannot sell SCHNOZ - stop-loss would be unfillable");
     }
 }

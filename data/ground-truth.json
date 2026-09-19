@@ -143,7 +143,8 @@
     "Measured gas per operation from a real deployment - no public figure is trustworthy",
     "cirBTC redemption path with Circle - is there a non-DEX exit for seized collateral?",
     "Settlement gas overhead constant (currently 30000) must be measured on a real deployment",
-    "Reconcile transient pool liquidity with the absence of ModifyLiquidity events - JIT liquidity, RPC behaviour, or a wrong slot assumption. Blocks the curated list."
+    "Why BB is untradeable in both directions despite stable liquidity and continuous swap flow. Excluded from the curated list until understood.",
+    "Move the keeper off the public RPC, or cross-check tick reads against Swap events, before mainnet"
   ],
   "toolchain": {
     "required": "circlefin/arc-foundry v0.8.0-2",
@@ -316,16 +317,25 @@
     }
   },
   "liquidityIsNotStable": {
-    "_severity": "HIGH - affects whether the product can work at all",
-    "observed": "Pools measured with 1e23-1e24 liquidity read ZERO liquidity minutes later, and real swaps against them revert with NothingReceived. Verified at head, not a historical-read artifact.",
-    "unresolved": "No ModifyLiquidity events appear in the blocks where liquidity apparently changed, and repeated reads of the same slot at the same block are consistent. Those two facts cannot both be true under any explanation I have. NOT resolved - do not build on either interpretation.",
-    "verifiedNow": "BB has 4.5e24 nominal liquidity and a real $50 swap returns nothing. Nominal depth is not tradeable depth.",
-    "productImplications": [
-      "A curated pool list CANNOT be a static snapshot; it must be a live simulated-swap check",
-      "A stop-loss pointed at a pool whose liquidity vanishes cannot fill - the user is unprotected exactly when they need it, and this must be stated in the UI, not buried",
-      "Fork tests against 'latest' are non-deterministic here; PoolDepth.t.sol is pinned to block 21694303"
-    ],
-    "castsDoubtOn": "The 24h drawdown study in demandEvidence used archive state reads. If historical state is unreliable in a way the consistency check did not catch, those numbers are softer than stated. Re-derive from Swap events (which carry tick in the log) before relying on them."
+    "_status": "RESOLVED 2026-09-19 - liquidity IS stable. The earlier alarm was bad state reads.",
+    "evidenceFromEvents": {
+      "method": "tools/fillability.py - Swap events carry the pool's liquidity at swap time, so this is log data, immune to node pruning or archive behaviour",
+      "USO_6h": {
+        "swaps": 114,
+        "distinctLiquidityValues": 1,
+        "medianGapSeconds": 2.0,
+        "maxGapSeconds": 14.2,
+        "gapsOver5min": 0
+      },
+      "BB_6h": {
+        "swaps": 135,
+        "distinctLiquidityValues": 1,
+        "medianGapSeconds": 1.5,
+        "maxGapSeconds": 8.1,
+        "gapsOver5min": 0
+      }
+    },
+    "conclusion": "Liquidity never changed - one value across every swap for six hours, and both pools trade every ~2s with no gap over 15s. Tradability is continuous."
   },
   "measuredDepth": {
     "_at": "block 21694303, realised via executed swaps",
@@ -350,5 +360,22 @@
       "trueImpactBps": 18
     },
     "BB": "NOT TRADEABLE despite 4.5e24 nominal liquidity"
-  }
+  },
+  "rpcStateReadsAreUnreliable": {
+    "_severity": "HIGH - affects the keeper in production",
+    "observed": "eth_call extsload against rpc.mainnet.arc.io returned ZERO for a pool slot at some blocks including latest, while Swap events prove the slot was non-zero throughout. Repeated reads of the same slot at the same block were consistent, so a naive retry does not catch it.",
+    "impact": "The keeper reads pool ticks via extsload. A spurious zero makes currentTick revert with PoolNotInitialised, so a triggered order silently does not fill - the exact failure a stop-loss must never have.",
+    "mitigations": [
+      "Use a provider endpoint (Alchemy, dRPC, QuickNode all list Arc) rather than the public RPC",
+      "Cross-check a tick read against the most recent Swap event's tick before acting",
+      "Treat event data as authoritative and state reads as a hint"
+    ],
+    "status": "OPEN - must be addressed before mainnet"
+  },
+  "nativeUsdcUnits": {
+    "finding": "Uniswap V4 accounts Arc's native USDC (currency address(0)) in 18dp. A pool whose currency0 is native pays out in native units, not the 6dp ERC-20 view.",
+    "howItSurfaced": "A sell test compared an 18dp return value against a 6dp balanceOf delta and was wrong by exactly 1e12. The adapter was correct; the test was not.",
+    "rule": "Never compare a V4 amount for a native currency against balanceOf. Compare against address(x).balance."
+  },
+  "curatedListRule": "A pool qualifies only if an EXECUTED SELL swap (token -> USDC) succeeds at the size being offered. Not a liquidity read, not a buy. USO and SCHNOZ pass. BB fails in both directions despite 4.5e24 nominal liquidity and 135 swaps in 6h - unexplained, and excluded."
 }
