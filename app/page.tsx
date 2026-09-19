@@ -34,8 +34,8 @@ export default function Landing() {
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 1200, margin: "0 auto", padding: "0 24px 96px" }}>
         {/* ── Hero ─────────────────────────────────────────────── */}
-        <section style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 32, padding: "56px 0 72px" }}>
-          <div style={{ flex: "1 1 440px", minWidth: 0 }}>
+        <section style={{ padding: "64px 0 80px" }}>
+          <div style={{ maxWidth: 680 }}>
             <div
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px",
@@ -97,18 +97,6 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Argus Panoptes — the watchman who never fully sleeps. Decoration, hidden from AT. */}
-          <div
-            aria-hidden
-            style={{
-              flex: "1 1 420px", minWidth: 0, alignSelf: "stretch", position: "relative",
-              minHeight: 520, marginRight: -120, opacity: 0.5,
-              backgroundImage: "url(/argus-ascii.png)", backgroundSize: "cover",
-              backgroundPosition: "52% center",
-              WebkitMaskImage: "linear-gradient(90deg, transparent 0%, #000 34%, #000 100%)",
-              maskImage: "linear-gradient(90deg, transparent 0%, #000 34%, #000 100%)",
-            }}
-          />
         </section>
 
         {/* ── How it works ─────────────────────────────────────── */}
