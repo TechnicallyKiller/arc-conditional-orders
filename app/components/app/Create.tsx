@@ -7,7 +7,7 @@ import { DEPLOY } from "../../lib/data";
 import { txUrl } from "../../lib/chain";
 import { Row } from "./Chip";
 import { TickScale } from "../TickScale";
-import { TESTNET_MARKET } from "../../lib/markets";
+import { type Market } from "../../lib/markets";
 import { fmt, humanPriceFromTick, sig, tickFromHumanPrice } from "../../lib/orderbook";
 import { FILL } from "../../lib/data";
 
@@ -26,8 +26,10 @@ const createOrderAbi = parseAbi([
   "function createOrder(address tokenIn, uint128 amountIn, uint128 minAmountOut, PoolKey key, int24 triggerTick, bool triggerBelow, uint64 expiry) returns (uint256)",
 ]);
 
-export function Create({ currentTick }: { currentTick: number | null }) {
-  const m = TESTNET_MARKET;
+export function Create({
+  currentTick, market, orderBook,
+}: { currentTick: number | null; market: Market; orderBook: `0x${string}` }) {
+  const m = market;
   const w = useWallet();
   const [amount, setAmount] = useState("");
   const [trigger, setTrigger] = useState("");
@@ -82,10 +84,10 @@ export function Create({ currentTick }: { currentTick: number | null }) {
       // default for a contract that has not been audited.
       const approve = {
         to: m.token as Hex,
-        data: encodeFunctionData({ abi: erc20Abi, functionName: "approve", args: [DEPLOY.orderBook as Hex, amountWei] }),
+        data: encodeFunctionData({ abi: erc20Abi, functionName: "approve", args: [orderBook, amountWei] }),
       };
       const create = {
-        to: DEPLOY.orderBook as Hex,
+        to: orderBook,
         data: encodeFunctionData({
           abi: createOrderAbi, functionName: "createOrder",
           args: [

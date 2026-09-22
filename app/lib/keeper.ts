@@ -1,5 +1,4 @@
-import { parseAbiItem, type Hex } from "viem";
-import { client } from "./orderbook";
+import { parseAbiItem, type Hex, type PublicClient } from "viem";
 
 /**
  * Keeper liveness, derived from EVENTS the keeper actually emitted.
@@ -24,7 +23,7 @@ export type KeeperStatus = {
   reachable: boolean;
 };
 
-export async function readKeeper(orderBook: Hex, lookback = 3000n): Promise<KeeperStatus> {
+export async function readKeeper(orderBook: Hex, client: PublicClient, lookback = 3000n): Promise<KeeperStatus> {
   try {
     const head = await client.getBlockNumber();
     const fromBlock = head > lookback ? head - lookback : 0n;

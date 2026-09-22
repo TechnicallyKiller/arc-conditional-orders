@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createPublicClient, http, parseAbiItem } from "viem";
-import { arcTestnet } from "../lib/chain";
-import { DEPLOY } from "../lib/data";
-
-const client = createPublicClient({ chain: arcTestnet, transport: http() });
+import { parseAbiItem } from "viem";
+import { useNetwork } from "../lib/network";
 
 /**
  * A stop-loss that silently does not fire is worse than none, so keeper health is shown, not
@@ -13,6 +10,7 @@ const client = createPublicClient({ chain: arcTestnet, transport: http() });
  * derived from events, not from a status endpoint we control.
  */
 export function KeeperStatus() {
+  const { info, client } = useNetwork();
   const [head, setHead] = useState<bigint | null>(null);
   const [lastSeen, setLastSeen] = useState<bigint | null>(null);
   const [failed, setFailed] = useState(false);
@@ -26,7 +24,7 @@ export function KeeperStatus() {
         setHead(h);
         setFailed(false);
         const logs = await client.getLogs({
-          address: DEPLOY.orderBook as `0x${string}`,
+          address: info.orderBook,
           event: parseAbiItem("event OrderArmed(uint256 indexed id, int24 tick, uint64 atBlock)"),
           fromBlock: h - 4000n > 0n ? h - 4000n : 0n,
           toBlock: h,
@@ -37,10 +35,11 @@ export function KeeperStatus() {
         if (alive) setFailed(true);
       }
     };
+    setHead(null); setLastSeen(null);
     tick();
     const t = setInterval(tick, 8000);
     return () => { alive = false; clearInterval(t); };
-  }, []);
+  }, [client, info.orderBook]);
 
   const stale = lastSeen === null;
   const tone = failed ? "var(--brick)" : stale ? "var(--ochre)" : "var(--pine)";

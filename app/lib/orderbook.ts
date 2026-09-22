@@ -1,7 +1,4 @@
-import { createPublicClient, http, parseAbi } from "viem";
-import { arcTestnet } from "./chain";
-
-export const client = createPublicClient({ chain: arcTestnet, transport: http() });
+import { parseAbi, type PublicClient } from "viem";
 
 export const orderBookAbi = parseAbi([
   "struct PoolKey { address currency0; address currency1; uint24 fee; int24 tickSpacing; address hooks; }",
@@ -52,7 +49,7 @@ export function sig(n: number, digits = 4): string {
 export const fmt = (n: number, dp = 6) =>
   isFinite(n) ? n.toLocaleString("en-US", { minimumFractionDigits: dp, maximumFractionDigits: dp }) : "—";
 
-export async function loadOrders(orderBook: `0x${string}`): Promise<OrderView[]> {
+export async function loadOrders(orderBook: `0x${string}`, client: PublicClient): Promise<OrderView[]> {
   const next = await client.readContract({ address: orderBook, abi: orderBookAbi, functionName: "nextOrderId" });
   const ids = Array.from({ length: Number(next) - 1 }, (_, i) => BigInt(i + 1));
   if (!ids.length) return [];

@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MARKETS, TESTNET_MARKET, type Market } from "../../lib/markets";
+import { marketsFor, type Market } from "../../lib/markets";
 import { readPools, type PoolState } from "../../lib/pools";
 import { readHistory, type Series } from "../../lib/history";
 import { humanPriceFromTick, sig } from "../../lib/orderbook";
 import { Spark } from "./Spark";
 
-const ROWS: Market[] = [TESTNET_MARKET, ...MARKETS];
+
 const GRID = "1.3fr .85fr .75fr 1fr .95fr auto";
 
 function DepthBadge({ m }: { m: Market }) {
@@ -32,7 +32,10 @@ function DepthBadge({ m }: { m: Market }) {
   );
 }
 
-export function Markets({ onSetStop }: { onSetStop: () => void }) {
+export function Markets({
+  network, onSetStop,
+}: { network: "mainnet" | "testnet"; onSetStop: () => void }) {
+  const ROWS: Market[] = marketsFor(network);
   const [pools, setPools] = useState<Record<string, PoolState>>({});
   const [hist, setHist] = useState<Record<string, Series>>({});
 

@@ -9,11 +9,12 @@ import { Create } from "../components/app/Create";
 import { Proof } from "../components/app/Proof";
 import { Connect } from "../components/app/Connect";
 import { WalletProvider } from "../lib/wallet";
-import { DEPLOY } from "../lib/data";
 import { readKeeper, type KeeperStatus } from "../lib/keeper";
-import { TESTNET_MARKET } from "../lib/markets";
+import { defaultMarketFor } from "../lib/markets";
+import { useNetwork } from "../lib/network";
+import { NetworkSwitch } from "../components/NetworkSwitch";
 import {
-  client, fmt, loadOrders, orderBookAbi, TriggerState, type OrderView,
+  fmt, loadOrders, orderBookAbi, TriggerState, type OrderView,
 } from "../lib/orderbook";
 
 type Tab = "markets" | "create" | "orders" | "proof";
@@ -25,6 +26,12 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 function AppInner() {
+  // Every read below is bound to the selected network. Nothing infers it, because reading a
+  // mainnet pool through the testnet RPC returns nothing and that looks like an empty pool.
+  const { network, info, client } = useNetwork();
+  const market = defaultMarketFor(network);
+  const book = info.orderBook;
+
   const [tab, setTab] = useState<Tab>("orders");
   const [orders, setOrders] = useState<OrderView[] | null>(null);
   const [head, setHead] = useState<bigint | null>(null);
@@ -34,18 +41,21 @@ function AppInner() {
 
   useEffect(() => {
     let alive = true;
+    // Clear first: showing the previous network's orders under a new network label is worse
+    // than showing nothing.
+    setOrders(null); setCaps(null); setKeeper(null); setHead(null); setErr(null);
     const load = async () => {
       try {
         const [h, os, maxOrder, maxTotal, filled] = await Promise.all([
           client.getBlockNumber(),
-          loadOrders(DEPLOY.orderBook as `0x${string}`),
-          client.readContract({ address: DEPLOY.orderBook as `0x${string}`, abi: orderBookAbi, functionName: "maxOrderValueUsdc" }),
-          client.readContract({ address: DEPLOY.orderBook as `0x${string}`, abi: orderBookAbi, functionName: "maxTotalValueUsdc" }),
-          client.readContract({ address: DEPLOY.orderBook as `0x${string}`, abi: orderBookAbi, functionName: "totalFilledUsdc" }),
+          loadOrders(book, client),
+          client.readContract({ address: book, abi: orderBookAbi, functionName: "maxOrderValueUsdc" }),
+          client.readContract({ address: book, abi: orderBookAbi, functionName: "maxTotalValueUsdc" }),
+          client.readContract({ address: book, abi: orderBookAbi, functionName: "totalFilledUsdc" }),
         ]);
         if (!alive) return;
         setHead(h);
-        readKeeper(DEPLOY.orderBook as `0x${string}`).then((k) => { if (alive) setKeeper(k); });
+        readKeeper(book, client).then((k) => { if (alive) setKeeper(k); });
         setOrders(os);
         // Zero means unlimited in the contract; say so rather than printing "0.000000".
         const cap = (v: bigint) => (v === 0n ? "uncapped" : fmt(Number(v) / 1e6));
@@ -58,7 +68,8 @@ function AppInner() {
     load();
     const t = setInterval(load, 10_000);
     return () => { alive = false; clearInterval(t); };
-  }, []);
+    // Re-runs on network change: `book` and `client` both switch with it.
+  }, [book, client]);
 
   const open = orders?.filter((o) => o.status === 1) ?? [];
   const closed = orders?.filter((o) => o.status !== 1) ?? [];
@@ -123,17 +134,15 @@ function AppInner() {
               <span className={err ? "" : "pulse"} style={{ width: 7, height: 7, borderRadius: 999, background: err ? "var(--brick)" : "var(--pine)" }} />
               {err ? "rpc unreachable" : head ? head.toLocaleString() : "connecting…"}
             </div>
-            <span className="label" style={{ padding: "6px 11px", borderRadius: 999, background: "rgba(242,237,226,.10)", color: "var(--ink)" }}>
-              Testnet
-            </span>
+            <NetworkSwitch compact />
             <Connect />
           </div>
         </div>
       </header>
 
       <main style={{ position: "relative", zIndex: 1, maxWidth: 1200, margin: "0 auto", padding: "12px 24px 96px" }}>
-        {tab === "markets" && <Markets onSetStop={() => setTab("create")} />}
-        {tab === "create" && <Create currentTick={null} />}
+        {tab === "markets" && <Markets network={network} onSetStop={() => setTab("create")} />}
+        {tab === "create" && <Create currentTick={null} market={market} orderBook={book} />}
         {tab === "proof" && <Proof />}
 
         {tab === "orders" && (
@@ -174,12 +183,12 @@ function AppInner() {
                   </div>
                 )}
 
-                {open.map((o) => <OrderCard key={o.id.toString()} o={o} dec={TESTNET_MARKET.decimals} />)}
+                {open.map((o) => <OrderCard key={o.id.toString()} o={o} dec={market.decimals} />)}
 
                 {closed.length > 0 && (
                   <>
                     <div className="label" style={{ marginTop: 32, paddingBottom: 8 }}>Closed</div>
-                    {closed.map((o) => <OrderCard key={o.id.toString()} o={o} dec={TESTNET_MARKET.decimals} />)}
+                    {closed.map((o) => <OrderCard key={o.id.toString()} o={o} dec={market.decimals} />)}
                   </>
                 )}
               </div>
@@ -188,6 +197,9 @@ function AppInner() {
                 keeper={keeper}
                 head={head}
                 caps={caps}
+                orderBook={book}
+                swapAdapter={info.swapAdapter}
+                chainId={info.chainId}
               />
             </div>
           </>

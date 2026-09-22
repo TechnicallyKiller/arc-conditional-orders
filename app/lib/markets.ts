@@ -63,3 +63,14 @@ export const TESTNET_MARKET: Market = {
   hooks: "0x0000000000000000000000000000000000000000",
   decimals: 18, impactBps50: null, impactBps500: null, poolFeeBps: 300, sellTestPassed: true,
 };
+
+/** Markets available on a given network. Mainnet rows are real Arc pools; testnet is the sandbox. */
+export const marketsFor = (network: "mainnet" | "testnet"): Market[] =>
+  network === "testnet" ? [TESTNET_MARKET] : MARKETS;
+
+/**
+ * The market an order form defaults to. On mainnet that is the deepest pool whose SELL test
+ * actually passed — a pool that only accepts buys is not somewhere a stop-loss can exit.
+ */
+export const defaultMarketFor = (network: "mainnet" | "testnet"): Market =>
+  network === "testnet" ? TESTNET_MARKET : (MARKETS.find((m) => m.sellTestPassed) ?? MARKETS[0]);

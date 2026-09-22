@@ -12,11 +12,14 @@ const note: React.CSSProperties = { margin: "10px 0 0", fontSize: 12, lineHeight
 const kv: React.CSSProperties = { display: "flex", justifyContent: "space-between", gap: 12, marginTop: 10, fontSize: 13, color: "var(--ink-2)" };
 
 export function Rail({
-  keeper, head, caps,
+  keeper, head, caps, orderBook, swapAdapter, chainId,
 }: {
   keeper: KeeperStatus | null;
   head: bigint | null;
   caps: { order: string; total: string; filled: string } | null;
+  orderBook: `0x${string}`;
+  swapAdapter: `0x${string}`;
+  chainId: number;
 }) {
   const tone = !keeper ? "muted" : !keeper.reachable ? "refused" : keeper.alive ? "filled" : "unreadable";
   const word = !keeper ? "Checking" : !keeper.reachable ? "RPC down" : keeper.alive ? "Live" : "Not running";
@@ -71,13 +74,13 @@ export function Rail({
 
       <section style={sect}>
         <h3 style={h3}>Contracts</h3>
-        {[["OrderBook", DEPLOY.orderBook], ["Swap adapter", DEPLOY.swapAdapter]].map(([l, a]) => (
+        {[["OrderBook", orderBook], ["Swap adapter", swapAdapter]].map(([l, a]) => (
           <div key={l} style={kv}>
             <span>{l}</span>
             <a href={addrUrl(a)} target="_blank" rel="noreferrer" title={a} className="num" style={{ fontSize: 13 }}>{short(a)} ↗</a>
           </div>
         ))}
-        <div style={kv}><span>Chain</span><span className="num">{DEPLOY.chainId}</span></div>
+        <div style={kv}><span>Chain</span><span className="num">{chainId}</span></div>
       </section>
     </aside>
   );
