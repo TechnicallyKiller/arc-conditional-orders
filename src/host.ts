@@ -155,7 +155,7 @@ if (keepers.length === 0 && !pulse.enabled) {
 const port = Number(process.env.PORT ?? 0);
 if (port > 0) {
   const staleAfterMs = Math.max(POLL_MS * 10, 60_000);
-  createServer((_req, res) => {
+  createServer((req, res) => {
     const now = Date.now();
     const jobs = keepers.map((k) => {
       const last = k.status.lastTickAt;
@@ -163,13 +163,32 @@ if (port > 0) {
       return { ...k.status, ageMs, healthy: ageMs <= staleAfterMs };
     });
     const healthy = jobs.length === 0 ? pulse.running : jobs.some((j) => j.healthy);
-    res.writeHead(healthy ? 200 : 503, {
+    const code = healthy ? 200 : 503;
+
+    // /ping is the same monitor in five bytes.
+    //
+    // The free-tier uptime pinger that keeps this service awake is also the thing that notices
+    // when it stops, so it has to see the status CODE. But cron-job.org rejects a response body
+    // it considers too large and fails the job outright, which kills the ping and lets the
+    // service sleep - the keeper then stops for real, silently, which is the one outcome this
+    // whole codebase exists to prevent. So the code is preserved and the body is not.
+    if (req.url === "/ping") {
+      res.writeHead(code, {
+        "content-type": "text/plain",
+        "access-control-allow-origin": "*",
+        "cache-control": "no-store",
+      });
+      res.end(healthy ? "ok" : "stale");
+      return;
+    }
+
+    res.writeHead(code, {
       "content-type": "application/json",
       "access-control-allow-origin": "*",
       "cache-control": "no-store",
     });
     res.end(JSON.stringify({ healthy, staleAfterMs, jobs, pulse, misconfigured }, null, 2));
-  }).listen(port, () => console.log(`health endpoint on :${port}`));
+  }).listen(port, () => console.log(`health endpoint on :${port} (/ping for uptime monitors)`));
 }
 
 console.log(`host up — ${keepers.length} keeper(s), pulse ${pulse.enabled ? "on" : "off"}, mode ${MODE}`);

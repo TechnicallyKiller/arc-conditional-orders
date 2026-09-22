@@ -6,9 +6,14 @@
 # exists to make visible. The process therefore serves a health endpoint on $PORT which returns
 # 503 once the last COMPLETE tick is older than the staleness budget.
 #
-# Keep it awake with any free uptime pinger (UptimeRobot, Better Stack) hitting `/` every
-# 5 minutes. That ping doubles as the monitor: if the keeper stalls, the endpoint goes 503 and
-# the pinger alerts, rather than the keeper dying quietly while traders believe they are covered.
+# Keep it awake with any free uptime pinger (UptimeRobot, Better Stack, cron-job.org) hitting
+# `/ping` every 5 MINUTES - not 10, which leaves no margin against the 15 minute spin-down. That
+# ping doubles as the monitor: if the keeper stalls the endpoint goes 503 and the pinger alerts,
+# rather than the keeper dying quietly while traders believe they are covered.
+#
+# Point the pinger at `/ping`, which answers "ok" or "stale" in five bytes. `/` returns the full
+# JSON, and some free pingers fail a job whose response body they consider too large - which
+# stops the ping, lets the service sleep, and stops the keeper. Use `/` for humans and debugging.
 #
 # If you can afford $7/month, change `type: web` to `type: worker` and delete healthCheckPath —
 # workers do not sleep and need no pinger.
