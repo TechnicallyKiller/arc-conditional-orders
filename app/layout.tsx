@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { NetworkProvider } from "./lib/network";
 
 const sans = Instrument_Sans({
   subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"],
@@ -24,7 +25,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sans.variable} ${serif.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      <body>
+        <NetworkProvider>{children}</NetworkProvider>
+      </body>
     </html>
   );
 }

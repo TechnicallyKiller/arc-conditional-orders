@@ -62,7 +62,12 @@ if (port > 0) {
     // Grace before the first tick, or Render's health check fails the deploy during startup.
     const uptimeMs = Date.now() - Date.parse(keeper.status.startedAt);
     const healthy = last === null ? uptimeMs < staleAfterMs : ageMs <= staleAfterMs;
-    res.writeHead(healthy ? 200 : 503, { "content-type": "application/json" });
+    // Read cross-origin by the status page. Public liveness data only - no secrets here.
+    res.writeHead(healthy ? 200 : 503, {
+      "content-type": "application/json",
+      "access-control-allow-origin": "*",
+      "cache-control": "no-store",
+    });
     res.end(JSON.stringify({ healthy, staleAfterMs, ageMs: Number.isFinite(ageMs) ? ageMs : null, ...keeper.status }, null, 2));
   }).listen(port, () => console.log(`health endpoint on :${port}`));
 }

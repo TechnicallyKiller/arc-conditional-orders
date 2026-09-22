@@ -26,6 +26,8 @@ export function Header() {
           <a href="#how" style={navLink}>How it works</a>
           <a href="#honest" style={navLink}>What can go wrong</a>
           <a href="#proof" style={navLink}>Proof</a>
+          <a href="/docs" style={navLink}>Docs</a>
+          <a href="/status" style={navLink}>Status</a>
         </nav>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <KeeperStatus />

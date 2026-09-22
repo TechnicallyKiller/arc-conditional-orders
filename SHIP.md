@@ -143,6 +143,26 @@ gas, sends nothing), then `execute`. Change the mode in `startCommand`.
 
 ## 7. Frontend
 
+The app has four routes: `/` (landing), `/app` (create and watch orders), `/docs` (how it
+works, and what can go wrong) and `/status` (keeper liveness and live contract configuration).
+
+A network switch in the header flips every page between testnet and mainnet; the choice is
+remembered per browser. Testnet is the default because it is the one with a faucet and a
+scripted pool — there is nothing to hand out on mainnet.
+
+`/status` derives keeper liveness from `OrderArmed` / `OrderFilled` events rather than from
+order state, because an order sits in `Ready` precisely when a keeper armed it and then
+stopped. To additionally surface the keeper process's own health endpoint, set:
+
+```
+NEXT_PUBLIC_KEEPER_HEALTH_URL=https://<your-render-service>.onrender.com/
+```
+
+That panel is clearly marked as self-reported; the chain-derived signal stays authoritative,
+since a running process proves nothing about whether it is actually filling.
+
+### Original note
+
 Point `app/lib/clients.ts` at mainnet and rebuild. Mainnet pools must be read over the
 mainnet RPC — reading them over the testnet RPC returns nothing, which previously looked
 like empty pools rather than a misconfiguration.
