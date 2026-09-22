@@ -12,6 +12,7 @@ import { WalletProvider } from "../lib/wallet";
 import { readKeeper, type KeeperStatus } from "../lib/keeper";
 import { defaultMarketFor } from "../lib/markets";
 import { useNetwork } from "../lib/network";
+import { logsClientFor } from "../lib/clients";
 import { NetworkSwitch } from "../components/NetworkSwitch";
 import {
   fmt, loadOrders, orderBookAbi, TriggerState, type OrderView,
@@ -55,7 +56,7 @@ function AppInner() {
         ]);
         if (!alive) return;
         setHead(h);
-        readKeeper(book, client).then((k) => { if (alive) setKeeper(k); });
+        readKeeper(book, client, logsClientFor(network)).then((k) => { if (alive) setKeeper(k); });
         setOrders(os);
         // Zero means unlimited in the contract; say so rather than printing "0.000000".
         const cap = (v: bigint) => (v === 0n ? "uncapped" : fmt(Number(v) / 1e6));
@@ -68,8 +69,9 @@ function AppInner() {
     load();
     const t = setInterval(load, 10_000);
     return () => { alive = false; clearInterval(t); };
-    // Re-runs on network change: `book` and `client` both switch with it.
-  }, [book, client]);
+    // Re-runs on network change: `book` and `client` both switch with it, and `network`
+    // selects the log-capable RPC.
+  }, [book, client, network]);
 
   const open = orders?.filter((o) => o.status === 1) ?? [];
   const closed = orders?.filter((o) => o.status !== 1) ?? [];
@@ -223,6 +225,9 @@ function AppInner() {
               <Rail
                 keeper={keeper}
                 head={head}
+                liveOrders={orders === null ? null : orders.filter(
+                  (o) => o.state !== TriggerState.NotOpen && o.state !== TriggerState.Expired
+                ).length}
                 caps={caps}
                 orderBook={book}
                 swapAdapter={info.swapAdapter}

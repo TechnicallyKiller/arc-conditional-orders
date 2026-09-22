@@ -23,13 +23,24 @@ export type KeeperStatus = {
   reachable: boolean;
 };
 
-export async function readKeeper(orderBook: Hex, client: PublicClient, lookback = 3000n): Promise<KeeperStatus> {
+/**
+ * `logsClient` is separate from `client` on purpose. Provider free tiers cap eth_getLogs hard —
+ * Alchemy's allows a 10 BLOCK range and this needs thousands — so sending the log query to the
+ * configured provider throws, and a caller that treats any throw as "chain unreachable" then
+ * reports a healthy chain as down. Contract reads go to the provider; logs go to the public RPC.
+ */
+export async function readKeeper(
+  orderBook: Hex,
+  client: PublicClient,
+  logsClient: PublicClient = client,
+  lookback = 3000n,
+): Promise<KeeperStatus> {
   try {
     const head = await client.getBlockNumber();
     const fromBlock = head > lookback ? head - lookback : 0n;
     const [armed, filled] = await Promise.all([
-      client.getLogs({ address: orderBook, event: ARMED, fromBlock, toBlock: head }),
-      client.getLogs({ address: orderBook, event: FILLED, fromBlock, toBlock: head }),
+      logsClient.getLogs({ address: orderBook, event: ARMED, fromBlock, toBlock: head }),
+      logsClient.getLogs({ address: orderBook, event: FILLED, fromBlock, toBlock: head }),
     ]);
     const blocks = [...armed, ...filled].map((l) => l.blockNumber);
     const lastSeen = blocks.length ? blocks.reduce((a, b) => (b > a ? b : a)) : null;

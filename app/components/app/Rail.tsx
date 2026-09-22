@@ -12,17 +12,29 @@ const note: React.CSSProperties = { margin: "10px 0 0", fontSize: 12, lineHeight
 const kv: React.CSSProperties = { display: "flex", justifyContent: "space-between", gap: 12, marginTop: 10, fontSize: 13, color: "var(--ink-2)" };
 
 export function Rail({
-  keeper, head, caps, orderBook, swapAdapter, chainId,
+  keeper, head, caps, orderBook, swapAdapter, chainId, liveOrders,
 }: {
   keeper: KeeperStatus | null;
   head: bigint | null;
+  /** Orders a keeper could still act on. Null while loading. */
+  liveOrders: number | null;
   caps: { order: string; total: string; filled: string } | null;
   orderBook: `0x${string}`;
   swapAdapter: `0x${string}`;
   chainId: number;
 }) {
-  const tone = !keeper ? "muted" : !keeper.reachable ? "refused" : keeper.alive ? "filled" : "unreadable";
-  const word = !keeper ? "Checking" : !keeper.reachable ? "RPC down" : keeper.alive ? "Live" : "Not running";
+  // Silence with work outstanding is an alarm. Silence with an empty queue is just quiet, and
+  // an amber "Not running" over zero open orders trains people to ignore the one indicator that
+  // has to be believed on the day it means something.
+  const idle = keeper !== null && keeper.reachable && !keeper.alive && liveOrders === 0;
+  const tone = !keeper ? "muted"
+    : !keeper.reachable ? "refused"
+    : keeper.alive ? "filled"
+    : idle ? "muted" : "unreadable";
+  const word = !keeper ? "Checking"
+    : !keeper.reachable ? "RPC down"
+    : keeper.alive ? "Live"
+    : idle ? "Idle" : "Not running";
   return (
     <aside style={{ flex: "1 1 280px", minWidth: 0, maxWidth: 360, display: "flex", flexDirection: "column", gap: 16 }}>
       <section style={sect}>
@@ -48,7 +60,13 @@ export function Rail({
           precisely because a keeper armed it and then stopped, so order state would report a dead
           keeper as live.
         </p>
-        {keeper && !keeper.alive && keeper.reachable && (
+        {idle && (
+          <p style={note}>
+            Every order here is filled or cancelled, so there is nothing for a keeper to arm. This
+            is an empty queue, not a fault.
+          </p>
+        )}
+        {keeper && !keeper.alive && keeper.reachable && !idle && (
           <p style={{ ...note, color: "var(--ochre)" }}>
             No keeper has acted recently. Orders will not arm or fill. Treat any protection here as
             suspended — anyone can run a keeper, and until someone does these orders are inert.
