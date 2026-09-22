@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { parseAbi, parseAbiItem, formatUnits } from "viem";
 import { useNetwork } from "../lib/network";
+import { logsClientFor } from "../lib/clients";
 import { SiteNav } from "../components/SiteNav";
 
 const bookAbi = parseAbi([
@@ -41,7 +42,9 @@ const usdc = (v: bigint) => (v === 0n ? "unlimited" : `${formatUnits(v, 6)} USDC
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
 export default function StatusPage() {
-  const { info, client } = useNetwork();
+  const { network, info, client } = useNetwork();
+  // Logs go to the public RPC: provider free tiers cap eth_getLogs range (Alchemy: 10 blocks).
+  const logs = logsClientFor(network);
   const [chain, setChain] = useState<Chain | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [health, setHealth] = useState<Health | null>(null);
@@ -75,8 +78,8 @@ export default function StatusPage() {
 
         const from = head > 3000n ? head - 3000n : 0n;
         const [armed, filled] = await Promise.all([
-          client.getLogs({ address: info.orderBook, event: ARMED, fromBlock: from, toBlock: head }),
-          client.getLogs({ address: info.orderBook, event: FILLED, fromBlock: from, toBlock: head }),
+          logs.getLogs({ address: info.orderBook, event: ARMED, fromBlock: from, toBlock: head }),
+          logs.getLogs({ address: info.orderBook, event: FILLED, fromBlock: from, toBlock: head }),
         ]);
         const blocks = [...armed, ...filled].map((l) => l.blockNumber);
         if (!live) return;
@@ -109,7 +112,7 @@ export default function StatusPage() {
     read();
     const t = setInterval(read, 12_000);
     return () => { live = false; clearInterval(t); };
-  }, [client, info.orderBook, info.swapAdapter]);
+  }, [client, logs, info.orderBook, info.swapAdapter]);
 
   useEffect(() => {
     if (!HEALTH_URL) return;

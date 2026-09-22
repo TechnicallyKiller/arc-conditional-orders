@@ -36,6 +36,30 @@ export const mainnetClient = createPublicClient({
 export const clientFor = (network: "mainnet" | "testnet") =>
   network === "mainnet" ? mainnetClient : testnetClient;
 
+/**
+ * A SEPARATE client for log queries, pinned to Arc's public RPC.
+ *
+ * Provider free tiers cap eth_getLogs hard — Alchemy's allows a 10 BLOCK range, and keeper
+ * liveness needs thousands. Sending those to a configured provider endpoint fails every read
+ * and renders as "chain unreachable", which is indistinguishable from the chain actually being
+ * down. Arc's public RPC has no such cap; it rate-limits instead, which the retry handles.
+ *
+ * So: provider endpoint for contract reads (frequent, small, rate-limit sensitive), public RPC
+ * for logs (rare, wide, range sensitive). Each gets the traffic it is good at.
+ */
+export const logsClientFor = (network: "mainnet" | "testnet") =>
+  network === "mainnet" ? mainnetLogsClient : testnetLogsClient;
+
+const mainnetLogsClient = createPublicClient({
+  chain: arc,
+  transport: transport(undefined),
+}) as PublicClient;
+
+const testnetLogsClient = createPublicClient({
+  chain: arcTestnet,
+  transport: transport(undefined),
+}) as PublicClient;
+
 /** Whether a dedicated endpoint is configured, so the UI can say so rather than guess. */
 export const rpcIsCustom = (network: "mainnet" | "testnet") =>
   Boolean(network === "mainnet" ? MAINNET_RPC : TESTNET_RPC);
