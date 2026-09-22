@@ -28,7 +28,7 @@ const TABS: { id: Tab; label: string }[] = [
 function AppInner() {
   // Every read below is bound to the selected network. Nothing infers it, because reading a
   // mainnet pool through the testnet RPC returns nothing and that looks like an empty pool.
-  const { network, info, client } = useNetwork();
+  const { network, info, client, setNetwork } = useNetwork();
   const market = defaultMarketFor(network);
   const book = info.orderBook;
 
@@ -174,12 +174,39 @@ function AppInner() {
                   </div>
                 )}
                 {orders !== null && orders.length === 0 && (
-                  <div style={{ padding: "40px 22px", borderTop: "1px solid var(--rule)", borderLeft: "2px solid var(--rule-2)" }}>
-                    <h2 style={{ margin: 0, fontSize: 19, fontWeight: 500 }}>No orders yet</h2>
-                    <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ink-2)", maxWidth: "58ch" }}>
-                      This OrderBook has never held an order. Set one on testnet — faucet funds, real
-                      contracts, the same code path as mainnet.
-                    </p>
+                  <div style={{ padding: "36px 22px", borderTop: "1px solid var(--rule)", borderLeft: "2px solid var(--rule-2)" }}>
+                    <h2 style={{ margin: 0, fontSize: 19, fontWeight: 500 }}>
+                      {network === "mainnet" ? "No orders on mainnet yet" : "No orders yet"}
+                    </h2>
+                    {network === "mainnet" ? (
+                      <>
+                        {/* An empty book is the honest state, but a bare "nothing here" reads as
+                            broken. Say what the deployment IS, and point at the thing to try. */}
+                        <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ink-2)", maxWidth: "62ch" }}>
+                          The contract is live and configured — exposure is capped on-chain at{" "}
+                          <span className="num">{caps?.order ?? "…"}</span> per fill and{" "}
+                          <span className="num">{caps?.total ?? "…"}</span> cumulative. There is no
+                          faucet here, so an order needs a token you already hold in one of the
+                          listed pools.
+                        </p>
+                        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+                          <button
+                            onClick={() => setNetwork("testnet")}
+                            style={{ height: 34, padding: "0 16px", border: "1px solid var(--rule-3)", borderRadius: 6, background: "transparent", color: "var(--ink)", font: "inherit", fontSize: 13, cursor: "pointer" }}
+                          >
+                            Try it on testnet instead
+                          </button>
+                          <a href="/status" style={{ height: 34, display: "inline-flex", alignItems: "center", padding: "0 16px", borderRadius: 6, border: "1px solid var(--rule-3)", color: "var(--ink-2)", fontSize: 13, textDecoration: "none" }}>
+                            See the live configuration
+                          </a>
+                        </div>
+                      </>
+                    ) : (
+                      <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--ink-2)", maxWidth: "58ch" }}>
+                        This OrderBook has never held an order. Set one here — faucet funds, real
+                        contracts, the same code path as mainnet.
+                      </p>
+                    )}
                   </div>
                 )}
 

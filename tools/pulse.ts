@@ -13,8 +13,12 @@ import { createPublicClient, createWalletClient, http, encodeFunctionData, parse
 import { privateKeyToAccount } from "viem/accounts";
 import { arcTestnet } from "viem/chains";
 
-const RPC = process.env.RPC_URL ?? "https://rpc.testnet.arc.io";
-const ADAPTER = (process.env.SWAP_ADAPTER ?? "0x2958d7445C5D0Aa9D06EAc625C85072E81CA49a3") as Hex;
+// Deliberately NOT RPC_URL / SWAP_ADAPTER: those carry the MAINNET deployment once .env is set
+// up for a mainnet deploy, and this script would then trade against a chain where the sandbox
+// token does not exist. It failed exactly that way once. Testnet-specific names, testnet-only.
+const RPC = process.env.TESTNET_RPC_URL ?? "https://rpc.testnet.arc.io";
+const ADAPTER = (process.env.TESTNET_SWAP_ADAPTER ?? "0x2958d7445C5D0Aa9D06EAc625C85072E81CA49a3") as Hex;
+const TESTNET_CHAIN_ID = 5042002;
 const TOKEN = (process.env.DEMO_TOKEN ?? "0xB828890c52F6d0436D9f601E78adB9E056e61ba8") as Hex;
 const USDC = "0x3600000000000000000000000000000000000000" as Hex;
 const PM = "0x8366a39CC670B4001A1121B8F6A443A643e40951" as Hex;
@@ -63,6 +67,12 @@ async function swap(zeroForOne: boolean, amountIn: bigint) {
 }
 
 async function main() {
+  const id = await pub.getChainId();
+  if (id !== TESTNET_CHAIN_ID) {
+    console.error(`refusing to run: connected to chain ${id}, expected Arc testnet ${TESTNET_CHAIN_ID}.`);
+    console.error("this script makes real trades; set TESTNET_RPC_URL rather than RPC_URL.");
+    process.exit(1);
+  }
   console.log("demo pulse — small real trades so the sandbox market is not flat");
   console.log(`  pool  ADEMO/USDC  adapter ${ADAPTER}`);
   for (const [token, spender] of [[USDC, ADAPTER], [TOKEN, ADAPTER]] as const) {

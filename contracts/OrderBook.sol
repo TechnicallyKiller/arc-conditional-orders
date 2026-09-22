@@ -21,11 +21,17 @@ interface ISwapRouter {
 /// @notice Non-custodial conditional orders for Arc spot traders.
 ///
 /// Funds stay in the trader's wallet until a fill. The keeper decides WHEN to attempt a fill;
-/// this contract decides whether the attempt is valid, by re-reading the pool's own tick.
-/// A wrong or malicious keeper can waste its own gas and nothing else.
+/// this contract decides whether the attempt is valid, by re-reading the pool's own tick and by
+/// building the router call itself from the order. A keeper cannot choose the pool, the amount
+/// or the recipient, so a wrong or malicious one wastes its own gas and nothing else.
 ///
 /// Fees are denominated in USDC, which is also what gas is denominated in on Arc. That is what
 /// lets `CostFloor` compare them without an oracle.
+///
+/// @dev `execute` and `armOrder` are callable by anyone, but the protocol fee is paid to
+///      `feeRecipient` while the gas is paid by `msg.sender`. A keeper that is not the fee
+///      recipient therefore runs at a loss on every fill, so in practice keeping is operator-run
+///      rather than an open market. Opening it would need the fee split between the two.
 contract OrderBook is CostFloor {
     using V4Price for IPoolManager;
 

@@ -23,8 +23,10 @@ services:
     startCommand: npx tsx src/keeper/index.ts execute
     healthCheckPath: /
     envVars:
+      # Set in the dashboard, not here: a provider URL carries an API key. The public RPC
+      # (https://rpc.mainnet.arc.io) works as a fallback but returns 429 under load.
       - key: RPC_URL
-        value: https://rpc.mainnet.arc.io
+        sync: false
       - key: ORDER_BOOK
         value: "0x9872b13257E958c2F7E4DcCc3F96b3C70c8e050c"
       - key: SWAP_ADAPTER
