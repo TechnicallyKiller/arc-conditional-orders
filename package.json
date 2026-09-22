@@ -36,6 +36,13 @@
     ],
     "overrides": {
       "viem": "2.56.0"
-    }
-  }
+    },
+    "ignoredBuiltDependencies": [
+      "@reown/appkit",
+      "bufferutil",
+      "keccak",
+      "utf-8-validate"
+    ]
+  },
+  "packageManager": "pnpm@9.15.9"
 }

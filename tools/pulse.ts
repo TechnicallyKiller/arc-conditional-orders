@@ -37,7 +37,7 @@ const adapterAbi = parseAbi([
 const erc20 = parseAbi(["function approve(address,uint256) returns (bool)", "function balanceOf(address) view returns (uint256)"]);
 
 const pk = process.env.KEEPER_PRIVATE_KEY as Hex;
-if (!pk) { console.error("KEEPER_PRIVATE_KEY not set"); process.exit(1); }
+if (!pk) throw new Error("pulse: KEEPER_PRIVATE_KEY not set");
 const account = privateKeyToAccount(pk);
 const pub = createPublicClient({ chain: arcTestnet, transport: http(RPC) });
 const wallet = createWalletClient({ account, chain: arcTestnet, transport: http(RPC) });
@@ -66,12 +66,15 @@ async function swap(zeroForOne: boolean, amountIn: bigint) {
   return hash;
 }
 
-async function main() {
+export async function runPulse() {
   const id = await pub.getChainId();
   if (id !== TESTNET_CHAIN_ID) {
-    console.error(`refusing to run: connected to chain ${id}, expected Arc testnet ${TESTNET_CHAIN_ID}.`);
-    console.error("this script makes real trades; set TESTNET_RPC_URL rather than RPC_URL.");
-    process.exit(1);
+    // Throw rather than exit: when the host imports this, a wrong chain must not take the
+    // keepers down with it.
+    throw new Error(
+      `pulse refusing to run: connected to chain ${id}, expected Arc testnet ${TESTNET_CHAIN_ID}. ` +
+      "It makes real trades; set TESTNET_RPC_URL rather than RPC_URL."
+    );
   }
   console.log("demo pulse — small real trades so the sandbox market is not flat");
   console.log(`  pool  ADEMO/USDC  adapter ${ADAPTER}`);
@@ -106,4 +109,9 @@ async function main() {
   }
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+// Only self-start when run directly. src/host.ts imports runPulse() instead, so a failure
+// there does not take the keepers down with it.
+import { fileURLToPath } from "node:url";
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  runPulse().catch((e) => { console.error(e); process.exit(1); });
+}

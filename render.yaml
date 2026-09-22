@@ -20,17 +20,32 @@ services:
     plan: free
     # tsx is a devDependency; Render may set NODE_ENV=production, which would skip it.
     buildCommand: npm ci --include=dev
-    startCommand: npx tsx src/keeper/index.ts execute
+    startCommand: npx tsx src/host.ts
     healthCheckPath: /
     envVars:
       # Set in the dashboard, not here: a provider URL carries an API key. The public RPC
       # (https://rpc.mainnet.arc.io) works as a fallback but returns 429 under load.
       - key: RPC_URL
         sync: false
+      # Mainnet: the real, capped deployment.
       - key: ORDER_BOOK
         value: "0x9872b13257E958c2F7E4DcCc3F96b3C70c8e050c"
       - key: SWAP_ADAPTER
         value: "0x0F1bf92EE0C79F7Ca5C1e30E9412aD5BFF45c7C8"
+      # Testnet: the sandbox a visitor actually interacts with. Without a keeper here an order
+      # they create sits at Ready forever and the demo reads as broken.
+      - key: TESTNET_ORDER_BOOK
+        value: "0xEe22D840289d4a94B0E1Efd7A072854a74ED489C"
+      - key: TESTNET_SWAP_ADAPTER
+        value: "0x2958d7445C5D0Aa9D06EAc625C85072E81CA49a3"
+      - key: TESTNET_RPC_URL
+        value: https://rpc.testnet.arc.io
+      # The sandbox market maker. Without it the demo price is a flat line.
+      - key: RUN_PULSE
+        value: "1"
+      # observe -> simulate -> execute. Start at observe and promote once you have watched it.
+      - key: MODE
+        value: execute
       # Arc blocks are ~0.507s. Polling faster buys little and costs RPC rate limit budget.
       - key: POLL_MS
         value: "5000"

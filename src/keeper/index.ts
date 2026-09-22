@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { Keeper, makeClient, type Config, type Mode } from "./keeper.js";
+import { arc, arcTestnet } from "../lib/chain.js";
 import type { Address, Hex } from "viem";
 
 /** Load .env for local runs. Hosted environments (Render) inject real env vars, which win. */
@@ -29,8 +30,14 @@ if (!["observe", "simulate", "execute"].includes(mode)) {
   process.exit(1);
 }
 
+// Single-network entry. src/host.ts runs several at once for a hosted deployment.
+const chain = env("CHAIN_ID", "5042") === "5042002" ? arcTestnet : arc;
+
 const cfg: Config = {
   mode,
+  chain,
+  rpcUrl: process.env.RPC_URL,
+  label: chain.id === 5042 ? "mainnet" : "testnet",
   orderBook: env("ORDER_BOOK") as Address,
   adapter: env("SWAP_ADAPTER") as Address,
   poolManager: env("POOL_MANAGER", "0x8366a39CC670B4001A1121B8F6A443A643e40951") as Address,

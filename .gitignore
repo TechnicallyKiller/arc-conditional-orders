@@ -10,6 +10,8 @@ node_modules/
 .agents/
 .claude/
 skills-lock.json
+# pnpm 9 reads settings from package.json; a pnpm-workspace.yaml without a `packages:`
+# key makes it fail with "packages field missing or empty".
 pnpm-workspace.yaml
 .next/
 next-env.d.ts

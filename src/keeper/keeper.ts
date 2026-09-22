@@ -1,6 +1,6 @@
 import {
   createPublicClient, createWalletClient, encodeFunctionData,
-  type Address, type Hex, type PublicClient,
+  type Address, type Chain, type Hex, type PublicClient,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { arc, arcTransport, MIN_MAX_FEE_PER_GAS, NATIVE_PER_ERC20 } from "../lib/chain.js";
@@ -11,6 +11,11 @@ export type Mode = "observe" | "simulate" | "execute";
 
 export type Config = {
   mode: Mode;
+  /** Which network this instance watches. One process can run several. */
+  chain: Chain;
+  rpcUrl?: string;
+  /** Shown in logs so two keepers in one process are tellable apart. */
+  label: string;
   orderBook: Address;
   adapter: Address;
   poolManager: Address;
@@ -41,6 +46,8 @@ const fmtNative = (v: bigint) => `${(Number(v) / 1e18).toFixed(8)} USDC`;
  *  make visible, so the process reports when it last completed a tick rather than merely that
  *  it is running. */
 export type KeeperStatus = {
+  /** Which network this keeper watches; two run in one process. */
+  label: string;
   mode: Mode;
   startedAt: string;
   lastTickAt: string | null;
@@ -60,6 +67,7 @@ export class Keeper {
     private client: PublicClient
   ) {
     this.status = {
+      label: cfg.label,
       mode: cfg.mode,
       startedAt: new Date().toISOString(),
       lastTickAt: null,
@@ -73,7 +81,7 @@ export class Keeper {
   }
 
   async start() {
-    console.log(`keeper starting in ${this.cfg.mode.toUpperCase()} mode`);
+    console.log(`[${this.cfg.label}] keeper starting in ${this.cfg.mode.toUpperCase()} mode`);
     console.log(`  orderBook ${this.cfg.orderBook}`);
 
     // No pool indexing: each order carries its own PoolKey, so the keeper can route any order
@@ -88,7 +96,7 @@ export class Keeper {
         // failure mode, because the trader believes they are protected.
         const msg = e instanceof Error ? e.message : String(e);
         this.status.lastError = msg;
-        console.error("tick failed:", msg);
+        console.error(`[${this.cfg.label}] tick failed:`, msg);
       }
       await new Promise((r) => setTimeout(r, this.cfg.pollMs));
     }
@@ -242,7 +250,9 @@ export class Keeper {
   private wallet() {
     if (!this.cfg.privateKey) throw new Error("execute mode needs a private key");
     return createWalletClient({
-      account: privateKeyToAccount(this.cfg.privateKey), chain: arc, transport: arcTransport(process.env.RPC_URL),
+      account: privateKeyToAccount(this.cfg.privateKey),
+      chain: this.cfg.chain,
+      transport: arcTransport(this.cfg.rpcUrl),
     });
   }
 
@@ -253,7 +263,7 @@ export class Keeper {
       address: this.cfg.orderBook, abi: orderBookAbi, functionName: "armOrder", args: [id],
       maxFeePerGas: bumpToFloor(fees?.maxFeePerGas ?? MIN_MAX_FEE_PER_GAS),
       maxPriorityFeePerGas: fees?.maxPriorityFeePerGas ?? 0n,
-      chain: arc,
+      chain: this.cfg.chain,
     });
     // Arc has deterministic finality: one confirmation is final.
     await this.client.waitForTransactionReceipt({ hash, confirmations: 1 });
@@ -270,7 +280,7 @@ export class Keeper {
       gas: (gas * 12n) / 10n,
       maxFeePerGas: bumpToFloor(fees?.maxFeePerGas ?? MIN_MAX_FEE_PER_GAS),
       maxPriorityFeePerGas: fees?.maxPriorityFeePerGas ?? 0n,
-      chain: arc,
+      chain: this.cfg.chain,
     });
     const rc = await this.client.waitForTransactionReceipt({ hash, confirmations: 1 });
     this.status.fills += 1;
@@ -289,11 +299,12 @@ export function bumpToFloor(maxFeePerGas: bigint): bigint {
   return maxFeePerGas < MIN_MAX_FEE_PER_GAS ? MIN_MAX_FEE_PER_GAS : maxFeePerGas;
 }
 
-export function makeClient(): PublicClient {
-  // RPC_URL lets the keeper run against a local arc-anvil fork without touching mainnet.
+export function makeClient(chain: Chain = arc, rpcUrl = process.env.RPC_URL): PublicClient {
+  // An explicit chain + url lets one process watch several networks, and lets a keeper run
+  // against a local arc-anvil fork without touching mainnet.
   return createPublicClient({
-    chain: arc,
-    transport: arcTransport(process.env.RPC_URL),
+    chain,
+    transport: arcTransport(rpcUrl),
     batch: { multicall: true },
   }) as PublicClient;
 }
