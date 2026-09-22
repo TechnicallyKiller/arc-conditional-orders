@@ -55,6 +55,7 @@ contract OrderBookTest is Test {
 
         vm.deal(address(router), PAYOUT * 1e12 * 10);
         router.setPayout(PAYOUT);
+        router.setTokenIn(address(tokenIn));
     }
 
     function _create(int24 triggerTick, bool below, uint128 minOut) internal returns (uint256 id) {
@@ -68,9 +69,6 @@ contract OrderBookTest is Test {
         vm.roll(block.number + DWELL);
     }
 
-    function _route() internal view returns (bytes memory) {
-        return abi.encodeCall(MockRouter.swap, (address(tokenIn), AMOUNT_IN));
-    }
 
     // =================================================================
     // Single-block manipulation defence - the reason arming exists
@@ -81,40 +79,40 @@ contract OrderBookTest is Test {
     /// in different blocks. Everything else here is ordinary order-book hygiene; this is the
     /// property that makes the dwell window worth its gas.
     function test_cannotArmAndFillInSameBlock() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         book.armOrder(id);
 
         vm.expectPartialRevert(OrderBook.DwellNotMet.selector);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
     function test_cannotFillWithoutArming() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         vm.expectRevert(OrderBook.NotArmed.selector);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
     /// An observation from long ago must not be replayable when price revisits the trigger.
     function test_staleArmIsRejected() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         book.armOrder(id);
         vm.roll(block.number + MAX_ARM_AGE + 1);
 
         vm.expectPartialRevert(OrderBook.ArmStale.selector);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
     /// Arming is permissionless, like execution: safety must not depend on who observes.
     function test_anyoneCanArm() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         vm.prank(address(0xD00D));
         book.armOrder(id);
         vm.roll(block.number + DWELL);
         vm.prank(keeper);
-        (uint256 amountOut,) = book.execute(id, address(router), _route());
+        (uint256 amountOut,) = book.execute(id, address(router));
         assertEq(amountOut, PAYOUT);
     }
 
@@ -124,7 +122,7 @@ contract OrderBookTest is Test {
 
     function test_cannotArmWhenPriceHasNotFallenToTrigger() public {
         int24 trigger = liveTick - 1000;
-        uint256 id = _create(trigger, true, 0);
+        uint256 id = _create(trigger, true, 1);
         vm.expectRevert(
             abi.encodeWithSelector(OrderBook.TriggerNotMet.selector, liveTick, trigger, true)
         );
@@ -134,7 +132,7 @@ contract OrderBookTest is Test {
 
     function test_cannotArmTakeProfitBelowTrigger() public {
         int24 trigger = liveTick + 1000;
-        uint256 id = _create(trigger, false, 0);
+        uint256 id = _create(trigger, false, 1);
         vm.expectRevert(
             abi.encodeWithSelector(OrderBook.TriggerNotMet.selector, liveTick, trigger, false)
         );
@@ -148,55 +146,69 @@ contract OrderBookTest is Test {
 
     function test_refusesWhenFeeDoesNotCoverGas() public {
         book.setFee(0, feeRecipient);
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         _armAndWait(id);
         vm.expectPartialRevert(CostFloor.CostFloorBreached.selector);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
+    /// The bound binds on what the trader RECEIVES, not on gross proceeds. With a 50bp fee a
+    /// PAYOUT of 1e9 nets 995e6, so an order asking for PAYOUT + 1 must refuse - and the error
+    /// must report the net figure, or the trader cannot tell how far short the fill fell.
     function test_refusesWhenSlippageExceeded() public {
         uint256 id = _create(liveTick + 1000, true, uint128(PAYOUT + 1));
         _armAndWait(id);
+        uint256 expectedNet = PAYOUT - (PAYOUT * 50) / 10_000;
         vm.expectRevert(
-            abi.encodeWithSelector(OrderBook.SlippageExceeded.selector, PAYOUT, PAYOUT + 1)
+            abi.encodeWithSelector(OrderBook.SlippageExceeded.selector, expectedNet, PAYOUT + 1)
         );
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
+    }
+
+    /// A fill that clears the bound GROSS but not NET must refuse. Before the fee was moved
+    /// ahead of the check, this order filled and paid the trader less than they signed for.
+    function test_slippageBindsOnNetNotGross() public {
+        uint256 id = _create(liveTick + 1000, true, uint128(PAYOUT));
+        _armAndWait(id);
+        vm.expectPartialRevert(OrderBook.SlippageExceeded.selector);
+        vm.prank(keeper);
+        book.execute(id, address(router));
     }
 
     function test_refusesUnapprovedRouter() public {
         MockRouter rogue = new MockRouter(GT.USDC);
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         _armAndWait(id);
         vm.expectRevert(abi.encodeWithSelector(OrderBook.RouterNotAllowed.selector, address(rogue)));
         vm.prank(keeper);
-        book.execute(id, address(rogue), _route());
+        book.execute(id, address(rogue));
     }
 
     function test_cannotFillTwice() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         _armAndWait(id);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
 
         vm.expectRevert(OrderBook.OrderNotOpen.selector);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
     function test_cancelledOrderCannotFill() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         _armAndWait(id);
         vm.prank(trader);
         book.cancelOrder(id);
         vm.expectRevert(OrderBook.OrderNotOpen.selector);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
     function test_onlyOwnerCanCancel() public {
-        uint256 id = _create(liveTick - 1000, true, 0);
+        uint256 id = _create(liveTick - 1000, true, 1);
         vm.expectRevert(OrderBook.NotOrderOwner.selector);
         vm.prank(keeper);
         book.cancelOrder(id);
@@ -205,14 +217,14 @@ contract OrderBookTest is Test {
     function test_expiredOrderCannotFill() public {
         vm.prank(trader);
         uint256 id = book.createOrder(
-            address(tokenIn), AMOUNT_IN, 0, _key(), liveTick + 1000, true, uint64(block.timestamp + 100)
+            address(tokenIn), AMOUNT_IN, 1, _key(), liveTick + 1000, true, uint64(block.timestamp + 100)
         );
         book.armOrder(id);
         vm.roll(block.number + DWELL);
         vm.warp(block.timestamp + 200);
         vm.expectRevert(OrderBook.OrderExpired.selector);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
     // =================================================================
@@ -220,13 +232,13 @@ contract OrderBookTest is Test {
     // =================================================================
 
     function test_fillsWhenPriceReachesTrigger() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         _armAndWait(id);
 
         uint256 traderBefore = IERC20(GT.USDC).balanceOf(trader);
 
         vm.prank(keeper);
-        (uint256 amountOut, uint256 fee) = book.execute(id, address(router), _route());
+        (uint256 amountOut, uint256 fee) = book.execute(id, address(router));
 
         assertEq(amountOut, PAYOUT, "wrong amount out");
         assertEq(fee, (PAYOUT * 50) / 10_000, "wrong fee");
@@ -253,32 +265,32 @@ contract OrderBookTest is Test {
     /// A cap enforced only in the UI is a suggestion. This one is readable on-chain.
     function test_perOrderCapBlocksAnOversizedFill() public {
         book.setCaps(PAYOUT - 1, 0); // cap just below what this fill would deliver
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         _armAndWait(id);
         vm.expectRevert(
             abi.encodeWithSelector(OrderBook.OrderValueCapped.selector, PAYOUT, PAYOUT - 1)
         );
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
     function test_totalCapBlocksCumulativeExposure() public {
         book.setCaps(0, PAYOUT - 1);
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         _armAndWait(id);
         vm.expectRevert(
             abi.encodeWithSelector(OrderBook.TotalValueCapped.selector, PAYOUT, PAYOUT - 1)
         );
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
     }
 
     function test_totalFilledAccumulates() public {
         book.setCaps(0, 0); // uncapped
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         _armAndWait(id);
         vm.prank(keeper);
-        book.execute(id, address(router), _route());
+        book.execute(id, address(router));
         assertEq(book.totalFilledUsdc(), PAYOUT, "total not tracked");
     }
 
@@ -303,14 +315,14 @@ contract OrderBookTest is Test {
     }
 
     function test_checkOrdersReportsNotTriggered() public {
-        uint256 id = _create(liveTick - 1000, true, 0);
+        uint256 id = _create(liveTick - 1000, true, 1);
         (OrderBook.TriggerState[] memory st, int24[] memory tk) = book.checkOrders(_ids(id));
         assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.NotTriggered));
         assertEq(tk[0], liveTick, "tick should still be reported");
     }
 
     function test_checkOrdersReportsTriggeredThenArmingThenReady() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         (OrderBook.TriggerState[] memory st,) = book.checkOrders(_ids(id));
         assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.Triggered));
 
@@ -330,7 +342,7 @@ contract OrderBookTest is Test {
             currency0: GT.USDC, currency1: address(0xDEAD), fee: 3000, tickSpacing: 60, hooks: address(0)
         });
         vm.prank(trader);
-        uint256 id = book.createOrder(address(tokenIn), AMOUNT_IN, 0, dead, 0, true, 0);
+        uint256 id = book.createOrder(address(tokenIn), AMOUNT_IN, 1, dead, 0, true, 0);
 
         (OrderBook.TriggerState[] memory st,) = book.checkOrders(_ids(id));
         assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.PoolUnreadable), "must be distinguishable");
@@ -341,7 +353,7 @@ contract OrderBookTest is Test {
     }
 
     function test_checkOrdersReportsCancelledAndExpired() public {
-        uint256 id = _create(liveTick + 1000, true, 0);
+        uint256 id = _create(liveTick + 1000, true, 1);
         vm.prank(trader);
         book.cancelOrder(id);
         (OrderBook.TriggerState[] memory st,) = book.checkOrders(_ids(id));
@@ -350,13 +362,103 @@ contract OrderBookTest is Test {
 
     /// Every order in one call means every order is evaluated against the same block.
     function test_checkOrdersBatches() public {
-        uint256 a = _create(liveTick + 1000, true, 0);
-        uint256 b = _create(liveTick - 1000, true, 0);
+        uint256 a = _create(liveTick + 1000, true, 1);
+        uint256 b = _create(liveTick - 1000, true, 1);
         uint256[] memory ids = new uint256[](2);
         ids[0] = a;
         ids[1] = b;
         (OrderBook.TriggerState[] memory st,) = book.checkOrders(ids);
         assertEq(uint8(st[0]), uint8(OrderBook.TriggerState.Triggered));
         assertEq(uint8(st[1]), uint8(OrderBook.TriggerState.NotTriggered));
+    }
+
+    // =================================================================
+    // Regressions for the audit findings. Each one FAILED before its fix.
+    // =================================================================
+
+    /// FINDING 2. armOrder is permissionless and used to overwrite armedAtBlock on every call,
+    /// so anyone could push the dwell deadline forward every block and keep an order
+    /// permanently unfillable - during exactly the price move the stop-loss exists for.
+    function test_reArmingCannotResetTheDwellClock() public {
+        address griefer = address(0xBAD);
+        uint256 id = _create(liveTick + 1000, true, 1);
+
+        book.armOrder(id);
+        uint64 armedAt = uint64(block.number);
+
+        // The griefer re-arms in every block of the dwell window.
+        for (uint256 i = 0; i < DWELL; i++) {
+            vm.roll(block.number + 1);
+            vm.prank(griefer);
+            book.armOrder(id);
+        }
+
+        assertEq(book.getOrder(id).armedAtBlock, armedAt, "re-arm moved the dwell clock");
+
+        // The original observation still governs, so the fill lands on schedule.
+        vm.prank(keeper);
+        book.execute(id, address(router));
+        assertEq(uint8(book.getOrder(id).status), uint8(OrderBook.Status.Filled));
+    }
+
+    /// A genuinely stale arm must still be replaceable, or an order that went un-filled could
+    /// never be re-armed.
+    function test_staleArmCanStillBeReplaced() public {
+        uint256 id = _create(liveTick + 1000, true, 1);
+        book.armOrder(id);
+        uint64 first = book.getOrder(id).armedAtBlock;
+
+        vm.roll(block.number + MAX_ARM_AGE + 1);
+        book.armOrder(id);
+
+        assertGt(book.getOrder(id).armedAtBlock, first, "stale arm was not replaced");
+    }
+
+    /// FINDING 1. execute used to forward caller-authored calldata, so the pool whose tick
+    /// authorised the fill was not necessarily the pool the fill traded in, and the proceeds
+    /// recipient was whatever the caller named. The call is now built from the order.
+    function test_routeIsBuiltFromTheOrderNotTheCaller() public {
+        uint256 id = _create(liveTick + 1000, true, 1);
+        _armAndWait(id);
+
+        vm.prank(keeper);
+        book.execute(id, address(router));
+
+        assertEq(router.lastRecipient(), address(book), "proceeds must land on the book");
+        assertEq(router.lastAmountIn(), AMOUNT_IN, "amount must come from the order");
+
+        (address c0, address c1, uint24 f, int24 ts, address h) = router.lastKey();
+        PoolKey memory k = _key();
+        assertEq(c0, k.currency0, "currency0 not from the order");
+        assertEq(c1, k.currency1, "currency1 not from the order");
+        assertEq(f, k.fee, "fee not from the order");
+        assertEq(ts, k.tickSpacing, "tickSpacing not from the order");
+        assertEq(h, k.hooks, "hooks not from the order");
+    }
+
+    /// FINDING 5. balanceBefore was sampled before the input was pulled in, so an order whose
+    /// input IS the proceeds token scored its own principal as swap output.
+    function test_rejectsOrderWhoseInputIsTheProceedsToken() public {
+        vm.prank(trader);
+        vm.expectRevert(OrderBook.TokenInIsProceeds.selector);
+        book.createOrder(GT.USDC, AMOUNT_IN, 1, _key(), liveTick + 1000, true, 0);
+    }
+
+    /// FINDING 3. The shipped frontend passed 0 for every order, so the one protection the
+    /// contract relies on was absent in practice.
+    function test_rejectsZeroSlippageBound() public {
+        vm.prank(trader);
+        vm.expectRevert(OrderBook.ZeroMinAmountOut.selector);
+        book.createOrder(address(tokenIn), AMOUNT_IN, 0, _key(), liveTick + 1000, true, 0);
+    }
+
+    /// FINDING 8. feeBps applies at fill time, so a raise reaches orders already signed.
+    function test_feeCannotExceedCeiling() public {
+        uint16 max = book.MAX_FEE_BPS();
+        vm.expectRevert(abi.encodeWithSelector(OrderBook.FeeTooHigh.selector, uint16(10_000), max));
+        book.setFee(10_000, feeRecipient);
+
+        book.setFee(max, feeRecipient);
+        assertEq(book.feeBps(), max, "ceiling itself must be settable");
     }
 }

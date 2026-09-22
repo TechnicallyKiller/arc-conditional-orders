@@ -172,27 +172,20 @@ export class Keeper {
     };
   }
 
-  private routeData(o: Order): Hex {
-    // Selling tokenIn: zeroForOne is true only when tokenIn is currency0.
-    const zeroForOne = o.key.currency0.toLowerCase() === o.tokenIn.toLowerCase();
-    return encodeFunctionData({
-      abi: adapterAbi, functionName: "swapExactIn",
-      args: [o.key, zeroForOne, o.amountIn, this.cfg.orderBook],
-    });
-  }
+  // The OrderBook now builds the router call itself from the order's own key, amount and
+  // address(this). The keeper no longer authors calldata - that was the route-divergence bug.
 
   private async simulate(o: Order) {
-    const data = this.routeData(o);
     const account = this.cfg.privateKey ? privateKeyToAccount(this.cfg.privateKey).address : undefined;
     try {
       const { result } = await this.client.simulateContract({
         address: this.cfg.orderBook, abi: orderBookAbi, functionName: "execute",
-        args: [o.id, this.cfg.adapter, data], account,
+        args: [o.id, this.cfg.adapter], account,
       });
       const [amountOut, fee] = result as unknown as [bigint, bigint];
       const gas = await this.client.estimateContractGas({
         address: this.cfg.orderBook, abi: orderBookAbi, functionName: "execute",
-        args: [o.id, this.cfg.adapter, data], account,
+        args: [o.id, this.cfg.adapter], account,
       }).catch((e) => {
         console.error(`          gas estimate failed, falling back to 400k: ${e?.shortMessage ?? e}`);
         return 400_000n;
@@ -202,7 +195,7 @@ export class Keeper {
       const gasCost = gas * price;
       // Fee is a 6dp ERC-20 amount; gas cost is native 18dp. Scale before comparing.
       const profit = fee * NATIVE_PER_ERC20 - gasCost;
-      return { amountOut, fee, gas, gasCost, profit, data };
+      return { amountOut, fee, gas, gasCost, profit };
     } catch (e) {
       console.log(`          simulation reverted: ${e instanceof Error ? e.message.split("\n")[0] : e}`);
       return null;
@@ -231,12 +224,11 @@ export class Keeper {
   }
 
   private async fill(o: Order, gas: bigint) {
-    const data = this.routeData(o);
     const w = this.wallet();
     const fees = await this.client.estimateFeesPerGas().catch(() => null);
     const hash = await w.writeContract({
       address: this.cfg.orderBook, abi: orderBookAbi, functionName: "execute",
-      args: [o.id, this.cfg.adapter, data],
+      args: [o.id, this.cfg.adapter],
       gas: (gas * 12n) / 10n,
       maxFeePerGas: bumpToFloor(fees?.maxFeePerGas ?? MIN_MAX_FEE_PER_GAS),
       maxPriorityFeePerGas: fees?.maxPriorityFeePerGas ?? 0n,

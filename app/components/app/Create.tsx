@@ -60,7 +60,19 @@ export function Create({ currentTick }: { currentTick: number | null }) {
     const a = parseFloat(amount);
     return isFinite(a) && a > 0 ? BigInt(Math.floor(a * 10 ** m.decimals)) : 0n;
   })();
-  const canSubmit = Boolean(w.address) && valid && amountWei > 0n && calc.clears > 0 && !submitting;
+
+  // The contract refuses minAmountOut == 0: without a floor, the only thing bounding a fill is
+  // the keeper's own gas, which is a few cents regardless of how large the order is.
+  const SLIPPAGE_BPS = 100; // 1%
+  const expectedNet = calc.net - calc.keeperFee;
+  const minAmountOut = expectedNet > 0
+    ? BigInt(Math.floor(expectedNet * (1 - SLIPPAGE_BPS / 10_000) * 1e6))
+    : 0n;
+  // Orders are live against a standing allowance, so they should not outlive the intent.
+  const expiry = BigInt(Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60);
+
+  const canSubmit =
+    Boolean(w.address) && valid && amountWei > 0n && minAmountOut > 0n && calc.clears > 0 && !submitting;
 
   async function submit() {
     if (!canSubmit || calc.tick === null) return;
@@ -77,9 +89,9 @@ export function Create({ currentTick }: { currentTick: number | null }) {
         data: encodeFunctionData({
           abi: createOrderAbi, functionName: "createOrder",
           args: [
-            m.token as Hex, amountWei, 0n,
+            m.token as Hex, amountWei, minAmountOut,
             { currency0: m.currency0, currency1: m.token, fee: m.fee, tickSpacing: m.tickSpacing, hooks: m.hooks },
-            calc.tick, true, 0n,
+            calc.tick, true, expiry,
           ],
         }),
       };
@@ -188,6 +200,11 @@ export function Create({ currentTick }: { currentTick: number | null }) {
             <Row label={`Pool fee (${(m.poolFeeBps / 100).toFixed(2)}%)`} value={calc.gross ? `−${fmt(calc.poolFee)}` : "—"} />
             <Row label="You receive" value={calc.gross ? fmt(calc.net - calc.keeperFee) : "—"} />
             <Row label="Keeper fee (0.50%)" value={calc.gross ? fmt(calc.keeperFee) : "—"} />
+            <Row
+              label={`Minimum you accept (${SLIPPAGE_BPS / 100}% slippage)`}
+              value={minAmountOut > 0n ? fmt(Number(minAmountOut) / 1e6) : "—"}
+            />
+            <Row label="Order expires" value="in 30 days" />
             <Row label="Gas cost (measured)" value={`−${fmt(calc.gas)}`} />
             <Row
               label="Cost floor"

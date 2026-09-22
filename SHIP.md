@@ -3,6 +3,35 @@
 Everything that does not cost money is already done. This is the sequence to run once the
 wallet is funded. Measured cost of the whole thing: **well under 3 USDC**.
 
+## Security status
+
+A twelve-agent adversarial audit (Pashov Audit Group skills) ran against this codebase and
+found twelve issues, two of which were fund-loss. All blockers are fixed and each has a
+regression test that fails against the previous code:
+
+| # | Issue | Status |
+|---|---|---|
+| 1 | `execute` forwarded keeper-authored calldata — the fill pool need not be the pool whose tick authorised it | **fixed** — the call is built in-contract from the order |
+| 2 | `armOrder` reset the dwell clock, so anyone could keep any order unfillable for ~$7/hour | **fixed** — a live arm is never overwritten |
+| 3 | `createOrder` accepted `minAmountOut == 0`, and the UI always passed it | **fixed** — rejected on-chain, UI derives a 1% floor |
+| 5 | `balanceBefore` sampled before the input was pulled | **fixed** — snapshot moved, and `tokenIn == TOKEN_OUT` rejected |
+| 7 | Slippage bound checked on gross while the trader is paid net | **fixed** — fee computed first |
+| 8 | `feeBps` unbounded and retroactive | **fixed** — `MAX_FEE_BPS = 200` |
+
+**Still open, and deliberately not fixed in this pass** — none block a capped deployment, but
+know them before raising the caps:
+
+- `totalFilledUsdc` is a monotonic lifetime counter, so the exposure cap bricks the book once
+  reached rather than bounding concurrent exposure. Recovery is owner-only via `setCaps`.
+- `_check` omits the caps and the cost floor, so `checkOrders` can return `Ready` for an order
+  that will deterministically revert.
+- The fee accrues to `feeRecipient` while gas is paid by `msg.sender`, so no third-party keeper
+  is profitable — order liveness depends on the operator's own keeper staying up.
+- `armedTick` is written and never read: the dwell proves the trigger was true at two separate
+  instants, not that it held between them.
+
+Full reports: [x-ray/x-ray.md](x-ray/x-ray.md), [x-ray/invariants.md](x-ray/invariants.md).
+
 ## 0. Before anything: rotate the Privy app secret
 
 `.env.example` is a tracked file and it contained a real Privy **app secret**, which is

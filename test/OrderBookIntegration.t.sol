@@ -55,10 +55,6 @@ contract OrderBookIntegrationTest is Test {
         liveTick = PM.currentTick(POOL);
     }
 
-    function _route(uint128 amountIn) internal view returns (bytes memory) {
-        // oneForZero: selling TOKEN (currency1) for USDC (currency0), proceeds to the book.
-        return abi.encodeCall(V4SwapAdapter.swapExactIn, (_key(), false, amountIn, address(book)));
-    }
 
     function _armAndWait(uint256 id) internal {
         book.armOrder(id);
@@ -72,13 +68,13 @@ contract OrderBookIntegrationTest is Test {
 
     /// Same assertion as the mocked suite, against a real swap.
     function test_stopLossFillsThroughRealPool() public {
-        uint256 id = _create(liveTick + 1000, true, 0); // trigger already met
+        uint256 id = _create(liveTick + 1000, true, 1); // trigger already met
         _armAndWait(id);
 
         uint256 traderUsdcBefore = IERC20(GT.USDC).balanceOf(trader);
 
         vm.prank(keeper);
-        (uint256 amountOut, uint256 fee) = book.execute(id, address(adapter), _route(traderTokens));
+        (uint256 amountOut, uint256 fee) = book.execute(id, address(adapter));
 
         assertGt(amountOut, 0, "no proceeds");
         assertEq(fee, (amountOut * 50) / 10_000, "fee wrong");
@@ -96,7 +92,7 @@ contract OrderBookIntegrationTest is Test {
     /// Same negative assertion as the mocked suite, against a real swap.
     function test_refusesWhenTriggerNotMetThroughRealPool() public {
         int24 trigger = liveTick - 1000;
-        uint256 id = _create(trigger, true, 0);
+        uint256 id = _create(trigger, true, 1);
 
         vm.expectRevert(
             abi.encodeWithSelector(OrderBook.TriggerNotMet.selector, liveTick, trigger, true)
@@ -111,7 +107,7 @@ contract OrderBookIntegrationTest is Test {
         _armAndWait(id);
         vm.prank(keeper);
         vm.expectPartialRevert(OrderBook.SlippageExceeded.selector);
-        book.execute(id, address(adapter), _route(traderTokens));
+        book.execute(id, address(adapter));
     }
 
     receive() external payable {}

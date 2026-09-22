@@ -7,6 +7,16 @@ import {IPoolManager, PoolId, PoolKey, poolIdOf} from "./interfaces/IPoolManager
 import {IERC20} from "./interfaces/IERC20.sol";
 import {ArcGroundTruth as GT} from "./ArcGroundTruth.sol";
 
+/// @notice The only shape a router may have. `execute` builds this call itself from the order's
+///         own fields; it does NOT accept caller-supplied calldata, because a keeper-authored
+///         blob can name a different pool and a different recipient than the one whose tick
+///         authorised the fill.
+interface ISwapRouter {
+    function swapExactIn(PoolKey calldata key, bool zeroForOne, uint256 amountIn, address recipient)
+        external
+        returns (uint256 amountOut);
+}
+
 /// @title OrderBook
 /// @notice Non-custodial conditional orders for Arc spot traders.
 ///
@@ -46,6 +56,9 @@ contract OrderBook is CostFloor {
     /// @dev Proceeds are always USDC: it is the fee unit and the gas unit, which is the only
     ///      reason the cost floor can be stated without a price oracle.
     address public constant TOKEN_OUT = GT.USDC;
+    /// @dev Hard ceiling on the protocol fee. Without one, `setFee` can take 100% of a pending
+    ///      fill's proceeds retroactively, and anything above 10_000 underflows every payout.
+    uint16 public constant MAX_FEE_BPS = 200;
 
     address public owner;
     address public feeRecipient;
@@ -87,7 +100,6 @@ contract OrderBook is CostFloor {
     error TriggerNotMet(int24 currentTick, int24 triggerTick, bool triggerBelow);
     error SlippageExceeded(uint256 amountOut, uint256 minAmountOut);
     error RouterNotAllowed(address router);
-    error SwapFailed();
     error Reentrancy();
     error ZeroAmount();
     error NotArmed();
@@ -95,6 +107,9 @@ contract OrderBook is CostFloor {
     error ArmStale(uint64 armedAtBlock, uint64 currentBlock);
     error OrderValueCapped(uint256 amountOut, uint256 cap);
     error TotalValueCapped(uint256 wouldBeTotal, uint256 cap);
+    error ZeroMinAmountOut();
+    error TokenInIsProceeds();
+    error FeeTooHigh(uint16 feeBps, uint16 max);
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
@@ -122,6 +137,7 @@ contract OrderBook is CostFloor {
         poolManager = IPoolManager(_poolManager);
         owner = msg.sender;
         feeRecipient = _feeRecipient;
+        if (_feeBps > MAX_FEE_BPS) revert FeeTooHigh(_feeBps, MAX_FEE_BPS);
         feeBps = _feeBps;
         marginNative = _marginNative;
         minDwellBlocks = _minDwellBlocks;
@@ -148,6 +164,17 @@ contract OrderBook is CostFloor {
         uint64 expiry
     ) external returns (uint256 id) {
         if (amountIn == 0) revert ZeroAmount();
+        // A zero bound is not a bound. The contract still never PICKS the number, but it
+        // refuses an order that has no price protection at all, because `execute` routes
+        // against a live pool and the trader's own floor is the only thing sizing the fill.
+        if (minAmountOut == 0) revert ZeroMinAmountOut();
+        // Proceeds are measured as a balance delta of TOKEN_OUT. If the input is also
+        // TOKEN_OUT, the pulled principal lands inside that measurement and is counted as
+        // swap output.
+        if (tokenIn == TOKEN_OUT) revert TokenInIsProceeds();
+        // Deliberately NOT checked here: that tokenIn is one of `key`'s currencies. The route is
+        // built from `key`, and this contract only ever approves `tokenIn` to the router, so a
+        // key that does not contain tokenIn fails closed on the router's own transferFrom.
         id = nextOrderId++;
         orders[id] = Order({
             owner: msg.sender,
@@ -227,6 +254,13 @@ contract OrderBook is CostFloor {
         if (o.status != Status.Open) revert OrderNotOpen();
         if (o.expiry != 0 && block.timestamp > o.expiry) revert OrderExpired();
 
+        // A live arm must never be pushed forward. Overwriting it restarts the dwell clock,
+        // which lets ANY address keep an order permanently unfillable for the price of one
+        // cheap transaction per window - and the precondition for calling this is exactly the
+        // condition under which the trader wants the fill. Silent no-op rather than a revert,
+        // so an honest keeper re-arming an already-armed order does not log an error.
+        if (o.armedAtBlock != 0 && block.number <= o.armedAtBlock + maxArmAgeBlocks) return;
+
         int24 tick = poolManager.currentTick(_poolId(o.key));
         _requireTrigger(o, tick);
 
@@ -237,7 +271,11 @@ contract OrderBook is CostFloor {
 
     /// @notice Fill an order. Reverts unless the trigger is genuinely met AND the fee collected
     ///         covers this call's own gas plus margin.
-    function execute(uint256 id, address router, bytes calldata routeData)
+    /// @dev The router is named by the caller but the CALL is built here, from the order's own
+    ///      key, amount and this address as recipient. An earlier version forwarded caller
+    ///      calldata, which meant the pool whose tick authorised the fill was not necessarily
+    ///      the pool the fill traded in, and the recipient was not necessarily this contract.
+    function execute(uint256 id, address router)
         external
         nonReentrant
         returns (uint256 amountOut, uint256 fee)
@@ -262,17 +300,29 @@ contract OrderBook is CostFloor {
         // Effects before interactions: the order cannot be filled twice even if a router calls back.
         o.status = Status.Filled;
 
+        IERC20(o.tokenIn).transferFrom(o.owner, address(this), o.amountIn);
+
+        // Snapshot AFTER the input arrives. Taken before, a tokenIn equal to TOKEN_OUT would
+        // put the trader's own principal inside the measured window and score it as proceeds.
+        // createOrder now rejects that case too; both guards, because either alone is a
+        // one-line edit away from reintroducing it.
         uint256 balanceBefore = IERC20(TOKEN_OUT).balanceOf(address(this));
 
-        IERC20(o.tokenIn).transferFrom(o.owner, address(this), o.amountIn);
         IERC20(o.tokenIn).approve(router, o.amountIn);
-        (bool ok,) = router.call(routeData);
-        if (!ok) revert SwapFailed();
+        // Selling tokenIn: zeroForOne is true only when tokenIn is currency0. createOrder has
+        // already proven tokenIn is one of the two currencies.
+        bool zeroForOne = o.tokenIn == o.key.currency0;
+        ISwapRouter(router).swapExactIn(o.key, zeroForOne, o.amountIn, address(this));
         IERC20(o.tokenIn).approve(router, 0);
 
         // Measure what actually arrived rather than trusting the router's return value.
         amountOut = IERC20(TOKEN_OUT).balanceOf(address(this)) - balanceBefore;
-        if (amountOut < o.minAmountOut) revert SlippageExceeded(amountOut, o.minAmountOut);
+
+        // Fee first: the trader's bound must be checked against what they RECEIVE, not against
+        // gross proceeds they never see.
+        fee = (amountOut * feeBps) / 10_000;
+        uint256 netToOwner = amountOut - fee;
+        if (netToOwner < o.minAmountOut) revert SlippageExceeded(netToOwner, o.minAmountOut);
 
         // Exposure caps. The keeper simulates before submitting, so a capped order is skipped
         // rather than burning gas on a revert.
@@ -285,14 +335,12 @@ contract OrderBook is CostFloor {
         }
         totalFilledUsdc = newTotal;
 
-        fee = (amountOut * feeBps) / 10_000;
-
         // Fee is USDC in the 6dp ERC-20 view; gas cost is native 18dp. Scaling here is the
         // single highest-risk line in this contract - see test_feeMustBeScaledBeforeCostFloor.
         uint256 feeNative = fee * GT.NATIVE_PER_ERC20;
         uint256 gasCostNative = _assertCoversCost(gasStart, feeNative, marginNative);
 
-        IERC20(TOKEN_OUT).transfer(o.owner, amountOut - fee);
+        IERC20(TOKEN_OUT).transfer(o.owner, netToOwner);
         if (fee > 0) IERC20(TOKEN_OUT).transfer(feeRecipient, fee);
 
         emit OrderFilled(id, msg.sender, amountOut, fee, gasCostNative);
@@ -317,6 +365,9 @@ contract OrderBook is CostFloor {
     }
 
     function setFee(uint16 _feeBps, address _feeRecipient) external onlyOwner {
+        // The fee is applied at fill time, not snapshotted per order, so a raise reaches every
+        // order already signed. A ceiling bounds what that retroactive reach can take.
+        if (_feeBps > MAX_FEE_BPS) revert FeeTooHigh(_feeBps, MAX_FEE_BPS);
         feeBps = _feeBps;
         feeRecipient = _feeRecipient;
     }

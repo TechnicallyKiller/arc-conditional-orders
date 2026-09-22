@@ -10,7 +10,7 @@ export const orderBookAbi = parseAbi([
   "function getOrder(uint256 id) view returns (Order)",
   "function checkOrders(uint256[] ids) view returns (uint8[] states, int24[] ticks)",
   "function armOrder(uint256 id)",
-  "function execute(uint256 id, address router, bytes routeData) returns (uint256 amountOut, uint256 fee)",
+  "function execute(uint256 id, address router) returns (uint256 amountOut, uint256 fee)",
   "event OrderCreated(uint256 indexed id, address indexed owner, address tokenIn, uint128 amountIn, int24 triggerTick, bool triggerBelow)",
   "event OrderArmed(uint256 indexed id, int24 tick, uint64 atBlock)",
   "event OrderFilled(uint256 indexed id, address indexed keeper, uint256 amountOut, uint256 fee, uint256 gasCostNative)",
