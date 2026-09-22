@@ -10,7 +10,25 @@ import { Spark } from "./Spark";
 
 const GRID = "1.3fr .85fr .75fr 1fr .95fr auto";
 
-function DepthBadge({ m }: { m: Market }) {
+/**
+ * Liquidity is read live, because a measured impact figure describes the pool as it was on the
+ * day it was measured. Arc's USO pool held 3.8e23 when this list was written and holds zero now;
+ * anyone clicking "set stop" on it gets a revert. A stale number is worse than no number.
+ */
+function DepthBadge({ m, pool }: { m: Market; pool?: PoolState }) {
+  if (pool && pool.readable && pool.liquidity === 0n) {
+    return (
+      <span
+        title="This pool currently holds no liquidity. A fill would revert, so the order cannot be placed."
+        style={{
+          padding: "3px 10px", borderRadius: 999, background: "#2B1410", color: "var(--brick)",
+          fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", whiteSpace: "nowrap",
+        }}
+      >
+        no liquidity
+      </span>
+    );
+  }
   const failed = !m.sellTestPassed;
   const bps = m.impactBps500 ?? m.impactBps50;
   const unmeasured = bps === null;
@@ -124,22 +142,29 @@ export function Markets({
                 )}
               </div>
 
-              <div><DepthBadge m={m} /></div>
+              <div><DepthBadge m={m} pool={p} /></div>
 
               <div>
-                <button
-                  onClick={onSetStop}
-                  disabled={!m.sellTestPassed}
-                  style={{
-                    height: 34, padding: "0 14px", borderRadius: 6,
-                    cursor: m.sellTestPassed ? "pointer" : "not-allowed",
-                    border: "1px solid rgba(242,237,226,.16)", background: "transparent",
-                    color: m.sellTestPassed ? "var(--ink)" : "var(--ink-3)",
-                    font: "inherit", fontSize: 13, fontWeight: 500, whiteSpace: "nowrap",
-                  }}
-                >
-                  Set stop
-                </button>
+                {(() => {
+                  const dry = Boolean(p && p.readable && p.liquidity === 0n);
+                  const ok = m.sellTestPassed && !dry;
+                  return (
+                    <button
+                      onClick={onSetStop}
+                      disabled={!ok}
+                      title={dry ? "This pool has no liquidity right now." : undefined}
+                      style={{
+                        height: 34, padding: "0 14px", borderRadius: 6,
+                        cursor: ok ? "pointer" : "not-allowed",
+                        border: "1px solid rgba(242,237,226,.16)", background: "transparent",
+                        color: ok ? "var(--ink)" : "var(--ink-3)",
+                        font: "inherit", fontSize: 13, fontWeight: 500, whiteSpace: "nowrap",
+                      }}
+                    >
+                      Set stop
+                    </button>
+                  );
+                })()}
               </div>
             </div>
           );

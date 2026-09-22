@@ -64,9 +64,19 @@ export const TESTNET_MARKET: Market = {
   decimals: 18, impactBps50: null, impactBps500: null, poolFeeBps: 300, sellTestPassed: true,
 };
 
+/**
+ * Symbols that must never appear as a tradeable market, because the payout leg is real USDC and
+ * a row labelled "USDC" that is not USDC is a trap rather than a listing. Arc's two busiest
+ * memecoin pools both set symbol() to "USDC" - verified on-chain 2026-09-22. The executed-sell
+ * rule does not catch this: those tokens trade perfectly well, which is the point.
+ */
+export const FORBIDDEN_SYMBOLS = new Set(["USDC", "EURC", "USYC"]);
+
+export const symbolIsSafe = (symbol: string) => !FORBIDDEN_SYMBOLS.has(symbol.toUpperCase());
+
 /** Markets available on a given network. Mainnet rows are real Arc pools; testnet is the sandbox. */
 export const marketsFor = (network: "mainnet" | "testnet"): Market[] =>
-  network === "testnet" ? [TESTNET_MARKET] : MARKETS;
+  (network === "testnet" ? [TESTNET_MARKET] : MARKETS).filter((m) => symbolIsSafe(m.symbol));
 
 /**
  * The market an order form defaults to. On mainnet that is the deepest pool whose SELL test
