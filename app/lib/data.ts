@@ -9,6 +9,11 @@ export const DEPLOY = {
   mainnetChainId: 5042,
   orderBook: "0xEe22D840289d4a94B0E1Efd7A072854a74ED489C",
   swapAdapter: "0x2958d7445C5D0Aa9D06EAc625C85072E81CA49a3",
+  // Live on Arc mainnet (chain 5042), deployed 2026-09-22 with the post-audit contracts.
+  // The interactive demo stays on testnet because the faucet token and its seeded pool
+  // only exist there; mainnet holds the real, capped deployment.
+  mainnetOrderBook: "0x9872b13257E958c2F7E4DcCc3F96b3C70c8e050c",
+  mainnetSwapAdapter: "0x0F1bf92EE0C79F7Ca5C1e30E9412aD5BFF45c7C8",
   keeper: "0x364EDC06254874e62FF4AD8fA4d9a45238cb5609",
   demoToken: "0xB828890c52F6d0436D9f601E78adB9E056e61ba8",
   demoLiquidity: "0xdC49311dFF60b7D971a0ac9394115D545FD5Bafa",

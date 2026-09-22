@@ -1,7 +1,24 @@
 # Ship to Arc mainnet
 
-Everything that does not cost money is already done. This is the sequence to run once the
-wallet is funded. Measured cost of the whole thing: **well under 3 USDC**.
+## Live on mainnet
+
+Deployed 2026-09-22 from the post-audit contracts. Cost: **0.0650 USDC**.
+
+```
+ORDER_BOOK   0x9872b13257E958c2F7E4DcCc3F96b3C70c8e050c
+SWAP_ADAPTER 0x0F1bf92EE0C79F7Ca5C1e30E9412aD5BFF45c7C8
+```
+
+Verified on-chain after deployment: owner and feeRecipient are the keeper address,
+`routerAllowed(adapter)` is true, caps are 10 USDC per fill and 100 USDC cumulative,
+`feeBps` 50 against a `MAX_FEE_BPS` of 200, dwell 2 blocks, arm age 300 blocks.
+
+Deployer, owner, feeRecipient and keeper are deliberately the same address: it is the only
+funded wallet, and it is also the only configuration in which the keeper is profitable, since
+the fee accrues to `feeRecipient`. Note `owner` has no transfer path - it is fixed for the life
+of the contract.
+
+Steps 1-5 below are **done**. Steps 0, 6, 7 and 8 remain.
 
 ## Security status
 
@@ -41,30 +58,25 @@ never reached the built bundle, but the grant requires a **public** repo.
 - Rotate it in the Privy dashboard. Do this even if history is rewritten — assume it leaked.
 - The app only ever needs `NEXT_PUBLIC_PRIVY_APP_ID`, which is public by design.
 
-## 1. Fund two addresses
+## 1. Fund the wallet — DONE
 
-| Address | Why | Amount |
-|---|---|---|
-| deployer (`PRIVATE_KEY`) | one-off deploy | ~0.07 USDC + margin |
-| keeper (`KEEPER_PRIVATE_KEY`) | arms and fills, forever | 1–2 USDC |
+`0x364EDC06254874e62FF4AD8fA4d9a45238cb5609` serves as deployer, owner, feeRecipient and
+keeper. Funded with 4 USDC; **3.935 USDC remains** after deployment.
 
-Current keeper address: `0x364EDC06254874e62FF4AD8fA4d9a45238cb5609` — held **0 USDC** on
-mainnet at last check.
-
-## 2. Set the exposure caps
+## 2. Set the exposure caps — DONE
 
 In `.env`, USDC 6dp. These bind on **realised proceeds** of a fill, not on the input, so they
 are exact without a price oracle. The mainnet script refuses to deploy if either is 0.
 
 ```
-MAX_ORDER_USDC=25000000     # 25 USDC per fill
-MAX_TOTAL_USDC=250000000    # 250 USDC cumulative, ever
+MAX_ORDER_USDC=10000000     # 10 USDC per fill      (deployed value)
+MAX_TOTAL_USDC=100000000    # 100 USDC cumulative   (deployed value)
 ```
 
 Start small. The owner can raise them afterwards with `setCaps()`; they cannot be raised by
 anyone else.
 
-## 3. Preflight
+## 3. Preflight — DONE (re-run any time; it is read-only)
 
 ```bash
 npx tsx tools/preflight.ts
@@ -74,7 +86,7 @@ Refuses to pass unless: chain is 5042, the RPC survives a 24-request burst witho
 limiting, the PoolManager and Multicall3 have code, gas is above Arc's 20 gwei floor, both
 wallets are funded, and both caps are set. It exits non-zero on any failure.
 
-## 4. Deploy
+## 4. Deploy — DONE
 
 ```bash
 export PATH="$HOME/.arc-foundry/bin:$PATH"    # stock Foundry CANNOT execute Arc's USDC precompile
@@ -86,7 +98,7 @@ The script asserts chain 5042, requires non-zero caps, and reads the caps and ow
 off the deployed bytecode** before it prints the addresses. Copy `ORDER_BOOK` and
 `SWAP_ADAPTER` into `.env`.
 
-## 5. Verify the deployment
+## 5. Verify the deployment — DONE
 
 ```bash
 npx tsx tools/preflight.ts      # now also checks the live contract's caps and owner
@@ -113,7 +125,7 @@ like empty pools rather than a misconfiguration.
 
 ## 8. Submission checklist (Arc Microgrants, closes 14 Oct 2026, rolling review)
 
-- [ ] Live mainnet deployment, with a link
+- [x] Live mainnet deployment — `0x9872b13257E958c2F7E4DcCc3F96b3C70c8e050c`
 - [ ] Public repo — **only after the Privy secret is rotated**
 - [ ] Short description: what it does and what it uses Arc for
 - [ ] Public builder profile (GitHub / X / Farcaster)
