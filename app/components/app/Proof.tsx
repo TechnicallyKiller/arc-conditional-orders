@@ -1,5 +1,5 @@
 import { Row } from "./Chip";
-import { DEPLOY, FILL, GAS_ROWS, REFUSAL, TX } from "../../lib/data";
+import { DEPLOY, FILL, GAS_ROWS, REFUSAL, TX , MAINNET_FILL } from "../../lib/data";
 import { addrUrl, short, txUrl } from "../../lib/chain";
 
 const panel: React.CSSProperties = {
@@ -14,10 +14,39 @@ export function Proof() {
         Proof
       </h1>
       <p style={{ margin: "6px 0 24px", fontSize: 13, lineHeight: "19px", color: "var(--ink-2)", maxWidth: "72ch" }}>
-        Two transactions on Arc testnet: one that filled, one the invariant refused. The refusal is
-        the more useful of the two — a system that only ever succeeds tells you nothing about its
-        safety property.
+        A real fill on Arc mainnet, and two on testnet: one that filled, one the invariant
+        refused. The refusal is the most useful of the three — a system that only ever succeeds
+        tells you nothing about its safety property.
       </p>
+
+      {/* Mainnet. Real USDC, and nobody pressed anything: the hosted keeper armed it and then
+          filled it eighteen blocks later, on its own. */}
+      <div style={{ ...panel, borderLeft: "2px solid var(--vermilion)", marginBottom: 16, width: "100%" }}>
+        <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600 }}>
+          Mainnet · filled autonomously by the keeper
+        </h3>
+        <p style={{ margin: "0 0 8px", fontSize: 12, color: "var(--ink-3)" }}>
+          Armed at block {MAINNET_FILL.armBlock.toLocaleString()}, filled at{" "}
+          {MAINNET_FILL.fillBlock.toLocaleString()} — 18 blocks later, so the dwell held across
+          blocks. Selling {MAINNET_FILL.token} for USDC.
+        </p>
+        <Row label="Proceeds" value={MAINNET_FILL.proceeds} />
+        <Row label={`Keeper fee (${MAINNET_FILL.feeBps / 100}%)`} value={MAINNET_FILL.fee} />
+        <Row label="Gas used" value={MAINNET_FILL.gasUsed} />
+        <Row label="Gas cost" value={`−${MAINNET_FILL.gasCost}`} />
+        <Row label="Margin over gas" value={MAINNET_FILL.marginX} tone="var(--pine)" />
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 12 }}>
+          <a href={`https://explorer.arc.io/tx/${MAINNET_FILL.fill}`} target="_blank" rel="noreferrer" className="num" style={{ fontSize: 13 }}>
+            fill ↗
+          </a>
+          <a href={`https://explorer.arc.io/tx/${MAINNET_FILL.arm}`} target="_blank" rel="noreferrer" className="num" style={{ fontSize: 13 }}>
+            arm ↗
+          </a>
+          <a href={`https://explorer.arc.io/tx/${MAINNET_FILL.buy}`} target="_blank" rel="noreferrer" className="num" style={{ fontSize: 13 }}>
+            the buy that funded it ↗
+          </a>
+        </div>
+      </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
         <div style={{ ...panel, borderLeft: "2px solid var(--pine)" }}>

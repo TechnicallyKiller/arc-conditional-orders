@@ -30,6 +30,18 @@ const NATIVE = "0x0000000000000000000000000000000000000000" as const;
 
 export const MARKETS: Market[] = [
   {
+    // Verified by an EXECUTED round trip on 2026-09-22: bought 1,489.46 FOCI for 0.70 USDC
+    // (0x07aca67c…), then the keeper filled a real order back to USDC (0x580a4b38…).
+    // currency0 is the ERC-20 USDC address, not native, and the pool carries an
+    // AFTER_SWAP_RETURNS_DELTA hook — the case the adapter settles from transient deltas.
+    symbol: "FOCI", name: "Foci", network: "mainnet",
+    token: "0x7c7489163b1060333e71229bb7a9f8cb7094a7a9",
+    currency0: "0x3600000000000000000000000000000000000000",
+    fee: 0, tickSpacing: 200,
+    hooks: "0xf847790b6fa5da300bb3f56f10d743e71e98e044",
+    decimals: 18, impactBps50: null, impactBps500: null, poolFeeBps: 0, sellTestPassed: true,
+  },
+  {
     symbol: "USO", name: "United States Oil Fund", network: "mainnet",
     token: "0xa5a3e8FF2a61EdFb60fFB2ccAA89dDF0eFE3d227",
     currency0: NATIVE, fee: 10000, tickSpacing: 200, hooks: NATIVE,

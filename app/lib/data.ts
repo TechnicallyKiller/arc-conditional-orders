@@ -19,6 +19,22 @@ export const DEPLOY = {
   demoLiquidity: "0xdC49311dFF60b7D971a0ac9394115D545FD5Bafa",
 } as const;
 
+/** The mainnet fill. Real USDC, filled autonomously by the hosted keeper. */
+export const MAINNET_FILL = {
+  arm: "0x07e15e8a5ea2a635941f5d51c315919196be16f8f0051275046c2a99c64e7480",
+  fill: "0x580a4b38890ba9241f7bbaf5fd389b3a534e7c155d98381e06677f214a7e3302",
+  buy: "0x07aca67c51dbd88131be86ca95ef9a13e75147324102fe2b2b16e3c81ce971e5",
+  armBlock: 22_135_116,
+  fillBlock: 22_135_134,
+  proceeds: "0.769724",
+  fee: "0.015394",
+  feeBps: 200,
+  gasCost: "0.00686401",
+  gasUsed: "274,380",
+  marginX: "2.24x",
+  token: "FOCI",
+} as const;
+
 export const TX = {
   fill: "0xe6b66031b1cd20b8ebe3a63aaa7cc5ad788a1484c6361f8a8afe1788301e48af",
   arm: "0x5d726af9d03c69f5357ebf218029be434928dc4cd5ece3a8b115fca1e3cea1b9",

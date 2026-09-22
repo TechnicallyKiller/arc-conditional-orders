@@ -22,6 +22,25 @@ Configuration read back off the deployed bytecode, not taken from the constructo
 `routerAllowed(adapter)` true, `feeBps` 50 against a `MAX_FEE_BPS` of 200, `minDwellBlocks` 2,
 `maxArmAgeBlocks` 300, caps 10 / 100 USDC.
 
+## A real fill on mainnet
+
+The hosted keeper armed and filled a live order against a real Uniswap v4 pool. Nobody pressed
+anything: the order was created, and the keeper did the rest.
+
+| | |
+| --- | --- |
+| **Fill** | [`0x580a4b38…`](https://explorer.arc.io/tx/0x580a4b38890ba9241f7bbaf5fd389b3a534e7c155d98381e06677f214a7e3302) · block 22,135,134 |
+| Arm | [`0x07e15e8a…`](https://explorer.arc.io/tx/0x07e15e8a5ea2a635941f5d51c315919196be16f8f0051275046c2a99c64e7480) · block 22,135,116 |
+
+0.769724 USDC out, 0.015394 USDC fee, 274,380 gas at 20.19 Gwei = 0.00686401 USDC of gas —
+a **2.24× margin** over the cost floor. The arm and the fill are 18 blocks apart, so the dwell
+held across blocks rather than within one transaction.
+
+The fee was temporarily set to 200 bps for this fill and returned to 50 bps afterwards: the
+cost floor requires proceeds of roughly `gas ÷ feeBps`, so a higher fee lets a smaller order
+clear it — 0.37 USDC instead of 1.47 — which is the difference between testing with pocket
+change and testing with a third of the wallet.
+
 ## What it does, demonstrated
 
 The interactive demo runs on **Arc testnet**, because it needs a faucet token and a seeded pool
