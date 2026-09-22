@@ -19,7 +19,25 @@ export const DEPLOY = {
   demoLiquidity: "0xdC49311dFF60b7D971a0ac9394115D545FD5Bafa",
 } as const;
 
-/** The mainnet fill. Real USDC, filled autonomously by the hosted keeper. */
+/**
+ * Mainnet fills. Every figure is from the OrderFilled event, not computed here.
+ *
+ * Order 2 is the one worth reading twice: measured at 24.85 gwei its fee of 0.008464 sat under
+ * a gas cost of 0.00889245, so CostFloor refused it and the keeper skipped. Eighteen blocks
+ * after order 3, gas had fallen, the same order cost 0.00663479 to execute, and it cleared at
+ * 1.29x. Nothing about the order changed — only the real cost of running it did.
+ */
+export const MAINNET_FILLS = [
+  { id: 1, block: 22_135_134, out: "0.769724", fee: "0.015394", feeBps: 200, gas: "0.00686401", marginX: "2.24x",
+    tx: "0x580a4b38890ba9241f7bbaf5fd389b3a534e7c155d98381e06677f214a7e3302" },
+  { id: 3, block: 22_137_837, out: "1.990132", fee: "0.009950", feeBps: 50, gas: "0.00804768", marginX: "1.24x",
+    tx: "0xf2487b593d885a2fa1a8d50ccbd2cd026ea8e3c8d2617f6881a490fd247155f3" },
+  { id: 2, block: 22_137_855, out: "1.716212", fee: "0.008581", feeBps: 50, gas: "0.00663479", marginX: "1.29x",
+    tx: "0x63691eb4c7d282a5f0241c0ff194f1696349a7a10d0ae613a87d7177e5ff7c94",
+    note: "refused at 24.85 gwei, filled once gas fell" },
+] as const;
+
+/** The first mainnet fill, kept separate because its arm transaction is the dwell evidence. */
 export const MAINNET_FILL = {
   arm: "0x07e15e8a5ea2a635941f5d51c315919196be16f8f0051275046c2a99c64e7480",
   fill: "0x580a4b38890ba9241f7bbaf5fd389b3a534e7c155d98381e06677f214a7e3302",
@@ -34,6 +52,9 @@ export const MAINNET_FILL = {
   marginX: "2.24x",
   token: "FOCI",
 } as const;
+
+/** Cumulative, read from the contract: totalFilledUsdc against maxTotalValueUsdc. */
+export const MAINNET_TOTALS = { filled: "4.476068", cap: "100", orders: 3, fills: 3 } as const;
 
 export const TX = {
   fill: "0xe6b66031b1cd20b8ebe3a63aaa7cc5ad788a1484c6361f8a8afe1788301e48af",

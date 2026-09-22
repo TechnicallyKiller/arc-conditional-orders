@@ -6,7 +6,8 @@ An order names a pool, a tick threshold and a direction. A keeper observes the t
 block, waits out a dwell period, and fills in a later one — then the contract proves *on-chain*
 that the fee it collected exceeded the gas that fill burned.
 
-> **Live on Arc mainnet**, with a real fill. 71 tests against a mainnet fork. An adversarial
+> **Live on Arc mainnet** — three real fills, one of which the cost floor refused until gas
+> fell. 71 tests against a mainnet fork. An adversarial
 > review before deployment found two fund-loss bugs; both fixed, both with regression tests.
 > Exposure capped on-chain at 10 USDC per fill.
 
@@ -18,7 +19,7 @@ that the fee it collected exceeded the gas that fill burned.
 
 ---
 
-## The fill, on mainnet
+## Filling on mainnet
 
 Nobody pressed anything. An order was created; the hosted keeper did the rest.
 
@@ -53,6 +54,23 @@ sequenceDiagram
 
 **Eighteen blocks between arm and fill.** That gap *is* the security property: a price spike
 reverted inside one transaction cannot satisfy two observations in two different blocks.
+
+### Three fills, and one that had to wait
+
+| Order | Proceeds | Fee | Gas | Margin | |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 1 | 0.769724 | 0.015394 | 0.00686401 | 2.24× | [tx](https://explorer.arc.io/tx/0x580a4b38890ba9241f7bbaf5fd389b3a534e7c155d98381e06677f214a7e3302) |
+| 3 | 1.990132 | 0.009950 | 0.00804768 | 1.24× | [tx](https://explorer.arc.io/tx/0xf2487b593d885a2fa1a8d50ccbd2cd026ea8e3c8d2617f6881a490fd247155f3) |
+| 2 | 1.716212 | 0.008581 | 0.00663479 | 1.29× | [tx](https://explorer.arc.io/tx/0x63691eb4c7d282a5f0241c0ff194f1696349a7a10d0ae613a87d7177e5ff7c94) |
+
+**Order 2 is the one worth reading twice.** Measured at 24.85 Gwei, its fee of 0.008464 USDC sat
+*under* a gas cost of 0.00889245 — so `CostFloor` refused it and the keeper skipped it, while
+order 3 filled normally. Eighteen blocks later gas had fallen, the same order cost 0.00663479 to
+execute, and it cleared at 1.29×.
+
+Nothing about the order changed. Only the real cost of running it did. That is the difference
+between an invariant and a hard-coded minimum — and it is visible on-chain rather than asserted
+here.
 
 ---
 
