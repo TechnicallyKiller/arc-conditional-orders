@@ -26,6 +26,19 @@ const createOrderAbi = parseAbi([
   "function createOrder(address tokenIn, uint128 amountIn, uint128 minAmountOut, PoolKey key, int24 triggerTick, bool triggerBelow, uint64 expiry) returns (uint256)",
 ]);
 
+/**
+ * Measured impact for this notional, interpolated between the two points verified by a real
+ * executed sell. Returns null when the size was never verified for this pool — the honest
+ * answer, rather than an extrapolation dressed up as a measurement.
+ */
+function impactFor(m: Market, notionalUsdc: number): number | null {
+  if (notionalUsdc <= 0 || m.impactBps50 === null) return null;
+  if (notionalUsdc <= 50) return m.impactBps50;
+  if (m.impactBps500 === null) return null;
+  if (notionalUsdc >= 500) return m.impactBps500;
+  return m.impactBps50 + ((notionalUsdc - 50) / 450) * (m.impactBps500 - m.impactBps50);
+}
+
 export function Create({
   currentTick, market, orderBook,
 }: { currentTick: number | null; market: Market; orderBook: `0x${string}` }) {
@@ -49,13 +62,20 @@ export function Create({
 
     const gross = isFinite(amt) && isFinite(t) && t > 0 ? amt * t : 0;
     const poolFee = gross * (m.poolFeeBps / 10_000);
-    const net = gross - poolFee;
+
+    // Price impact, interpolated between the two sizes actually measured by an EXECUTED sell
+    // (see markets.ts). Ignoring it is not conservative: it inflates the expected proceeds, and
+    // a minAmountOut derived from an inflated quote is a floor the fill can never clear.
+    const impactBps = impactFor(m, gross);
+    const impact = impactBps === null ? 0 : (gross - poolFee) * (impactBps / 10_000);
+
+    const net = gross - poolFee - impact;
     const keeperFee = net * 0.005;
     // The gas figure is the measured testnet fill, not an estimate.
     const gas = parseFloat(FILL.gasCost);
     const clears = keeperFee - gas;
-    return { t, tick, back, drift, gross, poolFee, net, keeperFee, gas, clears };
-  }, [amount, trigger, m.decimals, m.poolFeeBps]);
+    return { t, tick, back, drift, gross, poolFee, impactBps, impact, net, keeperFee, gas, clears };
+  }, [amount, trigger, m]);
 
   const valid = calc.tick !== null;
   const amountWei = (() => {
@@ -65,7 +85,11 @@ export function Create({
 
   // The contract refuses minAmountOut == 0: without a floor, the only thing bounding a fill is
   // the keeper's own gas, which is a few cents regardless of how large the order is.
-  const SLIPPAGE_BPS = 100; // 1%
+  //
+  // Where impact was measured, 1% on top of the impact-adjusted quote is a real bound. Where it
+  // was not (the sandbox pool, or a size beyond what was verified), a tight bound would just
+  // guarantee the order never fills, so the tolerance widens and the UI says why.
+  const SLIPPAGE_BPS = calc.impactBps === null ? 500 : 100;
   const expectedNet = calc.net - calc.keeperFee;
   const minAmountOut = expectedNet > 0
     ? BigInt(Math.floor(expectedNet * (1 - SLIPPAGE_BPS / 10_000) * 1e6))
@@ -200,10 +224,15 @@ export function Create({
             <div className="label" style={{ color: "var(--ink-2)" }}>If it filled at your trigger</div>
             <Row label="Gross proceeds" value={calc.gross ? fmt(calc.gross) : "—"} />
             <Row label={`Pool fee (${(m.poolFeeBps / 100).toFixed(2)}%)`} value={calc.gross ? `−${fmt(calc.poolFee)}` : "—"} />
+            <Row
+              label={calc.impactBps === null ? "Price impact" : `Price impact (${(calc.impactBps / 100).toFixed(2)}%)`}
+              value={!calc.gross ? "—" : calc.impactBps === null ? "not measured at this size" : `−${fmt(calc.impact)}`}
+              tone={calc.impactBps === null ? "var(--ochre)" : undefined}
+            />
             <Row label="You receive" value={calc.gross ? fmt(calc.net - calc.keeperFee) : "—"} />
             <Row label="Keeper fee (0.50%)" value={calc.gross ? fmt(calc.keeperFee) : "—"} />
             <Row
-              label={`Minimum you accept (${SLIPPAGE_BPS / 100}% slippage)`}
+              label={`Minimum you accept (${SLIPPAGE_BPS / 100}% tolerance)`}
               value={minAmountOut > 0n ? fmt(Number(minAmountOut) / 1e6) : "—"}
             />
             <Row label="Order expires" value="in 30 days" />
