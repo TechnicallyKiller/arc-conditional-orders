@@ -99,9 +99,23 @@ if (pulse.enabled) {
     });
 }
 
+const misconfigured: string[] = [];
+for (const s2 of SPECS) {
+  if (!s2.orderBook || !s2.adapter) {
+    misconfigured.push(
+      s2.label === "mainnet"
+        ? "set ORDER_BOOK and SWAP_ADAPTER for mainnet"
+        : "set TESTNET_ORDER_BOOK and TESTNET_SWAP_ADAPTER for testnet"
+    );
+  }
+}
+if (MODE === "execute" && !KEY) misconfigured.push("execute mode needs KEEPER_PRIVATE_KEY");
+
+// Deliberately NOT process.exit here. Render's start command dying leaves you reading logs to
+// find out why; binding the port and serving 503 with the reason puts it at the URL the monitor
+// already watches. A misconfigured service should be visibly wrong, not absent.
 if (keepers.length === 0 && !pulse.enabled) {
-  console.error("nothing to run: configure ORDER_BOOK / TESTNET_ORDER_BOOK, or set RUN_PULSE=1");
-  process.exit(1);
+  console.error("nothing to run — " + misconfigured.join("; "));
 }
 
 /**
@@ -126,8 +140,10 @@ if (port > 0) {
       "access-control-allow-origin": "*",
       "cache-control": "no-store",
     });
-    res.end(JSON.stringify({ healthy, staleAfterMs, jobs, pulse }, null, 2));
+    res.end(JSON.stringify({ healthy, staleAfterMs, jobs, pulse, misconfigured }, null, 2));
   }).listen(port, () => console.log(`health endpoint on :${port}`));
 }
 
 console.log(`host up — ${keepers.length} keeper(s), pulse ${pulse.enabled ? "on" : "off"}, mode ${MODE}`);
+if (misconfigured.length) console.error("  missing config: " + misconfigured.join("; "));
+if (port === 0) console.error("  PORT not set — no health endpoint. Render requires a bound port.");
