@@ -1,9 +1,9 @@
 import {
-  createPublicClient, createWalletClient, http, encodeFunctionData,
+  createPublicClient, createWalletClient, encodeFunctionData,
   type Address, type Hex, type PublicClient,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { arc, MIN_MAX_FEE_PER_GAS, NATIVE_PER_ERC20 } from "../lib/chain.js";
+import { arc, arcTransport, MIN_MAX_FEE_PER_GAS, NATIVE_PER_ERC20 } from "../lib/chain.js";
 import { orderBookAbi, adapterAbi, Status, TriggerState } from "./abi.js";
 import { readTick, poolIdOf, type PoolKey } from "./pools.js";
 
@@ -69,13 +69,30 @@ export class Keeper {
       this.client.readContract({ address: this.cfg.orderBook, abi: orderBookAbi, functionName: "nextOrderId" }),
     ]);
 
-    const open: Order[] = [];
-    for (let id = 1n; id < nextId; id++) {
-      const o = await this.readOrder(id);
-      if (o && o.status === Status.Open) open.push(o);
+    // Issued concurrently so viem folds them into a single Multicall3 call. Sequential awaits
+    // meant one RPC round-trip per order per tick, which is what trips Arc's rate limiter.
+    const ids: bigint[] = [];
+    for (let id = 1n; id < nextId; id++) ids.push(id);
+    const results = await Promise.allSettled(ids.map((id) => this.readOrder(id)));
+
+    const failed = results.filter((r) => r.status === "rejected").length;
+    if (failed > 0) {
+      // A read that fails and is treated as "no such order" removes a live order from the
+      // keeper's view. The trader still believes they are protected. Say it loudly.
+      console.error(
+        `[${head}] *** ${failed}/${ids.length} ORDER READS FAILED *** ` +
+        `orders that could not be read are UNPROTECTED this tick. Not concluding anything.`
+      );
     }
+
+    const open = results
+      .filter((r): r is PromiseFulfilledResult<Order> => r.status === "fulfilled")
+      .map((r) => r.value)
+      .filter((o) => o.status === Status.Open);
+
     if (open.length === 0) {
-      console.log(`[${head}] no open orders`);
+      // Only a clean sweep may be reported as "nothing to do".
+      if (failed === 0) console.log(`[${head}] no open orders`);
       return;
     }
 
@@ -138,20 +155,21 @@ export class Keeper {
     }
   }
 
-  private async readOrder(id: bigint): Promise<Order | null> {
-    try {
-      const r = await this.client.readContract({
-        address: this.cfg.orderBook, abi: orderBookAbi, functionName: "getOrder", args: [id],
-      }) as any;
-      return {
-        id, owner: r.owner, tokenIn: r.tokenIn, amountIn: r.amountIn,
-        minAmountOut: r.minAmountOut, key: r.key, triggerTick: r.triggerTick,
-        triggerBelow: r.triggerBelow, expiry: r.expiry, status: r.status,
-        armedAtBlock: r.armedAtBlock, armedTick: r.armedTick,
-      };
-    } catch {
-      return null;
-    }
+  /**
+   * Throws on failure. It must NOT return null on error: the caller cannot distinguish
+   * "this order is not open" from "the RPC refused to answer", and conflating them is how
+   * a keeper reports a healthy idle loop while every order sits unprotected.
+   */
+  private async readOrder(id: bigint): Promise<Order> {
+    const r = await this.client.readContract({
+      address: this.cfg.orderBook, abi: orderBookAbi, functionName: "getOrder", args: [id],
+    }) as any;
+    return {
+      id, owner: r.owner, tokenIn: r.tokenIn, amountIn: r.amountIn,
+      minAmountOut: r.minAmountOut, key: r.key, triggerTick: r.triggerTick,
+      triggerBelow: r.triggerBelow, expiry: r.expiry, status: r.status,
+      armedAtBlock: r.armedAtBlock, armedTick: r.armedTick,
+    };
   }
 
   private routeData(o: Order): Hex {
@@ -175,7 +193,10 @@ export class Keeper {
       const gas = await this.client.estimateContractGas({
         address: this.cfg.orderBook, abi: orderBookAbi, functionName: "execute",
         args: [o.id, this.cfg.adapter, data], account,
-      }).catch(() => 400_000n);
+      }).catch((e) => {
+        console.error(`          gas estimate failed, falling back to 400k: ${e?.shortMessage ?? e}`);
+        return 400_000n;
+      });
       const fees = await this.client.estimateFeesPerGas().catch(() => null);
       const price = bumpToFloor(fees?.maxFeePerGas ?? MIN_MAX_FEE_PER_GAS);
       const gasCost = gas * price;
@@ -191,7 +212,7 @@ export class Keeper {
   private wallet() {
     if (!this.cfg.privateKey) throw new Error("execute mode needs a private key");
     return createWalletClient({
-      account: privateKeyToAccount(this.cfg.privateKey), chain: arc, transport: http(process.env.RPC_URL),
+      account: privateKeyToAccount(this.cfg.privateKey), chain: arc, transport: arcTransport(process.env.RPC_URL),
     });
   }
 
@@ -239,5 +260,9 @@ export function bumpToFloor(maxFeePerGas: bigint): bigint {
 
 export function makeClient(): PublicClient {
   // RPC_URL lets the keeper run against a local arc-anvil fork without touching mainnet.
-  return createPublicClient({ chain: arc, transport: http(process.env.RPC_URL) }) as PublicClient;
+  return createPublicClient({
+    chain: arc,
+    transport: arcTransport(process.env.RPC_URL),
+    batch: { multicall: true },
+  }) as PublicClient;
 }
