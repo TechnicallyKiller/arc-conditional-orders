@@ -1,43 +1,57 @@
 # Arc Conditional Orders
 
-Stop-loss, take-profit, limit and time-sliced orders for spot traders on
-[Arc](https://arc.io) — settled by a contract that proves on-chain that the fee it charged
-exceeded the gas it burned.
+A conditional execution engine for Uniswap v4 pools on [Arc](https://arc.io). An order names a
+pool, a tick threshold and a direction. A keeper observes the trigger in one block, waits out a
+dwell period, and fills in a later one — and the contract proves on-chain that the fee it
+collected exceeded the gas that fill burned.
 
-> **Status: live on Arc testnet.** 42/42 tests passing against an Arc mainnet fork.
-> Unaudited. Do not put money in this.
+> **Status: live on Arc mainnet.** 71 tests passing against an Arc mainnet fork.
+> Audited (see [Security](#security)); two fund-loss findings found and fixed.
+> Exposure is capped on-chain at 10 USDC per fill and 100 USDC cumulative.
 
-## Live on Arc testnet
-
-A keeper autonomously filled a conditional order, and refused an unprofitable one.
+## Live on Arc mainnet
 
 | | |
 | --- | --- |
-| OrderBook | [`0x55EC8907f937fEA942c5f98039a218708E965280`](https://explorer.testnet.arc.io/address/0x55EC8907f937fEA942c5f98039a218708E965280) |
-| Swap adapter | [`0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f`](https://explorer.testnet.arc.io/address/0xbaaB5e17f572CC17BA3dCa8Ebf6089908873653f) |
-| **Fill** | [`0x4e3998e4…`](https://explorer.testnet.arc.io/tx/0x4e3998e43e9e67718b89171d5242dcae33f6687d43581391bac7382f8ab4545d) |
-| Arm | [`0x2a2928de…`](https://explorer.testnet.arc.io/tx/0x2a2928de338fd6a0aefa126987889174501bff75d5e313f32d0178e2fbf90bab) |
+| OrderBook | [`0x9872b13257E958c2F7E4DcCc3F96b3C70c8e050c`](https://explorer.arc.io/address/0x9872b13257E958c2F7E4DcCc3F96b3C70c8e050c) |
+| Swap adapter | [`0x0F1bf92EE0C79F7Ca5C1e30E9412aD5BFF45c7C8`](https://explorer.arc.io/address/0x0F1bf92EE0C79F7Ca5C1e30E9412aD5BFF45c7C8) |
+| Chain | 5042 · deployed 2026-09-22 · cost 0.0650 USDC |
 
-**The fill:** 10.297301 USDC out, 0.051486 USDC fee at 50bps, 351,348 gas at 25 Gwei
-= 0.00878370 USDC of gas. Keeper profit 0.0427 USDC, a 5.9x margin.
+Configuration read back off the deployed bytecode, not taken from the constructor arguments:
+`routerAllowed(adapter)` true, `feeBps` 50 against a `MAX_FEE_BPS` of 200, `minDwellBlocks` 2,
+`maxArmAgeBlocks` 300, caps 10 / 100 USDC.
 
-**The refusal is the better demonstration.** A second order was too small: 0.396122 USDC
-out, so a 0.5% fee of 0.001980 USDC against 0.01282902 USDC of gas — a loss of
-0.0108 USDC. The keeper refused it, and `CostFloor` would have reverted it on-chain had
-it been submitted anyway. A system that only ever succeeds proves nothing about its
-safety property.
+## What it does, demonstrated
 
-## Why
+The interactive demo runs on **Arc testnet**, because it needs a faucet token and a seeded pool
+that deliberately do not exist on mainnet.
 
-An Arc trader today has one tool: a market swap. There is no way to say *"sell if this falls
-30%"* — against ~550,000 swaps a day and ~2,600 new pools a day. Nothing on Arc offers
-conditional orders on spot AMM pools.
+| | |
+| --- | --- |
+| OrderBook (testnet) | [`0xEe22D840289d4a94B0E1Efd7A072854a74ED489C`](https://explorer.testnet.arc.io/address/0xEe22D840289d4a94B0E1Efd7A072854a74ED489C) |
+| **Fill** | [`0xe6b66031…`](https://explorer.testnet.arc.io/tx/0xe6b66031b1cd20b8ebe3a63aaa7cc5ad788a1484c6361f8a8afe1788301e48af) |
+| Arm | [`0x5d726af9…`](https://explorer.testnet.arc.io/tx/0x5d726af9d03c69f5357ebf218029be434928dc4cd5ece3a8b115fca1e3cea1b9) |
 
-On-chain stop-losses are a dead idea almost everywhere, because executing one on a small
-position costs more gas than the position is worth. On Arc, gas is USDC and a fill costs a
-fraction of a cent — so the executor can enforce its own profitability as a contract invariant
-instead of an off-chain heuristic. That claim is only honest on a chain where gas and profit
-share a unit.
+**The fill:** 1.934340 USDC out, 0.009671 USDC fee at 50bps, 238,700 gas at 25 Gwei
+= 0.005968 USDC of gas. Keeper margin +0.003703 USDC, 1.6×.
+
+**The refusal is the better demonstration.** A second order produced 0.016998 USDC, so a 0.5%
+fee of 0.000084 USDC against 0.008065 USDC of gas — a loss of 0.007981 USDC. The keeper refused
+it, and `CostFloor` would have reverted it on-chain had it been submitted anyway. That order is
+left permanently armed, so a visitor watches the invariant hold rather than a screenshot of it
+having held. A system that only ever succeeds proves nothing about its safety property.
+
+## Why this is an Arc protocol and not a port
+
+On-chain conditional orders are a dead idea almost everywhere, because executing one costs more
+gas than a small position is worth, and the executor's profitability can only be estimated
+off-chain — gas is denominated in the chain's native asset, proceeds in the traded one, and
+comparing them needs a price oracle and carries basis risk.
+
+On Arc, **gas is USDC and proceeds are USDC**. The comparison becomes arithmetic on two numbers
+the EVM already exposes, so the executor can enforce its own profitability as a *contract
+invariant* rather than a heuristic. That claim is not portable; it is only honest on a chain
+where gas and value share a unit.
 
 ## The invariant
 
@@ -48,8 +62,61 @@ share a unit.
 cost = (gasConsumed + 21000 + calldataBytes*16 + settlementOverhead) * tx.gasprice
 ```
 
-Intrinsic gas and calldata come from the EVM's own rules rather than a hand-tuned margin, so
-the floor is checkable by reading the contract rather than by trusting the operator.
+Intrinsic gas and calldata come from the EVM's own rules rather than a hand-tuned margin, so the
+floor is checkable by reading the contract rather than by trusting the operator.
+
+## Defeating single-block manipulation
+
+The trigger is a Uniswap v4 tick, which is manipulable within a transaction. `armOrder` records
+that the trigger held; `execute` re-derives it from the pool and requires the observation to be
+at least `minDwellBlocks` old and no more than `maxArmAgeBlocks` old. A spike-and-revert inside
+one transaction cannot satisfy both, because they must land in different blocks.
+
+A live arm can never be overwritten — an earlier version let anyone re-arm and push the dwell
+deadline forward indefinitely, which is [finding 2](#security).
+
+## Security
+
+This codebase was audited with [Pashov Audit Group's open-source audit
+skills](https://github.com/pashov/skills), run as twelve parallel AI agents across separate
+specialties (math precision, access control, economic security, execution trace, invariants,
+periphery, first principles, asymmetry, boundary, and three cross-lens gap hunters). **This was
+an AI audit, not a Pashov Audit Group engagement**, and AI analysis cannot establish the absence
+of vulnerabilities.
+
+It found twelve issues. Two were fund-loss and neither was visible from the test suite, which
+passed throughout. All blockers are fixed, and each fix has a regression test that fails against
+the previous code:
+
+| Finding | Agents | Fix |
+| --- | ---: | --- |
+| `execute` forwarded keeper-authored calldata, so the pool whose tick authorised a fill need not be the pool that filled it | 7 | The router call is built in-contract from `o.key`, `o.amountIn` and `address(this)` |
+| `armOrder` reset the dwell clock on every call, letting anyone keep any order unfillable | 8 | A live, non-stale arm is never overwritten |
+| `createOrder` accepted `minAmountOut == 0`, and the frontend always passed it | — | Rejected on-chain; the UI derives a 1% floor from its own quote |
+| The output balance was snapshotted before the input was pulled in | 4 | Snapshot moved, and `tokenIn == TOKEN_OUT` rejected |
+| The slippage bound was checked on gross proceeds while the trader is paid net | 2 | Fee computed first; the bound binds on what the trader receives |
+| `feeBps` was unbounded and applied retroactively to signed orders | — | `MAX_FEE_BPS = 200`, enforced in the setter and the constructor |
+
+Full reports: [x-ray/x-ray.md](x-ray/x-ray.md) (threat model, entry points, git analysis) and
+[x-ray/invariants.md](x-ray/invariants.md) (24 guards, 19 inferred invariants, 6 not enforced
+on-chain).
+
+### Known limitations
+
+Stated plainly rather than buried:
+
+- **The keeper is operator-run, not permissionless.** The fee accrues to `feeRecipient` while gas
+  is paid by `msg.sender`, so an independent keeper runs at a loss on every fill. This deployment
+  sets them to the same address. An open keeper market would need a fee split.
+- **`totalFilledUsdc` is a monotonic lifetime counter**, so the cumulative cap bounds total
+  throughput rather than concurrent exposure. Once reached, fills stop until the owner raises it.
+- **`checkOrders` can return `Ready` for an order that will revert** — the view omits the caps
+  and the cost floor that `execute` enforces.
+- **`armedTick` is written and never read.** The dwell proves the trigger was true at two
+  separate instants, not that it held between them.
+- **`owner` has no transfer path.** It is fixed at deployment for the life of the contract.
+- No formal verification and no stateful fuzzing yet. Exposure caps exist because of the above,
+  not in spite of it.
 
 ## Running the tests
 
@@ -68,16 +135,18 @@ forge test
 ```
 
 `network = "arc"` is pinned in [foundry.toml](foundry.toml) so the flag cannot be forgotten.
+Before deploying anywhere, `npx tsx tools/preflight.ts` checks the chain, the RPC's behaviour
+under load, the dependencies' bytecode, the gas floor, both balances and both caps — and exits
+non-zero rather than returning a default on any failure.
 
 ## Ground truth
 
 Every address and parameter used by this codebase is recorded in
-[data/ground-truth.json](data/ground-truth.json) with the on-chain read that confirmed it,
-verified 2026-09-19. Nothing may appear as a constant in the code without an entry there.
-The chain overrides the documentation wherever they disagree — and they do: Arc's own
-`llms.txt` still says "testnet only" while mainnet is at block 21.6M.
+[data/ground-truth.json](data/ground-truth.json) with the on-chain read that confirmed it.
+Nothing may appear as a constant in the code without an entry there. The chain overrides the
+documentation wherever they disagree — and they do.
 
-Three Arc behaviours that change how contracts are written here:
+Four Arc behaviours that changed how these contracts are written:
 
 1. **A USDC ERC-20 transfer moves native value** — any contract receiving USDC needs a payable
    `receive()` or the transfer reverts.
@@ -85,17 +154,23 @@ Three Arc behaviours that change how contracts are written here:
    79,228,162,514,264,337 (Foundry's default 2⁹⁶−1 wei / 10¹²). Measure deltas, never absolute
    balances.
 3. **Native is 18dp, ERC-20 is 6dp, one balance** — mixing them is wrong by a factor of 10¹²,
-   and in one direction it silently passes everything.
+   and in one direction it silently passes everything. This one bit: an early depth measurement
+   reported "0 bps impact" because a swap labelled `$50` moved 0.000001 USDC.
+4. **The public RPC returns HTTP 429 under load.** Code that swallows that and returns an empty
+   result reports "nothing found" with total confidence. Every client here retries with backoff
+   and fails loudly.
 
 ## Layout
 
 | Path | What |
 | --- | --- |
 | [contracts/CostFloor.sol](contracts/CostFloor.sol) | The invariant. Stateless, reusable |
-| [contracts/ArcGroundTruth.sol](contracts/ArcGroundTruth.sol) | Constants, all traceable to the ground-truth file |
-| [contracts/interfaces/IMorpho.sol](contracts/interfaces/IMorpho.sol) | Transcribed from selectors in the deployed bytecode, not from memory |
-| [test/CostFloor.t.sol](test/CostFloor.t.sol) | Negative tests first |
-| [test/ArcFork.t.sol](test/ArcFork.t.sol) | Mainnet fork: real market, real flash loan |
+| [contracts/OrderBook.sol](contracts/OrderBook.sol) | Order lifecycle, arm/dwell, caps, fee |
+| [contracts/adapters/V4SwapAdapter.sol](contracts/adapters/V4SwapAdapter.sol) | Uniswap v4 swap, settled against transient deltas |
+| [contracts/libraries/V4Price.sol](contracts/libraries/V4Price.sol) | Tick reads that distinguish "unreadable" from "not triggered" |
+| [tools/preflight.ts](tools/preflight.ts) | Refuses to let a broken deployment happen |
+| [x-ray/](x-ray/) | Threat model, invariant map, entry-point map |
+| [SHIP.md](SHIP.md) | The deployment runbook, with what is done and what remains |
 
 ## License
 
