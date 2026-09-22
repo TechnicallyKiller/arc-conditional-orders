@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { parseAbi, parseAbiItem, formatUnits } from "viem";
 import { useNetwork } from "../lib/network";
-import { NetworkSwitch } from "../components/NetworkSwitch";
+import { SiteNav } from "../components/SiteNav";
 
 const bookAbi = parseAbi([
   "function owner() view returns (address)",
@@ -133,6 +133,8 @@ export default function StatusPage() {
   const tone = err ? "var(--brick)" : alive ? "var(--pine)" : "var(--ochre)";
 
   return (
+    <>
+      <SiteNav current="status" />
     <main style={{ maxWidth: 860, margin: "0 auto", padding: "48px 20px 96px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div>
@@ -141,7 +143,6 @@ export default function StatusPage() {
             Read live from the chain on every load. Nothing here is cached or asserted.
           </p>
         </div>
-        <NetworkSwitch />
       </div>
 
       {/* Keeper liveness, derived from events the keeper actually emitted. */}
@@ -220,6 +221,7 @@ export default function StatusPage() {
         <a href="/docs" style={link}>How it works</a> · <a href="/app" style={link}>Open the app</a>
       </p>
     </main>
+    </>
   );
 }
 

@@ -98,6 +98,24 @@ function AppInner() {
                 {t.label}
               </button>
             ))}
+            <a
+              href="/docs"
+              style={{
+                padding: "8px 14px", borderRadius: 999, fontSize: 13, fontWeight: 500,
+                whiteSpace: "nowrap", color: "var(--ink-2)", textDecoration: "none",
+              }}
+            >
+              Docs
+            </a>
+            <a
+              href="/status"
+              style={{
+                padding: "8px 14px", borderRadius: 999, fontSize: 13, fontWeight: 500,
+                whiteSpace: "nowrap", color: "var(--ink-2)", textDecoration: "none",
+              }}
+            >
+              Status
+            </a>
           </nav>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>

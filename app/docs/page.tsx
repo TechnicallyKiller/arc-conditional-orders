@@ -1,12 +1,14 @@
 "use client";
 
 import { useNetwork } from "../lib/network";
-import { NetworkSwitch } from "../components/NetworkSwitch";
+import { SiteNav } from "../components/SiteNav";
 
 export default function DocsPage() {
   const { info } = useNetwork();
 
   return (
+    <>
+      <SiteNav current="docs" />
     <main style={{ maxWidth: 780, margin: "0 auto", padding: "48px 20px 96px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div>
@@ -18,7 +20,6 @@ export default function DocsPage() {
             profitability.
           </p>
         </div>
-        <NetworkSwitch />
       </div>
 
       <Section title="The idea">
@@ -160,6 +161,7 @@ revert unless  fee >= cost + margin`}</Pre>
         </a>
       </p>
     </main>
+    </>
   );
 }
 
