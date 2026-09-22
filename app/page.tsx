@@ -43,7 +43,7 @@ export default function Landing() {
                 fontSize: 11, fontWeight: 600, letterSpacing: "0.09em", textTransform: "uppercase",
               }}
             >
-              Live on Arc testnet
+              Live on Arc mainnet · 3 fills
             </div>
             <h1
               className="serif"

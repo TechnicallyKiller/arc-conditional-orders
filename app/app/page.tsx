@@ -76,7 +76,7 @@ function AppInner() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
-      <Atmosphere argus={false} />
+      <Atmosphere relief={false} />
 
       <header style={{ position: "sticky", top: 0, zIndex: 20, display: "flex", justifyContent: "center", padding: 16, pointerEvents: "none" }}>
         <div
