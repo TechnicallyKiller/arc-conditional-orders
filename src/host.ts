@@ -84,19 +84,47 @@ for (const s of SPECS) {
   });
 }
 
-/** Pulse is the demo market maker. Optional, testnet only, and never fatal to the keepers. */
-const pulse = { enabled: process.env.RUN_PULSE === "1", running: false, lastError: null as string | null };
-if (pulse.enabled) {
-  import("../tools/pulse.js")
-    .then(({ runPulse }) => {
+/**
+ * Pulse is the demo market maker. Optional, testnet only, never fatal to the keepers — and
+ * SUPERVISED, because it is a single promise rather than a self-healing loop.
+ *
+ * The keepers survive a transient RPC failure: their try/catch sits inside the polling loop, so
+ * a bad tick is logged and the next one proceeds. Pulse had no such thing. One
+ * "Timed out while waiting for transaction ... to be confirmed" rejected its promise, the catch
+ * recorded the error, and the demo market silently stopped moving for hours while the service
+ * still reported healthy. Restarting it is the whole point of noticing.
+ */
+const pulse = {
+  enabled: process.env.RUN_PULSE === "1",
+  running: false,
+  restarts: 0,
+  lastError: null as string | null,
+};
+
+async function supervisePulse() {
+  const { runPulse } = await import("../tools/pulse.js");
+  for (;;) {
+    try {
       pulse.running = true;
-      return runPulse();
-    })
-    .catch((e) => {
-      pulse.running = false;
-      pulse.lastError = e instanceof Error ? e.message : String(e);
-      console.error("[pulse] stopped:", pulse.lastError);
-    });
+      await runPulse();           // only returns if it stops on its own
+      pulse.lastError = "runPulse returned unexpectedly";
+    } catch (e) {
+      pulse.lastError = e instanceof Error ? e.message.split("\n")[0] : String(e);
+    }
+    pulse.running = false;
+    pulse.restarts += 1;
+    // Back off a little so a persistent failure (wrong chain, no funds) does not spin.
+    const waitMs = Math.min(30_000, 5_000 * pulse.restarts);
+    console.error(`[pulse] stopped (${pulse.lastError}) — restart #${pulse.restarts} in ${waitMs / 1000}s`);
+    await new Promise((r) => setTimeout(r, waitMs));
+  }
+}
+
+if (pulse.enabled) {
+  supervisePulse().catch((e) => {
+    pulse.lastError = `supervisor died: ${e instanceof Error ? e.message : e}`;
+    console.error("[pulse]", pulse.lastError);
+  });
 }
 
 const misconfigured: string[] = [];
