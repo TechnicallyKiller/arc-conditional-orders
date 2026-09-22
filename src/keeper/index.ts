@@ -1,5 +1,18 @@
+import { readFileSync } from "node:fs";
+import { createServer } from "node:http";
 import { Keeper, makeClient, type Config, type Mode } from "./keeper.js";
 import type { Address, Hex } from "viem";
+
+/** Load .env for local runs. Hosted environments (Render) inject real env vars, which win. */
+function loadDotEnv(path = ".env") {
+  let raw: string;
+  try { raw = readFileSync(path, "utf8"); } catch { return; }
+  for (const line of raw.split("\n")) {
+    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(line);
+    if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  }
+}
+loadDotEnv();
 
 function env(name: string, fallback?: string): string {
   const v = process.env[name] ?? fallback;
@@ -31,7 +44,30 @@ if (mode === "execute" && !cfg.privateKey) {
   process.exit(1);
 }
 
-new Keeper(cfg, makeClient()).start().catch((e) => {
+const keeper = new Keeper(cfg, makeClient());
+
+/**
+ * Render's free tier only offers Web Services, and it sleeps anything that receives no HTTP
+ * traffic for 15 minutes. A keeper receives none by definition, so it needs a port to stay
+ * awake. Rather than a dummy 200, serve the liveness the rest of this codebase argues for:
+ * 503 when the last COMPLETE tick is older than the staleness budget, so whatever pings this
+ * to keep it alive doubles as the monitor that notices when it has stopped working.
+ */
+const port = Number(process.env.PORT ?? 0);
+if (port > 0) {
+  const staleAfterMs = Math.max(cfg.pollMs * 10, 60_000);
+  createServer((_req, res) => {
+    const last = keeper.status.lastTickAt;
+    const ageMs = last === null ? Infinity : Date.now() - Date.parse(last);
+    // Grace before the first tick, or Render's health check fails the deploy during startup.
+    const uptimeMs = Date.now() - Date.parse(keeper.status.startedAt);
+    const healthy = last === null ? uptimeMs < staleAfterMs : ageMs <= staleAfterMs;
+    res.writeHead(healthy ? 200 : 503, { "content-type": "application/json" });
+    res.end(JSON.stringify({ healthy, staleAfterMs, ageMs: Number.isFinite(ageMs) ? ageMs : null, ...keeper.status }, null, 2));
+  }).listen(port, () => console.log(`health endpoint on :${port}`));
+}
+
+keeper.start().catch((e) => {
   console.error(e);
   process.exit(1);
 });

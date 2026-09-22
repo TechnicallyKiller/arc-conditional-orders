@@ -104,18 +104,42 @@ off the deployed bytecode** before it prints the addresses. Copy `ORDER_BOOK` an
 npx tsx tools/preflight.ts      # now also checks the live contract's caps and owner
 ```
 
-## 6. Start the keeper
+## 6. Host the keeper — Render
 
-```bash
-RPC_URL=https://rpc.mainnet.arc.io npm run keeper observe
+The repo ships a [render.yaml](render.yaml) blueprint. Point Render at the repo and it picks it
+up; then set **one** secret in the dashboard.
+
+```
+Environment → Add Environment Variable
+  KEEPER_PRIVATE_KEY = <the key>        # never in the file, never in git
 ```
 
-Watch a few ticks. `observe` touches nothing. Then `simulate` (prices fills against gas,
-sends nothing), then `execute`.
+**Why it is a `web` service and not a `worker`.** Render's free tier has no worker type, and it
+sleeps any service with no HTTP traffic for 15 minutes. A keeper receives none. So the process
+serves a health endpoint on `$PORT`:
 
-Host it somewhere that does not sleep. Oracle Cloud's always-free tier works. **Do not use a
-free tier that spins down idle services** — a keeper that sleeps is the exact failure this
-codebase is built to prevent.
+```json
+{ "healthy": true, "ageMs": 67, "lastBlock": "22109032", "openOrders": 0, "fills": 0 }
+```
+
+It returns **503** once the last *complete* tick is older than the staleness budget
+(`max(POLL_MS * 10, 60s)`), with a grace period before the first tick so the deploy does not
+fail during startup. A tick only counts as complete when no order read failed — otherwise the
+endpoint would report a healthy keeper that is in fact seeing a partial book.
+
+Point any free uptime pinger at `/` every 5 minutes. That keeps the service awake **and** makes
+it the monitor: if the keeper stalls, the endpoint goes 503 and the pinger alerts.
+
+On $7/month, change `type: web` to `type: worker` and drop `healthCheckPath` — workers do not
+sleep and need no pinger.
+
+Start in `observe` (touches nothing), watch a few ticks, then `simulate` (prices fills against
+gas, sends nothing), then `execute`. Change the mode in `startCommand`.
+
+> **Understand what you are uploading.** `KEEPER_PRIVATE_KEY` is also the contract `owner`, and
+> `owner` has no transfer path. A compromise of the Render environment is a compromise of the
+> contract's admin rights — an attacker could allowlist a malicious router. The on-chain caps
+> (10 USDC per fill, 100 cumulative) are what bound that, which is why they are set low.
 
 ## 7. Frontend
 

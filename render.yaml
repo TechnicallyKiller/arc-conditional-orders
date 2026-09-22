@@ -1,0 +1,38 @@
+# Render blueprint for the keeper.
+#
+# It is declared as a WEB service, not a worker, for one reason: Render's free tier has no
+# worker type, and it sleeps any service that receives no HTTP traffic for 15 minutes. A keeper
+# receives none, so it would sleep — and a sleeping keeper is the exact failure this project
+# exists to make visible. The process therefore serves a health endpoint on $PORT which returns
+# 503 once the last COMPLETE tick is older than the staleness budget.
+#
+# Keep it awake with any free uptime pinger (UptimeRobot, Better Stack) hitting `/` every
+# 5 minutes. That ping doubles as the monitor: if the keeper stalls, the endpoint goes 503 and
+# the pinger alerts, rather than the keeper dying quietly while traders believe they are covered.
+#
+# If you can afford $7/month, change `type: web` to `type: worker` and delete healthCheckPath —
+# workers do not sleep and need no pinger.
+
+services:
+  - type: web
+    name: arc-conditional-orders-keeper
+    runtime: node
+    plan: free
+    # tsx is a devDependency; Render may set NODE_ENV=production, which would skip it.
+    buildCommand: npm ci --include=dev
+    startCommand: npx tsx src/keeper/index.ts execute
+    healthCheckPath: /
+    envVars:
+      - key: RPC_URL
+        value: https://rpc.mainnet.arc.io
+      - key: ORDER_BOOK
+        value: "0x9872b13257E958c2F7E4DcCc3F96b3C70c8e050c"
+      - key: SWAP_ADAPTER
+        value: "0x0F1bf92EE0C79F7Ca5C1e30E9412aD5BFF45c7C8"
+      # Arc blocks are ~0.507s. Polling faster buys little and costs RPC rate limit budget.
+      - key: POLL_MS
+        value: "5000"
+      # NEVER put this in the file. Set it in the Render dashboard under Environment.
+      # It is the keeper's signing key AND the contract owner — see SHIP.md.
+      - key: KEEPER_PRIVATE_KEY
+        sync: false

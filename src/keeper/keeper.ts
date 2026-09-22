@@ -37,11 +37,40 @@ type Order = {
 const fmtUsdc = (v: bigint) => `${(Number(v) / 1e6).toFixed(6)} USDC`;
 const fmtNative = (v: bigint) => `${(Number(v) / 1e18).toFixed(8)} USDC`;
 
+/** Liveness surface. A keeper that has silently stopped is the failure this project exists to
+ *  make visible, so the process reports when it last completed a tick rather than merely that
+ *  it is running. */
+export type KeeperStatus = {
+  mode: Mode;
+  startedAt: string;
+  lastTickAt: string | null;
+  lastBlock: string | null;
+  openOrders: number;
+  failedReads: number;
+  arms: number;
+  fills: number;
+  lastError: string | null;
+};
+
 export class Keeper {
+  readonly status: KeeperStatus;
+
   constructor(
     private cfg: Config,
     private client: PublicClient
-  ) {}
+  ) {
+    this.status = {
+      mode: cfg.mode,
+      startedAt: new Date().toISOString(),
+      lastTickAt: null,
+      lastBlock: null,
+      openOrders: 0,
+      failedReads: 0,
+      arms: 0,
+      fills: 0,
+      lastError: null,
+    };
+  }
 
   async start() {
     console.log(`keeper starting in ${this.cfg.mode.toUpperCase()} mode`);
@@ -57,7 +86,9 @@ export class Keeper {
       } catch (e) {
         // Never die on a transient RPC failure; a keeper that silently stops is the worst
         // failure mode, because the trader believes they are protected.
-        console.error("tick failed:", e instanceof Error ? e.message : e);
+        const msg = e instanceof Error ? e.message : String(e);
+        this.status.lastError = msg;
+        console.error("tick failed:", msg);
       }
       await new Promise((r) => setTimeout(r, this.cfg.pollMs));
     }
@@ -75,7 +106,9 @@ export class Keeper {
     for (let id = 1n; id < nextId; id++) ids.push(id);
     const results = await Promise.allSettled(ids.map((id) => this.readOrder(id)));
 
+    this.status.lastBlock = head.toString();
     const failed = results.filter((r) => r.status === "rejected").length;
+    this.status.failedReads = failed;
     if (failed > 0) {
       // A read that fails and is treated as "no such order" removes a live order from the
       // keeper's view. The trader still believes they are protected. Say it loudly.
@@ -90,8 +123,12 @@ export class Keeper {
       .map((r) => r.value)
       .filter((o) => o.status === Status.Open);
 
+    this.status.openOrders = open.length;
+    // A tick only counts as complete when nothing was left unread. Otherwise the health
+    // endpoint would report a healthy keeper that is in fact seeing a partial book.
+    if (failed === 0) this.status.lastTickAt = new Date().toISOString();
+
     if (open.length === 0) {
-      // Only a clean sweep may be reported as "nothing to do".
       if (failed === 0) console.log(`[${head}] no open orders`);
       return;
     }
@@ -220,6 +257,7 @@ export class Keeper {
     });
     // Arc has deterministic finality: one confirmation is final.
     await this.client.waitForTransactionReceipt({ hash, confirmations: 1 });
+    this.status.arms += 1;
     console.log(`          ARMED ${id} in ${hash}`);
   }
 
@@ -235,6 +273,7 @@ export class Keeper {
       chain: arc,
     });
     const rc = await this.client.waitForTransactionReceipt({ hash, confirmations: 1 });
+    this.status.fills += 1;
     console.log(
       `          FILLED ${o.id} in ${hash} (${rc.status}, ${rc.gasUsed} gas, ` +
       `${fmtNative(rc.gasUsed * rc.effectiveGasPrice)})`

@@ -6,8 +6,9 @@ dwell period, and fills in a later one — and the contract proves on-chain that
 collected exceeded the gas that fill burned.
 
 > **Status: live on Arc mainnet.** 71 tests passing against an Arc mainnet fork.
-> Audited (see [Security](#security)); two fund-loss findings found and fixed.
-> Exposure is capped on-chain at 10 USDC per fill and 100 USDC cumulative.
+> Hardened against an adversarial review before deployment — two fund-loss issues found and
+> fixed, see [Security](#security). Exposure is capped on-chain at 10 USDC per fill and
+> 100 USDC cumulative.
 
 ## Live on Arc mainnet
 
@@ -77,46 +78,39 @@ deadline forward indefinitely, which is [finding 2](#security).
 
 ## Security
 
-This codebase was audited with [Pashov Audit Group's open-source audit
-skills](https://github.com/pashov/skills), run as twelve parallel AI agents across separate
-specialties (math precision, access control, economic security, execution trace, invariants,
-periphery, first principles, asymmetry, boundary, and three cross-lens gap hunters). **This was
-an AI audit, not a Pashov Audit Group engagement**, and AI analysis cannot establish the absence
-of vulnerabilities.
+The contracts went through an adversarial review before the mainnet deployment, run as a
+structured pass over each contract from a different attacker's angle — arithmetic, access
+control, economics, execution order, invariants, and the seams between them.
 
-It found twelve issues. Two were fund-loss and neither was visible from the test suite, which
-passed throughout. All blockers are fixed, and each fix has a regression test that fails against
-the previous code:
+It surfaced twelve issues. Two could have cost user funds, and neither was visible from the
+test suite, which passed throughout. All are fixed, and each fix carries a regression test that
+fails against the previous code:
 
-| Finding | Agents | Fix |
-| --- | ---: | --- |
-| `execute` forwarded keeper-authored calldata, so the pool whose tick authorised a fill need not be the pool that filled it | 7 | The router call is built in-contract from `o.key`, `o.amountIn` and `address(this)` |
-| `armOrder` reset the dwell clock on every call, letting anyone keep any order unfillable | 8 | A live, non-stale arm is never overwritten |
-| `createOrder` accepted `minAmountOut == 0`, and the frontend always passed it | — | Rejected on-chain; the UI derives a 1% floor from its own quote |
-| The output balance was snapshotted before the input was pulled in | 4 | Snapshot moved, and `tokenIn == TOKEN_OUT` rejected |
-| The slippage bound was checked on gross proceeds while the trader is paid net | 2 | Fee computed first; the bound binds on what the trader receives |
-| `feeBps` was unbounded and applied retroactively to signed orders | — | `MAX_FEE_BPS = 200`, enforced in the setter and the constructor |
+| Issue | Fix |
+| --- | --- |
+| `execute` forwarded caller-authored calldata, so the pool whose tick authorised a fill need not be the pool that filled it | The router call is built in-contract from `o.key`, `o.amountIn` and `address(this)` |
+| `armOrder` reset the dwell clock on every call, letting anyone keep any order unfillable | A live, non-stale arm is never overwritten |
+| `createOrder` accepted `minAmountOut == 0`, and the frontend always passed it | Rejected on-chain; the UI derives a 1% floor from its own quote |
+| The output balance was snapshotted before the input was pulled in | Snapshot moved, and `tokenIn == TOKEN_OUT` rejected |
+| The slippage bound was checked on gross proceeds while the trader is paid net | Fee computed first; the bound binds on what the trader receives |
+| `feeBps` was unbounded and applied retroactively to signed orders | `MAX_FEE_BPS = 200`, enforced in the setter and the constructor |
 
-Full reports: [x-ray/x-ray.md](x-ray/x-ray.md) (threat model, entry points, git analysis) and
-[x-ray/invariants.md](x-ray/invariants.md) (24 guards, 19 inferred invariants, 6 not enforced
-on-chain).
+Threat model and invariant map: [x-ray/x-ray.md](x-ray/x-ray.md),
+[x-ray/invariants.md](x-ray/invariants.md).
+
+No formal verification and no stateful fuzzing yet. Automated review cannot establish the
+absence of vulnerabilities, which is why exposure is capped on-chain.
 
 ### Known limitations
 
-Stated plainly rather than buried:
-
 - **The keeper is operator-run, not permissionless.** The fee accrues to `feeRecipient` while gas
-  is paid by `msg.sender`, so an independent keeper runs at a loss on every fill. This deployment
-  sets them to the same address. An open keeper market would need a fee split.
-- **`totalFilledUsdc` is a monotonic lifetime counter**, so the cumulative cap bounds total
-  throughput rather than concurrent exposure. Once reached, fills stop until the owner raises it.
+  is paid by `msg.sender`, so an independent keeper loses money on every fill.
+- **`totalFilledUsdc` never decreases**, so the cumulative cap bounds lifetime throughput rather
+  than concurrent exposure; once reached, fills stop until the owner raises it.
 - **`checkOrders` can return `Ready` for an order that will revert** — the view omits the caps
   and the cost floor that `execute` enforces.
-- **`armedTick` is written and never read.** The dwell proves the trigger was true at two
-  separate instants, not that it held between them.
-- **`owner` has no transfer path.** It is fixed at deployment for the life of the contract.
-- No formal verification and no stateful fuzzing yet. Exposure caps exist because of the above,
-  not in spite of it.
+- **`owner` has no transfer path**, and `armedTick` is recorded but never read: the dwell proves
+  the trigger was true at two instants, not that it held between them.
 
 ## Running the tests
 
